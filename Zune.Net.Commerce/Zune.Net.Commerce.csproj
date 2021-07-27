@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Zune.Commerce.Xml\Zune.Xml.csproj" />
+    <ProjectReference Include="..\Zune.Xml\Zune.Xml.csproj" />
   </ItemGroup>
 
 </Project>

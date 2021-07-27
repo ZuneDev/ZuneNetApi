@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using System.Xml;
 using System.Xml.Serialization;
 using Zune.Xml.SocialApi;
 
@@ -220,10 +219,15 @@ namespace Zune.SocialApi.Controllers
                     {
                         Description = "Restore the Zune social",
                         TypeId = BadgeType.ActiveForumsBadge_Gold,
-                        Title = "Necromancer",
+                        Title = new Content
+                        {
+                            Type = "text",
+                            Value = "Necromancer"
+                        },
                         Image = "https://i.imgur.com/dMwIZs8.png",
                         MediaId = Guid.NewGuid(),
-                        MediaType = "Application"
+                        MediaType = "Application",
+                        Summary = "Where is this shown? No idea, contact YoshiAsk if you see this in the software"
                     }
                 }
             };

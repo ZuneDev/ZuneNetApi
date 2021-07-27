@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net48;netstandard2.1</TargetFrameworks>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Atom\Atom.csproj" />
+        <ProjectReference Include="..\Zune.Xml\Zune.Xml.csproj" />
+        <PackageReference Include="EntityFramework" Version="6.4.4" />
+    </ItemGroup>
+
+</Project>

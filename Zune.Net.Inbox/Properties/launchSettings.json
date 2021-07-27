@@ -15,10 +15,10 @@
                 "ASPNETCORE_ENVIRONMENT": "Development"
             }
         },
-        "Zune.Net.Commerce": {
+        "Zune.Net.Inbox": {
             "commandName": "Project",
             "dotnetRunMessages": "true",
-            "applicationUrl": "https://127.0.0.3:443;http://127.0.0.3:80",
+            "applicationUrl": "https://127.0.0.7:443;http://127.0.0.7:80",
             "environmentVariables": {
                 "ASPNETCORE_ENVIRONMENT": "Development"
             }

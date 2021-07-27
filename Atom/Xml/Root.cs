@@ -22,6 +22,7 @@ namespace Atom.Xml
         public Content Content { get; set; }
 
         [XmlElement(ElementName = "id")]
+        [System.ComponentModel.DataAnnotations.Key]
         public string Id { get; set; }
 
         [XmlElement(ElementName = "author")]

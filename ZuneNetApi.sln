@@ -11,6 +11,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zune.Net.SocialApi", "Zune.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atom", "Atom\Atom.csproj", "{73A36324-79B5-4000-8343-35662402A861}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zune.Net.Inbox", "Zune.Net.Inbox\Zune.Net.Inbox.csproj", "{D942BB56-4E85-4DA9-9480-DF38D17AAC11}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zune.DB", "Zune.DB\Zune.DB.csproj", "{76E797D9-F174-4417-9EE4-0A6B959A0BF5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zune.DB.Console", "Zune.DB.Console\Zune.DB.Console.csproj", "{228D09C1-6477-47E1-B454-9AC07AD56AE6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +39,18 @@ Global
 		{73A36324-79B5-4000-8343-35662402A861}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73A36324-79B5-4000-8343-35662402A861}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{73A36324-79B5-4000-8343-35662402A861}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D942BB56-4E85-4DA9-9480-DF38D17AAC11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D942BB56-4E85-4DA9-9480-DF38D17AAC11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D942BB56-4E85-4DA9-9480-DF38D17AAC11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D942BB56-4E85-4DA9-9480-DF38D17AAC11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76E797D9-F174-4417-9EE4-0A6B959A0BF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76E797D9-F174-4417-9EE4-0A6B959A0BF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76E797D9-F174-4417-9EE4-0A6B959A0BF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76E797D9-F174-4417-9EE4-0A6B959A0BF5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{228D09C1-6477-47E1-B454-9AC07AD56AE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{228D09C1-6477-47E1-B454-9AC07AD56AE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{228D09C1-6477-47E1-B454-9AC07AD56AE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{228D09C1-6477-47E1-B454-9AC07AD56AE6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
