@@ -13,6 +13,7 @@ using Zune.Xml.Commerce;
 namespace CommerceZuneNet.Controllers
 {
     [Route("/{version}/{language}/account/{action=SignIn}")]
+    [Route("/{language}/account/{action=SignIn}")]
     [ApiController]
     public class AccountController : ControllerBase
     {
