@@ -68,7 +68,7 @@ namespace Zune.DB
             modelBuilder.Entity<MemberBadge>()
                 .HasOne(mb => mb.Badge)
                 .WithMany(b => b.Members)
-                .HasForeignKey(m => m.MemberId);
+                .HasForeignKey(m => m.BadgeId);
         }
     }
 }
