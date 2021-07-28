@@ -8,8 +8,8 @@ namespace Zune.DB.Models
 
         [Key]
         public string Id { get; set; }
-        public virtual Member Author { get; set; }
-        public virtual Member Recipient { get; set; }
+        public Member Author { get; set; }
+        public Member Recipient { get; set; }
         public string Content { get; set; }
     }
 }

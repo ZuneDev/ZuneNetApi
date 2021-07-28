@@ -3,8 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Zune.DB.Models.Joining;
 using Zune.Xml.Commerce;
-using Zune.Xml.SocialApi;
 
 namespace Zune.DB.Models
 {
@@ -12,12 +12,10 @@ namespace Zune.DB.Models
     {
         public Member()
         {
-            Badges = new HashSet<Badge>();
-            Comments = new HashSet<Comment>();
-            Friends = new HashSet<Member>();
+
         }
 
-        public Member(Xml.SocialApi.Member xmlMember = null, SignInResponse signInResponse = null) : this()
+        public Member(Xml.SocialApi.Member xmlMember = null, SignInResponse signInResponse = null)
         {
             if (xmlMember != null)
                 SetFromXmlMember(xmlMember);
@@ -33,10 +31,11 @@ namespace Zune.DB.Models
         public string Status { get; set; }
         public string Bio { get; set; }
         public string Location { get; set; }
-        public List<Link> Playlists { get; set; }
-        public virtual ICollection<Badge> Badges { get; set; }
-        public virtual ICollection<Comment> Comments { get; set; }
-        public virtual ICollection<Member> Friends { get; set; }
+        public IList<Link> Playlists { get; set; }
+        public IList<MemberBadge> Badges { get; set; }
+        public IList<Comment> Comments { get; set; }
+        public IList<Message> Messages { get; set; }
+        public IList<MemberMember> Friends { get; set; }
         public DateTime Updated { get; set; }
 
         public string Xuid { get; set; }
@@ -68,9 +67,9 @@ namespace Zune.DB.Models
         public string SubscriptionEndDate { get; set; }
         public string SubscriptionMeteringCertificate { get; set; }
         public string LastLabelTakedownDate { get; set; }
-        public TunerRegisterInfo MediaTypeTunerRegisterInfo { get; set; }
+        public Tuner MediaTypeTunerRegisterInfo { get; set; }
 
-        public TunerRegisterInfo TunerRegisterInfo { get; set; }
+        public Tuner TunerRegisterInfo { get; set; }
 
         public string UserTile { get; set; }
         public string Background { get; set; }
@@ -107,9 +106,9 @@ namespace Zune.DB.Models
             SubscriptionEndDate = sir.SubscriptionInfo.SubscriptionEndDate;
             SubscriptionMeteringCertificate = sir.SubscriptionInfo.SubscriptionMeteringCertificate;
             LastLabelTakedownDate = sir.SubscriptionInfo.LastLabelTakedownDate;
-            MediaTypeTunerRegisterInfo = sir.SubscriptionInfo.MediaTypeTunerRegisterInfo;
+            MediaTypeTunerRegisterInfo = new Tuner(sir.SubscriptionInfo.MediaTypeTunerRegisterInfo);
 
-            TunerRegisterInfo = sir.TunerRegisterInfo;
+            TunerRegisterInfo = new Tuner(sir.TunerRegisterInfo);
         }
 
         public SignInResponse GetSignInResponse()
@@ -126,6 +125,7 @@ namespace Zune.DB.Models
                 },
                 AccountInfo = new AccountInfo
                 {
+                    ZuneTag = this.ZuneTag,
                     Xuid = this.Xuid,
                     Locale = this.Locale,
                     ParentallyControlled = this.ParentallyControlled,
@@ -153,9 +153,9 @@ namespace Zune.DB.Models
                     SubscriptionEndDate = this.SubscriptionEndDate,
                     SubscriptionMeteringCertificate = this.SubscriptionMeteringCertificate,
                     LastLabelTakedownDate = this.LastLabelTakedownDate,
-                    MediaTypeTunerRegisterInfo = this.MediaTypeTunerRegisterInfo
+                    MediaTypeTunerRegisterInfo = this.MediaTypeTunerRegisterInfo?.GetTunerRegisterInfo()
                 },
-                TunerRegisterInfo = this.TunerRegisterInfo
+                TunerRegisterInfo = this.TunerRegisterInfo?.GetTunerRegisterInfo()
             };
         }
 
@@ -198,7 +198,7 @@ namespace Zune.DB.Models
                         Title = "background"
                     },
                 },
-                Playlists = this.Playlists,
+                Playlists = this.Playlists != null ? Playlists.ToList() : null,
                 Links =
                 {
                     new Link

@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using Zune.DB;
+using Zune.DB.Models;
 using Zune.Xml.Commerce;
 
 namespace CommerceZuneNet.Controllers
@@ -31,40 +33,26 @@ namespace CommerceZuneNet.Controllers
 
             string zuneId = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(id)));
 
-            var response = new SignInResponse
-            {
-                AccountState = new AccountState
-                {
-                    AcceptedTermsOfService = false,
-                    AccountSuspended = false,
-                    BillingUnavailable = true,
-                    SignInErrorCode = 0,
-                    SubscriptionLapsed = true,
-                    TagChangeRequired = false
-                },
-                AccountInfo = new AccountInfo
-                {
-                    UsageCollectionAllowed = false,
-                    ExplicitPrivilege = false,
-                    Lightweight = false,
-                    Locale = System.Globalization.CultureInfo.CurrentCulture.Name,
-                    ParentallyControlled = false,
-                    ZuneTag = "YoshiAsk",
-                    Xuid = zuneId
-                },
-                Balances = new Balances
-                {
-                    PointsBalance = 0.0,
-                    SongCreditBalance = 0.0,
-                    SongCreditRenewalDate = DateTime.Now.AddDays(1).ToString()
-                },
-                SubscriptionInfo = new SubscriptionInfo
-                {
-                    BillingInstanceId = "6cba2616-c59a-4dd5-bc9e-d41a45215cfa",
+            using var ctx = new ZuneNetContext();
+            Member member = ctx.Members.Find(zuneId);
+            SignInResponse response;
 
-                },
-                TunerRegisterInfo = new TunerRegisterInfo()
-            };
+            if (member != null)
+            {
+                response = member.GetSignInResponse();
+            }
+            else
+            {
+                // TODO: Work out the error response format
+                return NotFound();
+                response = new SignInResponse
+                {
+                    AccountState = new AccountState
+                    {
+                        SignInErrorCode = 404
+                    }
+                };
+            }
 
             // Serialize the response to XML
             XmlSerializer serializer = new XmlSerializer(typeof(SignInResponse));
@@ -73,7 +61,7 @@ namespace CommerceZuneNet.Controllers
             body.Flush();
             body.Position = 0;
 
-            return File(body, "application/xml");
+            return File(body, "application/atom+xml");
         }
     }
 }

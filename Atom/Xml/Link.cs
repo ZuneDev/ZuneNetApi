@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Xml.Serialization;
 
 namespace Atom.Xml
 {
@@ -19,5 +20,9 @@ namespace Atom.Xml
 
         [XmlAttribute(AttributeName = "updated")]
         public string Updated { get; set; }
+
+        [XmlAttribute(AttributeName = "id")]
+        [Key]
+        public string Id { get; set; }
     }
 }

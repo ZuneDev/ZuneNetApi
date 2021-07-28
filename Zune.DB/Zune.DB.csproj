@@ -1,13 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net48;netstandard2.1</TargetFrameworks>
+        <TargetFrameworks>netstandard2.1</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.8" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.8" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.8">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <ProjectReference Include="..\Atom\Atom.csproj" />
         <ProjectReference Include="..\Zune.Xml\Zune.Xml.csproj" />
-        <PackageReference Include="EntityFramework" Version="6.4.4" />
     </ItemGroup>
 
 </Project>

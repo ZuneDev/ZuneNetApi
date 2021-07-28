@@ -10,6 +10,7 @@ namespace Zune.Xml.Commerce
         public AccountInfo AccountInfo { get; set; }
         public Balances Balances { get; set; }
         public SubscriptionInfo SubscriptionInfo { get; set; }
+        [XmlElement(IsNullable = true)]
         public TunerRegisterInfo TunerRegisterInfo { get; set; }
     }
 }
