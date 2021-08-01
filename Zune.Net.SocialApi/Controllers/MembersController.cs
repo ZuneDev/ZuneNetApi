@@ -18,6 +18,7 @@ namespace Zune.SocialApi.Controllers
     [ApiController]
     public class MembersController : ControllerBase
     {
+        [HttpGet]
         public async Task<IActionResult> Info(string zuneTag)
         {
             string requestUrl = Request.Scheme + "://" + Request.Host + Request.Path;
@@ -50,6 +51,7 @@ namespace Zune.SocialApi.Controllers
             return File(body, "application/atom+xml");
         }
 
+        [HttpGet]
         public async Task<IActionResult> Friends(string zuneTag)
         {
             string requestUrl = Request.Scheme + "://" + Request.Host + Request.Path;
@@ -158,6 +160,7 @@ namespace Zune.SocialApi.Controllers
             //return File(body, "application/xml");
         }
 
+        [HttpGet]
         public async Task<IActionResult> Badges(string member)
         {
             string requestUrl = Request.Scheme + "://" + Request.Host + Request.Path;

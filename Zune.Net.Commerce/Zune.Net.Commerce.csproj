@@ -1,20 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-    <UserSecretsId>aspnet-CommerceZuneNet-C90ED701-548C-48E5-846A-FA9224DF834C</UserSecretsId>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <UserSecretsId>aspnet-CommerceZuneNet-C90ED701-548C-48E5-846A-FA9224DF834C</UserSecretsId>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.7" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="5.0.7" />
-    <PackageReference Include="Microsoft.Identity.Web" Version="1.1.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.8" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="5.0.8" />
+        <PackageReference Include="Microsoft.Identity.Web" Version="1.15.2" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.4" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Zune.DB\Zune.DB.csproj" />
-    <ProjectReference Include="..\Zune.Xml\Zune.Xml.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Zune.DB\Zune.DB.csproj" />
+        <ProjectReference Include="..\Zune.Xml\Zune.Xml.csproj" />
+
+        <OpenApiReference Include="openapi.json" />
+    </ItemGroup>
 
 </Project>

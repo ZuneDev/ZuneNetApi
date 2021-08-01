@@ -1,5 +1,4 @@
-﻿{
-    "$schema": "http://json.schemastore.org/launchsettings.json",
+{
     "iisSettings": {
         "windowsAuthentication": false,
         "anonymousAuthentication": true,
@@ -8,6 +7,7 @@
             "sslPort": 443
         }
     },
+    "$schema": "http://json.schemastore.org/launchsettings.json",
     "profiles": {
         "IIS Express": {
             "commandName": "IISExpress",
@@ -17,11 +17,11 @@
         },
         "Zune.Net.Commerce": {
             "commandName": "Project",
-            "dotnetRunMessages": "true",
-            "applicationUrl": "https://127.0.0.3:443;http://127.0.0.3:80",
             "environmentVariables": {
                 "ASPNETCORE_ENVIRONMENT": "Development"
-            }
+            },
+            "dotnetRunMessages": "true",
+            "applicationUrl": "https://127.0.0.3:443;http://127.0.0.3:80"
         }
     }
 }

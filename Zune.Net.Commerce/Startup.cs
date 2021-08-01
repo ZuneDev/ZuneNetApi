@@ -35,18 +35,30 @@ namespace CommerceZuneNet
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v2", new OpenApiInfo { Title = "CommerceZuneNet", Version = "v1" });
+                c.SwaggerDoc("CommerceZuneNet", new OpenApiInfo { Title = "CommerceZuneNet", Version = "v2" });
             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, Config cfg)
         {
+            LoggerFactory.Create(loggerFactory =>
+            {
+                loggerFactory.AddConsole();
+                loggerFactory.AddDebug();
+            });
+
+            app.UseStatusCodePages();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "CommerceZuneNet v2"));
+                app.UseSwaggerUI(c => {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Commerce.Zune.Net v2");
+                    c.RoutePrefix = string.Empty;
+                    //c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+                });
             }
 
             app.UseHttpsRedirection();
