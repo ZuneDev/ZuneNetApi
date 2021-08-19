@@ -7,6 +7,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Atom\Atom.csproj" />
     <ProjectReference Include="..\Zune.DB\Zune.DB.csproj" />
+    <ProjectReference Include="..\Zune.Net.Shared\Zune.Net.Shared.csproj" />
     <ProjectReference Include="..\Zune.Xml\Zune.Xml.csproj" />
   </ItemGroup>
 

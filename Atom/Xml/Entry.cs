@@ -2,10 +2,12 @@
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 using System.Xml.Serialization;
+using Atom.Attributes;
 
 namespace Atom.Xml
 {
     [XmlRoot(ElementName = "entry", Namespace = Constants.ATOM_NAMESPACE)]
+    [NamespacePrefix("a", Constants.ATOM_NAMESPACE)]
     public class Entry
     {
         [XmlElement(ElementName = "title")]

@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Zune.Net.Inbox
+namespace Zune.Net.Catalog
 {
     public class Startup
     {
@@ -26,6 +26,7 @@ namespace Zune.Net.Inbox
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers(o => o.UseZestFormatters());
+            services.AddDbContext<ZuneNetContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -36,7 +37,9 @@ namespace Zune.Net.Inbox
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
+
+            app.UseRequestBuffering();
 
             app.UseRouting();
 

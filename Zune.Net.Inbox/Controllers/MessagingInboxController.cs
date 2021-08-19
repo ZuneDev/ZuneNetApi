@@ -16,12 +16,12 @@ namespace Zune.Net.Inbox.Controllers
     public class MessagingInboxController : ControllerBase
     {
         [HttpGet]
-        public IActionResult List(string locale, string zuneTag)
+        public Feed<MessageRoot> List(string locale, string zuneTag)
         {
-            string requestUrl = Request.Scheme + "://" + Request.Host + Request.Path;
-            Guid msgId = Guid.Parse("7e366cd9-6d16-4ddf-9dfe-963acdef4450");
+            var requestUrl = Request.Scheme + "://" + Request.Host + Request.Path;
+            var msgId = Guid.Parse("7e366cd9-6d16-4ddf-9dfe-963acdef4450");
 
-            var feed = new Feed
+            var feed = new Feed<MessageRoot>
             {
                 Entries =
                 {
@@ -49,23 +49,11 @@ namespace Zune.Net.Inbox.Controllers
                 }
             };
 
-            var ns = new XmlSerializerNamespaces();
-            ns.Add("a", "http://www.w3.org/2005/Atom");
-            XmlSerializer serializer = new(typeof(Feed), new[] { typeof(MessageRoot) });
-
-            Console.Out.WriteLine("<!-- " + requestUrl + " -->");
-            serializer.Serialize(Console.Out, feed, ns);
-            Console.Out.Write("\n\n");
-
-            Stream body = new MemoryStream();
-            serializer.Serialize(body, feed, ns);
-            body.Flush();
-            body.Position = 0;
-            return File(body, "application/atom+xml");
+            return feed;
         }
 
         [HttpGet]
-        public IActionResult Details(string locale, string zuneTag, string id)
+        public ActionResult<MessageDetails> Details(string locale, string zuneTag, string id)
         {
             var message = new MessageDetails
             {
@@ -80,18 +68,7 @@ namespace Zune.Net.Inbox.Controllers
                 UserTile = "http://web.archive.org/web/20110510042505if_/http://tiles.zune.net/xweb/lx/pic/64x64_tile.jpg"
             };
 
-            var ns = new XmlSerializerNamespaces();
-            ns.Add("a", "http://www.w3.org/2005/Atom");
-            XmlSerializer serializer = new(typeof(MessageDetails));
-
-            serializer.Serialize(Console.Out, message, ns);
-            Console.Out.Write("\n\n");
-
-            Stream body = new MemoryStream();
-            serializer.Serialize(body, message, ns);
-            body.Flush();
-            body.Position = 0;
-            return File(body, "application/atom+xml");
+            return message;
         }
     }
 }

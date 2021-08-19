@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Serialization;
+using Atom.Attributes;
 
 namespace Atom.Xml
 {
     [XmlRoot("root", Namespace = Constants.ATOM_NAMESPACE)]
+    [NamespacePrefix("a", Constants.ATOM_NAMESPACE)]
     public abstract class Root
     {
         [XmlAttribute(AttributeName = "xmlns")]

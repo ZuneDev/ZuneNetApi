@@ -9,4 +9,11 @@ namespace Atom.Xml
         [XmlElement(ElementName = "entry")]
         public List<object> Entries { get; set; } = new List<object>();
     }
+
+    [XmlRoot("feed", Namespace = Constants.ATOM_NAMESPACE)]
+    public class Feed<T> : Root
+    {
+        [XmlElement(ElementName = "entry")]
+        public List<T> Entries { get; set; } = new List<T>();
+    }
 }

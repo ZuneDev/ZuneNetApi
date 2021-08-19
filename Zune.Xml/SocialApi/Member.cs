@@ -1,4 +1,5 @@
 ﻿using Atom;
+using Atom.Attributes;
 using Atom.Xml;
 using System.Collections.Generic;
 using System.Xml.Serialization;
@@ -6,6 +7,7 @@ using System.Xml.Serialization;
 namespace Zune.Xml.SocialApi
 {
     [XmlRoot("entry", Namespace = Constants.ATOM_NAMESPACE)]
+    [NamespacePrefix("zune", Constants.ZUNE_PROFILES_NAMESPACE)]
     public class Member : Root
     {
         [XmlElement("playcount", Namespace = Constants.ZUNE_PROFILES_NAMESPACE)]
@@ -27,7 +29,7 @@ namespace Zune.Xml.SocialApi
         public string Location { get; set; }
 
         [XmlArray("images", Namespace = Constants.ZUNE_PROFILES_NAMESPACE)]
-        [XmlArrayItem(ElementName = "link")]
+        [XmlArrayItem(ElementName = "link", Namespace = Constants.ATOM_NAMESPACE)]
         public List<Link> Images { get; set; } = new List<Link>();
 
         [XmlArray("playlists", Namespace = Constants.ZUNE_PROFILES_NAMESPACE)]
