@@ -84,20 +84,6 @@ namespace Zune.SocialApi.Controllers
 
             return feed;
 
-            //var ns = new XmlSerializerNamespaces();
-            //ns.Add("a", "http://www.w3.org/2005/Atom");
-            //XmlSerializer serializer = new(typeof(Feed));
-
-            //Console.Out.WriteLine("<!-- " + requestUrl + " -->");
-            //serializer.Serialize(Console.Out, feed, ns);
-            //Console.Out.Write("\n\n");
-
-            //Stream body = new MemoryStream();
-            //serializer.Serialize(body, feed, ns);
-            //body.Flush();
-            //body.Position = 0;
-            //return File(body, "application/xml");
-
             //var doc = new XmlDocument();
             //var nsManager = new XmlNamespaceManager(doc.NameTable);
             //nsManager.AddNamespace("a", "http://www.w3.org/2005/Atom");
@@ -190,20 +176,6 @@ namespace Zune.SocialApi.Controllers
             };
 
             return feed;
-
-            //var ns = new XmlSerializerNamespaces();
-            //ns.Add("a", "http://www.w3.org/2005/Atom");
-            //XmlSerializer serializer = new(typeof(Feed), new[] { typeof(Badge) });
-
-            //Console.Out.WriteLine("<!-- " + requestUrl + " -->");
-            //serializer.Serialize(Console.Out, feed, ns);
-            //Console.Out.Write("\n\n");
-
-            //Stream body = new MemoryStream();
-            //serializer.Serialize(body, feed, ns);
-            //body.Flush();
-            //body.Position = 0;
-            //return File(body, "application/atom+xml");
         }
     }
 }
