@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Xml.Serialization;
+using Atom;
 
 namespace Zune.Xml.Commerce
 {
+    [XmlType(Namespace = Constants.ZUNE_COMMERCE_NAMESPACE)]
     public class AccountInfo
     {
         public string ZuneTag { get; set; }

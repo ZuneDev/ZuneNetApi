@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -14,6 +15,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Zune.DB;
+using Zune.Net;
 
 namespace CommerceZuneNet
 {
@@ -32,7 +35,8 @@ namespace CommerceZuneNet
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddMicrosoftIdentityWebApi(Configuration.GetSection("AzureAd"));
 
-            services.AddControllers();
+            services.AddControllersWithViews(o => o.UseZestFormatters());
+            services.AddDbContext<ZuneNetContext>();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("CommerceZuneNet", new OpenApiInfo { Title = "CommerceZuneNet", Version = "v2" });
@@ -61,10 +65,11 @@ namespace CommerceZuneNet
                 });
             }
 
-            app.UseHttpsRedirection();
+            app.UseRequestBuffering();
+
+            // app.UseHttpsRedirection();
 
             app.UseRouting();
-
             app.UseAuthentication();
             app.UseAuthorization();
 

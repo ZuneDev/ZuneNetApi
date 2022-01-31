@@ -1,12 +1,8 @@
-﻿using Atom;
-using Atom.Xml;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.IO;
+﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
+using Atom;
+using Atom.Xml;
+using Microsoft.AspNetCore.Mvc;
 using Zune.DB;
 using Zune.Xml.SocialApi;
 
@@ -14,19 +10,24 @@ using Zune.Xml.SocialApi;
 
 namespace Zune.SocialApi.Controllers
 {
+    [Route("/members/{zuneTag}/{action=Info}")]
     [Route("/{locale}/members/{zuneTag}/{action=Info}")]
+    [Produces("application/atom+xml")]
     [ApiController]
     public class MembersController : ControllerBase
     {
-        [HttpGet]
-        public async Task<IActionResult> Info(string zuneTag)
+        private readonly ZuneNetContext _database;
+        public MembersController(ZuneNetContext database)
         {
-            string requestUrl = Request.Scheme + "://" + Request.Host + Request.Path;
+            _database = database;
+        }
+        
+        public ActionResult<Member> Info(string zuneTag)
+        {
+            var requestUrl = Request.Scheme + "://" + Request.Host + Request.Path;
+            var member = _database.Members.FirstOrDefault(m => m.ZuneTag == zuneTag);
 
-            using var ctx = new ZuneNetContext();
-            DB.Models.Member member = ctx.Members.FirstOrDefault(m => m.ZuneTag == zuneTag);
             Member response;
-
             if (member != null)
             {
                 response = member.GetXmlMember();
@@ -36,27 +37,14 @@ namespace Zune.SocialApi.Controllers
                 return NotFound();
             }
 
-            var ns = new XmlSerializerNamespaces();
-            ns.Add("a", "http://www.w3.org/2005/Atom");
-            XmlSerializer serializer = new(typeof(Member));
-
-            Console.Out.WriteLine("<!-- " + requestUrl + " -->");
-            serializer.Serialize(Console.Out, response, ns);
-            Console.Out.Write("\n\n");
-
-            Stream body = new MemoryStream();
-            serializer.Serialize(body, response, ns);
-            body.Flush();
-            body.Position = 0;
-            return File(body, "application/atom+xml");
+            return response;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Friends(string zuneTag)
+        public ActionResult<Feed<Member>> Friends(string zuneTag)
         {
             string requestUrl = Request.Scheme + "://" + Request.Host + Request.Path;
 
-            var feed = new Feed
+            var feed = new Feed<Member>
             {
                 Namespace = Constants.ZUNE_PROFILES_NAMESPACE,
                 Links =
@@ -80,34 +68,21 @@ namespace Zune.SocialApi.Controllers
                     Url = "http://social.zune.net/member/" + zuneTag
                 },
                 Id = "894090e7-b88e-4e3a-9ff8-eea48848638e",
-                Entries = new System.Collections.Generic.List<object>(),
+                Entries = new(),
                 Rights = "Copyright (c) Microsoft Corporation.  All rights reserved."
             };
 
-            using var ctx = new ZuneNetContext();
-            DB.Models.Member member = ctx.Members.FirstOrDefault(m => m.ZuneTag == zuneTag);
+            var member = _database.Members.FirstOrDefault(m => m.ZuneTag == zuneTag);
             if (member == null)
                 return NotFound();
 
             foreach (var relation in member.Friends)
             {
-                DB.Models.Member friend = relation.MemberB;
+                var friend = relation.MemberB;
                 feed.Entries.Add(friend.GetXmlMember());
             }
 
-            var ns = new XmlSerializerNamespaces();
-            ns.Add("a", "http://www.w3.org/2005/Atom");
-            XmlSerializer serializer = new(typeof(Feed));
-
-            Console.Out.WriteLine("<!-- " + requestUrl + " -->");
-            serializer.Serialize(Console.Out, feed, ns);
-            Console.Out.Write("\n\n");
-
-            Stream body = new MemoryStream();
-            serializer.Serialize(body, feed, ns);
-            body.Flush();
-            body.Position = 0;
-            return File(body, "application/xml");
+            return feed;
 
             //var doc = new XmlDocument();
             //var nsManager = new XmlNamespaceManager(doc.NameTable);
@@ -160,12 +135,11 @@ namespace Zune.SocialApi.Controllers
             //return File(body, "application/xml");
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Badges(string member)
+        public ActionResult<Feed<Badge>> Badges(string member)
         {
             string requestUrl = Request.Scheme + "://" + Request.Host + Request.Path;
 
-            var feed = new Feed
+            var feed = new Feed<Badge>
             {
                 Id = Guid.Empty.ToString(),
                 Links =
@@ -201,19 +175,7 @@ namespace Zune.SocialApi.Controllers
                 }
             };
 
-            var ns = new XmlSerializerNamespaces();
-            ns.Add("a", "http://www.w3.org/2005/Atom");
-            XmlSerializer serializer = new(typeof(Feed), new[] { typeof(Badge) });
-
-            Console.Out.WriteLine("<!-- " + requestUrl + " -->");
-            serializer.Serialize(Console.Out, feed, ns);
-            Console.Out.Write("\n\n");
-
-            Stream body = new MemoryStream();
-            serializer.Serialize(body, feed, ns);
-            body.Flush();
-            body.Position = 0;
-            return File(body, "application/atom+xml");
+            return feed;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Atom;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace Zune.Xml.Commerce
@@ -10,6 +11,8 @@ namespace Zune.Xml.Commerce
         public AccountInfo AccountInfo { get; set; }
         public Balances Balances { get; set; }
         public SubscriptionInfo SubscriptionInfo { get; set; }
+
+        // TODO: this is a list.
         [XmlElement(IsNullable = true)]
         public TunerRegisterInfo TunerRegisterInfo { get; set; }
     }

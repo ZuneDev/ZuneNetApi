@@ -19,24 +19,19 @@ namespace CommerceZuneNet.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        [HttpPost]
-        public async Task<IActionResult> SignIn()
+        private readonly ZuneNetContext _database;
+        public AccountController(ZuneNetContext database)
         {
-            string data = await new StreamReader(Request.Body).ReadToEndAsync();
-            var xml = XDocument.Parse(data);
-            
-            var tunerInfo = xml.Descendants();
-            string id = tunerInfo.First(e => e.Name.LocalName == "ID").Value;
-            string name = tunerInfo.First(e => e.Name.LocalName == "Name").Value;
-            string type = tunerInfo.First(e => e.Name.LocalName == "Type").Value;
-            string version = tunerInfo.First(e => e.Name.LocalName == "Version").Value;
+            _database = database;
+        }
 
-            string zuneId = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(id)));
+        [HttpPost]
+        public ActionResult<SignInResponse> SignIn(SignInRequest request)
+        {
+            var zuneId = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(request.TunerInfo.ID)));
+            var member = _database.Members.Find(zuneId);
 
-            using var ctx = new ZuneNetContext();
-            Member member = ctx.Members.Find(zuneId);
             SignInResponse response;
-
             if (member != null)
             {
                 response = member.GetSignInResponse();
@@ -44,24 +39,16 @@ namespace CommerceZuneNet.Controllers
             else
             {
                 // TODO: Work out the error response format
-                return NotFound();
                 response = new SignInResponse
                 {
                     AccountState = new AccountState
                     {
-                        SignInErrorCode = 404
+                        SignInErrorCode = 0x80070057,
                     }
                 };
             }
 
-            // Serialize the response to XML
-            XmlSerializer serializer = new XmlSerializer(typeof(SignInResponse));
-            Stream body = new MemoryStream();
-            serializer.Serialize(body, response);
-            body.Flush();
-            body.Position = 0;
-
-            return File(body, "application/atom+xml");
+            return response;
         }
     }
 }

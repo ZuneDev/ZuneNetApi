@@ -1,8 +1,12 @@
-﻿namespace Zune.Xml.Commerce
+﻿using System.Xml.Serialization;
+using Atom;
+
+namespace Zune.Xml.Commerce
 {
+    [XmlType(Namespace = Constants.ZUNE_COMMERCE_NAMESPACE)]
     public class AccountState
     {
-        public int SignInErrorCode { get; set; }
+        public uint SignInErrorCode { get; set; }
         public bool TagChangeRequired { get; set; }
         public bool AcceptedTermsOfService { get; set; }
         public bool AccountSuspended { get; set; }

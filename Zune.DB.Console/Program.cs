@@ -1,5 +1,6 @@
 ﻿using Atom.Xml;
 using System;
+using System.Globalization;
 using Zune.DB;
 using Zune.DB.Models;
 
@@ -94,6 +95,45 @@ namespace Zune.DB.Console
             ctx.Messages.Add(message);
             ctx.Tuners.Add(tuner);
 
+            memberId = "61E572878F7DBDF918211F0BB7E5715C01CD2B371BA0B4481887939713D48028";
+            var member2 = new Member
+            {
+                Updated = DateTime.UtcNow,
+                Id = memberId,
+                PlayCount = 4123,
+                Xuid = memberId,
+                ZuneTag = "WamWooWam",
+                DisplayName = string.Empty,
+                Status = "Restoring Windows Phone 7",
+                Bio = "he/they, pan, nerd with a strange obsession for windows phone",
+                Location = "Ireland",
+                UserTile = "http://i.imgur.com/06BuEKG.jpg",
+                Background = "http://i.imgur.com/KeZIsxF.jpg",
+
+                AcceptedTermsOfService = false,
+                AccountSuspended = false,
+                BillingUnavailable = true,
+                SubscriptionLapsed = true,
+                TagChangeRequired = false,
+                UsageCollectionAllowed = false,
+                ExplicitPrivilege = false,
+                Lightweight = false,
+                Locale = "en-GB",
+                ParentallyControlled = false,
+                PointsBalance = 100.0,
+                SongCreditBalance = 0.0,
+                SongCreditRenewalDate = DateTime.Now.AddDays(1).ToString("O"),
+                BillingInstanceId = "6cba2616-c59a-4dd5-bc9e-d41a5f215cfa"
+            };
+
+            tuner = new Tuner
+            {
+                Id = "6cba2616-c59a-4dd5-bc9e-d441f315cfb"
+            };
+            member2.TunerRegisterInfo = tuner;
+
+            ctx.Members.Add(member2);
+            ctx.Tuners.Add(tuner);
             ctx.SaveChanges();
         }
     }
