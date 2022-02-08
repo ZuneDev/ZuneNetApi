@@ -1,17 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net5.0</TargetFramework>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Atom\Atom.csproj" />
-    <ProjectReference Include="..\Zune.Net.Shared\Zune.Net.Shared.csproj" />
-    <ProjectReference Include="..\Zune.Xml\Zune.Xml.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Atom\Atom.csproj" />
+		<ProjectReference Include="..\Zune.Net.Shared\Zune.Net.Shared.csproj" />
+		<ProjectReference Include="..\Zune.DB\Zune.DB.csproj" />
+		<ProjectReference Include="..\Zune.Xml\Zune.Xml.csproj" />
+	</ItemGroup>
 
 </Project>

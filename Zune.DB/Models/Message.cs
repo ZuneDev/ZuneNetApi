@@ -72,6 +72,7 @@ namespace Zune.DB.Models
         public string Status { get; set; }
         public bool Wishlist { get; set; }
         public Guid MediaId { get; set; }
+        public bool IsRead { get; set; } = false;
 
         public void SetFromMessageRoot(Xml.Inbox.MessageRoot root)
         {

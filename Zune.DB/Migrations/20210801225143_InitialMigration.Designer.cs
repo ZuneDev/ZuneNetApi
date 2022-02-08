@@ -9,8 +9,8 @@ using Zune.DB;
 namespace Zune.DB.Migrations
 {
     [DbContext(typeof(ZuneNetContext))]
-    [Migration("20210728054518_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20210801225143_InitialMigration")]
+    partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -65,6 +65,9 @@ namespace Zune.DB.Migrations
                     b.Property<string>("MediaType")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Title")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Type")
                         .HasColumnType("TEXT");
 
@@ -103,6 +106,8 @@ namespace Zune.DB.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("MemberId", "BadgeId");
+
+                    b.HasIndex("BadgeId");
 
                     b.ToTable("MemberBadge");
                 });
@@ -259,6 +264,9 @@ namespace Zune.DB.Migrations
                     b.Property<string>("DetailsLink")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("INTEGER");
+
                     b.Property<Guid>("MediaId")
                         .HasColumnType("TEXT");
 
@@ -359,7 +367,7 @@ namespace Zune.DB.Migrations
                 {
                     b.HasOne("Zune.DB.Models.Badge", "Badge")
                         .WithMany("Members")
-                        .HasForeignKey("MemberId")
+                        .HasForeignKey("BadgeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Zune.DB.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class InitialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -12,6 +12,7 @@ namespace Zune.DB.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "TEXT", nullable: false),
+                    Title = table.Column<string>(type: "TEXT", nullable: true),
                     TypeId = table.Column<int>(type: "INTEGER", nullable: false),
                     Image = table.Column<string>(type: "TEXT", nullable: true),
                     Type = table.Column<string>(type: "TEXT", nullable: true),
@@ -35,8 +36,8 @@ namespace Zune.DB.Migrations
                 {
                     table.PrimaryKey("PK_MemberBadge", x => new { x.MemberId, x.BadgeId });
                     table.ForeignKey(
-                        name: "FK_MemberBadge_AvailableBadges_MemberId",
-                        column: x => x.MemberId,
+                        name: "FK_MemberBadge_AvailableBadges_BadgeId",
+                        column: x => x.BadgeId,
                         principalTable: "AvailableBadges",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -64,7 +65,8 @@ namespace Zune.DB.Migrations
                     DetailsLink = table.Column<string>(type: "TEXT", nullable: true),
                     Status = table.Column<string>(type: "TEXT", nullable: true),
                     Wishlist = table.Column<bool>(type: "INTEGER", nullable: false),
-                    MediaId = table.Column<Guid>(type: "TEXT", nullable: false)
+                    MediaId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    IsRead = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -189,6 +191,11 @@ namespace Zune.DB.Migrations
                 name: "IX_Link_MemberId",
                 table: "Link",
                 column: "MemberId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MemberBadge_BadgeId",
+                table: "MemberBadge",
+                column: "BadgeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MemberMember_MemberBId",

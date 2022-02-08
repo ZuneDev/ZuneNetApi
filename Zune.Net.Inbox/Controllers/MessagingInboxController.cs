@@ -1,4 +1,5 @@
 ﻿using Atom.Xml;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -7,12 +8,15 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using Zune.DB;
+using Zune.DB.Models;
 using Zune.Xml.Inbox;
 
 namespace Zune.Net.Inbox.Controllers
 {
     [ApiController]
-    [Route("/{locale}/messaging/{zuneTag}/inbox/{action=List}/{id?}")]
+    [Route("/{locale?}/messaging/{zuneTag}/inbox/{action=List}/{id?}")]
+    [Route("/messaging/{zuneTag}/inbox/{action=List}/{id?}")]
     public class MessagingInboxController : ControllerBase
     {
         [HttpGet]
@@ -69,6 +73,17 @@ namespace Zune.Net.Inbox.Controllers
             };
 
             return message;
+        }
+
+        [HttpGet]
+        public IActionResult UnreadCont(string locale, string zuneTag)
+        {
+            using var ctx = new ZuneNetContext();
+            Member member = ctx.Members.First(m => m.ZuneTag == zuneTag);
+            if (member == null)
+                return StatusCode(StatusCodes.Status400BadRequest, $"User {zuneTag} does not exist.");
+
+            return Content(member.Messages.Count(msg => !msg.IsRead).ToString());
         }
     }
 }
