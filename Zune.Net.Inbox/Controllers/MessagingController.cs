@@ -27,7 +27,7 @@ namespace Zune.Net.Inbox.Controllers
             using var ctx = new ZuneNetContext();
             Member sender = ctx.Members.FirstOrDefault(m => m.ZuneTag == zuneTag);
             if (sender == null)
-                return StatusCode(StatusCodes.Status400BadRequest, $"User {zuneTag} does not exist.");
+                return StatusCode(StatusCodes.Status400BadRequest, $"Sender {zuneTag} does not exist.");
 
             string recipientZuneTag = recipients.First();
             Member recipient;
@@ -36,7 +36,7 @@ namespace Zune.Net.Inbox.Controllers
             else
                 recipient = ctx.Members.FirstOrDefault(m => m.ZuneTag == recipientZuneTag);
             if (recipient == null)
-                return StatusCode(StatusCodes.Status400BadRequest, $"User {zuneTag} does not exist.");
+                return StatusCode(StatusCodes.Status400BadRequest, $"Recipient {zuneTag} does not exist.");
 
             Message msg = new()
             {

@@ -15,7 +15,7 @@ using Zune.Xml.Inbox;
 namespace Zune.Net.Inbox.Controllers
 {
     [ApiController]
-    [Route("/{locale?}/messaging/{zuneTag}/inbox/{action=List}/{id?}")]
+    [Route("/{locale}/messaging/{zuneTag}/inbox/{action=List}/{id?}")]
     [Route("/messaging/{zuneTag}/inbox/{action=List}/{id?}")]
     public class MessagingInboxController : ControllerBase
     {

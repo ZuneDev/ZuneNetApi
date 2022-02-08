@@ -4,4 +4,9 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Zune.DB\Zune.DB.csproj" />
+    <ProjectReference Include="..\Zune.Net.Shared\Zune.Net.Shared.csproj" />
+  </ItemGroup>
+
 </Project>
