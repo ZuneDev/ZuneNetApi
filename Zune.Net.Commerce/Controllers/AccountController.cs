@@ -50,5 +50,11 @@ namespace CommerceZuneNet.Controllers
 
             return response;
         }
+
+        [HttpPost]
+        public ActionResult<GetUserResponse> User(GetUserRequest request)
+        {
+            return new(new GetUserResponse());
+        }
     }
 }

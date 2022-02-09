@@ -12,14 +12,7 @@ namespace Zune.DB.Console
         {
             using var ctx = new ZuneNetContext(true);
 
-            string memberId = "92E7C0FBDC06369A797FDD30AECB92B19089B26D50A9E2384F0C7813E7003A1F";
-            Member member = ctx.Members.Find(memberId);
-            if (member != null)
-            {
-                ctx.Members.Remove(member);
-                ctx.SaveChanges();
-            }
-
+            string memberId = "0074DBEC1EBD57DAC0AC2F08CF65940460E08EF630CBE8AC9FF7427B08FE5477";
             var newMember = new Member
             {
                 Updated = DateTime.UtcNow,
@@ -27,12 +20,12 @@ namespace Zune.DB.Console
                 PlayCount = 206,
                 Xuid = memberId,
                 ZuneTag = "YoshiAsk",
-                DisplayName = string.Empty,
+                DisplayName = "Yoshi Askharoun",
                 Status = "Reviving the Zune social",
                 Bio = "A computer science student at Texas A&M Univserity that can't help but bring back dead Microsoft products.",
                 Location = "College Station, Texas",
-                UserTile = "http://web.archive.org/web/20110510042505if_/http://tiles.zune.net/xweb/lx/pic/64x64_tile.jpg",
-                Background = "http://cache-tiles.zune.net/tiles/background/YoshiAsk",
+                UserTile = "http://tiles.zunes.me/tiles/avatar/default.jpg",
+                Background = "http://tiles.zunes.me/tiles/background/YoshiAsk",
 
                 AcceptedTermsOfService = false,
                 AccountSuspended = false,
@@ -42,7 +35,7 @@ namespace Zune.DB.Console
                 UsageCollectionAllowed = false,
                 ExplicitPrivilege = false,
                 Lightweight = false,
-                Locale = System.Globalization.CultureInfo.CurrentCulture.Name,
+                Locale = "en-US",
                 ParentallyControlled = false,
                 PointsBalance = 0.0,
                 SongCreditBalance = 0.0,
