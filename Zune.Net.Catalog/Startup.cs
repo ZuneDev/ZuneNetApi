@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Localization.Routing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Zune.DB;
@@ -26,8 +29,24 @@ namespace Zune.Net.Catalog
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers(o => o.UseZestFormatters());
+            services.AddControllersWithViews(o => o.UseZestFormatters());
             services.AddDbContext<ZuneNetContext>();
+
+            var options = new RequestLocalizationOptions()
+            {
+                DefaultRequestCulture = new RequestCulture(culture: "en-US", uiCulture: "en-US"),
+            };
+            options.RequestCultureProviders = new[]
+            {
+                 new RouteDataRequestCultureProvider { Options = options }
+            };
+            services.AddSingleton(options);
+
+            services.AddSingleton(new MetaBrainz.MusicBrainz.Query("Zune", "4.8", "https://github.com/ZuneDev/ZuneNetApi"));
+
+            // allow a client to call you without specifying an api version
+            // since we haven't configured it otherwise, the assumed api version will be 1.0
+            //services.AddApiVersioning(o => o.AssumeDefaultVersionWhenUnspecified = true);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -49,6 +68,11 @@ namespace Zune.Net.Catalog
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+
+                endpoints.MapGet("/", ctx =>
+                {
+                    return Task.FromResult(new OkObjectResult("Welcome to the Social"));
+                });
             });
         }
     }

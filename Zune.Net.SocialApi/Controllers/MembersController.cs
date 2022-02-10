@@ -47,21 +47,9 @@ namespace Zune.SocialApi.Controllers
             var feed = new Feed<Member>
             {
                 Namespace = Constants.ZUNE_PROFILES_NAMESPACE,
-                Links =
-                {
-                    new Link
-                    {
-                        Relation = "self",
-                        Type = "application/atom+xml",
-                        Href = requestUrl
-                    }
-                },
-                Updated = DateTime.UtcNow.ToString("O"),
-                Title = new Content
-                {
-                    Type = "text",
-                    Value = zuneTag + "'s Friends"
-                },
+                Links = { new Link(requestUrl) },
+                Updated = DateTimeOffset.UtcNow,
+                Title = zuneTag + "'s Friends",
                 Author = new Author
                 {
                     Name = zuneTag,
@@ -83,56 +71,6 @@ namespace Zune.SocialApi.Controllers
             }
 
             return feed;
-
-            //var doc = new XmlDocument();
-            //var nsManager = new XmlNamespaceManager(doc.NameTable);
-            //nsManager.AddNamespace("a", "http://www.w3.org/2005/Atom");
-
-            //var feed = doc.CreateElement("a", "feed", null);
-            //feed.SetAttribute("xmlns", "http://schemas.zune.net/profiles/2008/01");
-
-            //var link = doc.CreateElement("a", "link", null);
-            //link.SetAttribute("rel", "self");
-            //link.SetAttribute("type", "application/atom+xml");
-            //link.SetAttribute("href", Request.Path);
-            //feed.AppendChild(link);
-
-            //var updated = doc.CreateElement("a", "updated", null);
-            //updated.InnerText = DateTime.UtcNow.ToString("O");
-            //feed.AppendChild(updated);
-
-            //var title = doc.CreateElement("a", "title", null);
-            //title.SetAttribute("type", "text");
-            //title.InnerText = member + "'s Friends";
-            //feed.AppendChild(title);
-
-            //var author = doc.CreateElement("a", "author", null);
-            //var authorName = doc.CreateElement("a", "name", null);
-            //authorName.InnerText = member;
-            //var authorUri = doc.CreateElement("a", "uri", null);
-            //authorUri.InnerText = "http://social.zune.net/member/" + member;
-            //author.AppendChild(authorName);
-            //author.AppendChild(authorUri);
-            //feed.AppendChild(author);
-
-            //var id = doc.CreateElement("a", "id", null);
-            //id.InnerText = "894090e7-b88e-4e3a-9ff8-eea48848638e";
-            //feed.AppendChild(id);
-
-            //var rights = doc.CreateElement("a", "rights", null);
-            //rights.InnerText = "Copyright (c) Microsoft Corporation.  All rights reserved.";
-            //feed.AppendChild(rights);
-
-            ////foreach ()
-
-            //doc.AppendChild(feed);
-
-            //Stream body = new MemoryStream();
-            //doc.Save(body);
-            //body.Flush();
-            //body.Position = 0;
-
-            //return File(body, "application/xml");
         }
 
         public ActionResult<Feed<Badge>> Badges(string member)
@@ -142,31 +80,15 @@ namespace Zune.SocialApi.Controllers
             var feed = new Feed<Badge>
             {
                 Id = Guid.Empty.ToString(),
-                Links =
-                {
-                    new Link
-                    {
-                        Relation = "self",
-                        Type = "application/atom+xml",
-                        Href = requestUrl
-                    }
-                },
-                Title = new Content
-                {
-                    Type = "text",
-                    Value = member + "'s Badges"
-                },
+                Links = { new Link(requestUrl) },
+                Title = member + "'s Badges",
                 Entries =
                 {
                     new Badge
                     {
                         Description = "Restore the Zune social",
                         TypeId = BadgeType.ActiveForumsBadge_Gold,
-                        Title = new Content
-                        {
-                            Type = "text",
-                            Value = "Necromancer"
-                        },
+                        Title = "Necromancer",
                         Image = "https://i.imgur.com/dMwIZs8.png",
                         MediaId = Guid.NewGuid(),
                         MediaType = "Application",
