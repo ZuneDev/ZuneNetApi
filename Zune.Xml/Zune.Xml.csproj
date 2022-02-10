@@ -14,7 +14,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Atom\Atom.csproj" />
-        <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0"/>
+        <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     </ItemGroup>
 
 </Project>

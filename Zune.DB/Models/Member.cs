@@ -117,45 +117,45 @@ namespace Zune.DB.Models
             {
                 AccountState = new AccountState
                 {
-                    TagChangeRequired = this.TagChangeRequired,
-                    AcceptedTermsOfService = this.AcceptedTermsOfService,
-                    AccountSuspended = this.AccountSuspended,
-                    SubscriptionLapsed = this.SubscriptionLapsed,
-                    BillingUnavailable = this.BillingUnavailable
+                    TagChangeRequired = TagChangeRequired,
+                    AcceptedTermsOfService = AcceptedTermsOfService,
+                    AccountSuspended = AccountSuspended,
+                    SubscriptionLapsed = SubscriptionLapsed,
+                    BillingUnavailable = BillingUnavailable
                 },
                 AccountInfo = new AccountInfo
                 {
-                    ZuneTag = this.ZuneTag,
-                    Xuid = this.Xuid,
-                    Locale = this.Locale,
-                    ParentallyControlled = this.ParentallyControlled,
-                    ExplicitPrivilege = this.ExplicitPrivilege,
-                    Lightweight = this.Lightweight,
-                    UserReadID = this.UserReadID,
-                    UserWriteID = this.UserWriteID,
-                    UsageCollectionAllowed = this.UsageCollectionAllowed,
+                    ZuneTag = ZuneTag,
+                    Xuid = Xuid,
+                    Locale = Locale,
+                    ParentallyControlled = ParentallyControlled,
+                    ExplicitPrivilege = ExplicitPrivilege,
+                    Lightweight = Lightweight,
+                    UserReadID = UserReadID,
+                    UserWriteID = UserWriteID,
+                    UsageCollectionAllowed = UsageCollectionAllowed,
                 },
                 Balances = new Balances
                 {
-                    PointsBalance = this.PointsBalance,
-                    SongCreditBalance = this.SongCreditBalance,
-                    SongCreditRenewalDate = this.SongCreditRenewalDate
+                    PointsBalance = PointsBalance,
+                    SongCreditBalance = SongCreditBalance,
+                    SongCreditRenewalDate = SongCreditRenewalDate
                 },
                 SubscriptionInfo = new SubscriptionInfo
                 {
-                    SubscriptionOfferId = this.SubscriptionOfferId,
-                    SubscriptionRenewalOfferId = this.SubscriptionRenewalOfferId,
-                    BillingInstanceId = this.BillingInstanceId,
-                    SubscriptionEnabled = this.SubscriptionEnabled,
-                    SubscriptionBillingViolation = this.SubscriptionBillingViolation,
-                    SubscriptionPendingCancel = this.SubscriptionPendingCancel,
-                    SubscriptionStartDate = this.SubscriptionStartDate,
-                    SubscriptionEndDate = this.SubscriptionEndDate,
-                    SubscriptionMeteringCertificate = this.SubscriptionMeteringCertificate,
-                    LastLabelTakedownDate = this.LastLabelTakedownDate,
-                    MediaTypeTunerRegisterInfo = this.MediaTypeTunerRegisterInfo?.GetTunerRegisterInfo()
+                    SubscriptionOfferId = SubscriptionOfferId,
+                    SubscriptionRenewalOfferId = SubscriptionRenewalOfferId,
+                    BillingInstanceId = BillingInstanceId,
+                    SubscriptionEnabled = SubscriptionEnabled,
+                    SubscriptionBillingViolation = SubscriptionBillingViolation,
+                    SubscriptionPendingCancel = SubscriptionPendingCancel,
+                    SubscriptionStartDate = SubscriptionStartDate,
+                    SubscriptionEndDate = SubscriptionEndDate,
+                    SubscriptionMeteringCertificate = SubscriptionMeteringCertificate,
+                    LastLabelTakedownDate = LastLabelTakedownDate,
+                    MediaTypeTunerRegisterInfo = MediaTypeTunerRegisterInfo?.GetTunerRegisterInfo()
                 },
-                TunerRegisterInfo = this.TunerRegisterInfo?.GetTunerRegisterInfo()
+                TunerRegisterInfo = TunerRegisterInfo?.GetTunerRegisterInfo()
             };
         }
 
@@ -176,56 +176,36 @@ namespace Zune.DB.Models
         {
             return new Xml.SocialApi.Member
             {
-                Id = this.Id,
-                ZuneTag = this.ZuneTag,
-                PlayCount = this.PlayCount,
-                DisplayName = this.DisplayName,
-                Status = this.Status,
-                Bio = this.Bio,
-                Location = this.Location,
+                Id = Id,
+                ZuneTag = ZuneTag,
+                PlayCount = PlayCount,
+                DisplayName = DisplayName,
+                Status = Status,
+                Bio = Bio,
+                Location = Location,
                 Images =
                 {
-                    new Link
+                    new Link(UserTile, "enclosure")
                     {
-                        Relation = "enclosure",
-                        Href = UserTile,
-                        Title = "usertile"
+                        Title = "userTile"
                     },
-                    new Link
+                    new Link(Background, "enclosure")
                     {
-                        Relation = "enclosure",
-                        Href = Background,
                         Title = "background"
                     },
                 },
-                Playlists = this.Playlists != null ? Playlists.ToList() : null,
+                Playlists = Playlists != null ? Playlists.ToList() : null,
                 Links =
                 {
-                    new Link
+                    new Link($"https://socialapi.zune.net/{Locale}/members/{ZuneTag}"),
+                    new Link($"https://socialapi.zune.net/{Locale}/members/{ZuneTag}/friends", "related")
                     {
-                        Relation = "self",
-                        Type = "application/atom+xml",
-                        Href = $"https://socialapi.zune.net/{Locale}/members/{ZuneTag}"
-                    },
-                    new Link
-                    {
-                        Relation = "related",
-                        Type = "application/atom+xml",
-                        Href = $"https://socialapi.zune.net/{Locale}/members/{ZuneTag}/friends",
                         Title = "friends"
                     },
                 },
-                Updated = Updated.ToString("O"),
-                Title = new Content
-                {
-                    Type = "text",
-                    Value = GetDisplayName()
-                },
-                Content = new Content
-                {
-                    Type = "html",
-                    Value = ""
-                },
+                Updated = Updated,
+                Title = GetDisplayName(),
+                Content = string.Empty,
                 Author = new Author
                 {
                     Name = ZuneTag,
@@ -236,7 +216,7 @@ namespace Zune.DB.Models
             };
         }
 
-        public string GetDisplayName() => String.IsNullOrEmpty(DisplayName) ? ZuneTag : DisplayName;
+        public string GetDisplayName() => string.IsNullOrEmpty(DisplayName) ? ZuneTag : DisplayName;
 
         public string GetUrl() => "http://social.zune.net/member/" + ZuneTag;
     }

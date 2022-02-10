@@ -91,26 +91,19 @@ namespace Zune.DB.Models
         {
             return new Xml.Inbox.MessageRoot
             {
-                Id = this.Id,
+                Id = Id,
                 From = new Author
                 {
                     Name = Sender.GetDisplayName(),
                     Url = Sender.GetUrl()
                 },
-                Type = this.Type,
-                Subject = new Content
-                {
-                    Type = "text",
-                    Value = Subject
-                },
-                Received = this.Received,
-                DetailsLink = new Link
-                {
-                    Href = GetDetailsLink()
-                },
-                Status = this.Status,
-                Wishlist = this.Wishlist,
-                MediaId = this.MediaId,
+                Type = Type,
+                Subject = Subject,
+                Received = Received,
+                DetailsLink = new Link(GetDetailsLink()),
+                Status = Status,
+                Wishlist = Wishlist,
+                MediaId = MediaId,
             };
         }
 
@@ -132,24 +125,20 @@ namespace Zune.DB.Models
         {
             return new Xml.Inbox.MessageDetails
             {
-                Id = this.Id,
-                Title = new Content
-                {
-                    Type = "text",
-                    Value = Subject
-                },
-                UserTile = this.Sender.UserTile,
-                ZuneTag = this.Sender.ZuneTag,
-                TextContent = this.TextContent,
-                ReplyLink = this.ReplyLink,
-                AltLink = this.AltLink,
-                AlbumTitle = this.AlbumTitle,
-                ArtistName = this.ArtistName,
-                SongTitle = this.SongTitle,
-                TrackNumber = this.TrackNumber,
-                PlaylistName = this.PlaylistName,
-                PodcastName = this.PodcastName,
-                PodcastUrl = this.PodcastUrl,
+                Id = Id,
+                Title = Subject,
+                UserTile = Sender.UserTile,
+                ZuneTag = Sender.ZuneTag,
+                TextContent = TextContent,
+                ReplyLink = ReplyLink,
+                AltLink = AltLink,
+                AlbumTitle = AlbumTitle,
+                ArtistName = ArtistName,
+                SongTitle = SongTitle,
+                TrackNumber = TrackNumber,
+                PlaylistName = PlaylistName,
+                PodcastName = PodcastName,
+                PodcastUrl = PodcastUrl,
             };
         }
 
