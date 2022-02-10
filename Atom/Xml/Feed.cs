@@ -4,14 +4,12 @@ using System.Xml.Serialization;
 namespace Atom.Xml
 {
     [XmlRoot("feed", Namespace = Constants.ATOM_NAMESPACE)]
-    public class Feed : Root
+    public class Feed : Feed<Entry>
     {
-        [XmlElement(ElementName = "entry")]
-        public List<object> Entries { get; set; } = new List<object>();
     }
 
     [XmlRoot("feed", Namespace = Constants.ATOM_NAMESPACE)]
-    public class Feed<T> : Root
+    public class Feed<T> : Root where T : class
     {
         [XmlElement(ElementName = "entry")]
         public List<T> Entries { get; set; } = new List<T>();

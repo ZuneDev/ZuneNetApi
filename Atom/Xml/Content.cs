@@ -5,9 +5,36 @@ namespace Atom.Xml
     public class Content
     {
         [XmlAttribute(AttributeName = "type")]
-        public string Type { get; set; }
+        public ContentType Type { get; set; } = ContentType.Text;
 
         [XmlText]
         public string Value { get; set; }
+
+        public static implicit operator Content(string val)
+        {
+            return new Content
+            {
+                Value = val,
+                Type = ContentType.Text
+            };
+        }
+    }
+
+    public enum ContentType
+    {
+        /// <summary>
+        /// Plain text with no entity-escaped HTML.
+        /// </summary>
+        Text,
+
+        /// <summary>
+        /// Entity-escaped HTML.
+        /// </summary>
+        HTML,
+
+        /// <summary>
+        /// Inline XHTML, wrapped in a <c>div</c> element.
+        /// </summary>
+        XHTML
     }
 }

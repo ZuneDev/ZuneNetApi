@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 using Atom.Attributes;
 
@@ -15,7 +16,7 @@ namespace Atom.Xml
         public List<Link> Links { get; set; } = new List<Link>();
 
         [XmlElement(ElementName = "updated")]
-        public string Updated { get; set; }
+        public DateTimeOffset Updated { get; set; }
 
         [XmlElement(ElementName = "title")]
         public Content Title { get; set; }

@@ -33,12 +33,12 @@ namespace Atom
             element.AppendChild(valueElement);
         }
 
-        public static XmlElement CreateFeed(XmlDocument doc, string localNamespace = null, bool includeOpenSourceNS = false)
+        public static XmlElement CreateFeed(XmlDocument doc, string localNamespace = null, bool includeOpenSearchNS = false)
         {
             var nsManager = new XmlNamespaceManager(doc.NameTable);
             nsManager.AddNamespace("a", ATOM_NAMESPACE);
 
-            if (includeOpenSourceNS)
+            if (includeOpenSearchNS)
                 nsManager.AddNamespace("os", OPENSEARCH_NAMESPACE);
 
             var feed = doc.CreateElement("a", "feed", null);

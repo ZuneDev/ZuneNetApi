@@ -11,7 +11,7 @@ namespace Atom.Xml
     public class Entry
     {
         [XmlElement(ElementName = "title")]
-        public Content Title { get; set; }
+        public Content Title { get; set; } = "List Of Items";
 
         [XmlElement(ElementName = "updated")]
         public DateTime Updated { get; set; }

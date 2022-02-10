@@ -8,5 +8,7 @@
         public const string ZUNE_PROFILES_NAMESPACE = "http://schemas.zune.net/profiles/2008/01";
         public const string ZUNE_CATALOG_MUSIC_NAMESPACE = "http://schemas.zune.net/catalog/music/2007/10";
         public const string ZUNE_COMMERCE_NAMESPACE = "http://schemas.zune.net/commerce/2009/01";
+
+        public const string ATOM_MIMETYPE = "application/atom+xml";
     }
 }
