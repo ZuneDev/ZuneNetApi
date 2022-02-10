@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31205.134
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32120.378
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zune.Net.Commerce", "Zune.Net.Commerce\Zune.Net.Commerce.csproj", "{3297B690-51F7-41DB-BD16-67A80D7BC43A}"
 EndProject
@@ -17,9 +17,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zune.DB", "Zune.DB\Zune.DB.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zune.DB.Console", "Zune.DB.Console\Zune.DB.Console.csproj", "{228D09C1-6477-47E1-B454-9AC07AD56AE6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zune.Net.Catalog", "Zune.Net.Catalog\Zune.Net.Catalog.csproj", "{10D35234-8353-457B-9E39-6133055A0C01}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zune.Net.Catalog", "Zune.Net.Catalog\Zune.Net.Catalog.csproj", "{10D35234-8353-457B-9E39-6133055A0C01}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zune.Net.Shared", "Zune.Net.Shared\Zune.Net.Shared.csproj", "{C8FED104-7F7F-426E-B615-BADD447E31C9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zune.Net.Shared", "Zune.Net.Shared\Zune.Net.Shared.csproj", "{C8FED104-7F7F-426E-B615-BADD447E31C9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zune.Net.Tiles", "Zune.Net.Tiles\Zune.Net.Tiles.csproj", "{D587579A-6A6F-45CB-AE48-467BF3148A3A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,10 @@ Global
 		{C8FED104-7F7F-426E-B615-BADD447E31C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8FED104-7F7F-426E-B615-BADD447E31C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C8FED104-7F7F-426E-B615-BADD447E31C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D587579A-6A6F-45CB-AE48-467BF3148A3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D587579A-6A6F-45CB-AE48-467BF3148A3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D587579A-6A6F-45CB-AE48-467BF3148A3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D587579A-6A6F-45CB-AE48-467BF3148A3A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
