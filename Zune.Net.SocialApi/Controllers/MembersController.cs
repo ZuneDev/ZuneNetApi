@@ -48,7 +48,7 @@ namespace Zune.SocialApi.Controllers
             {
                 Namespace = Constants.ZUNE_PROFILES_NAMESPACE,
                 Links = { new Link(requestUrl) },
-                Updated = DateTimeOffset.UtcNow,
+                Updated = DateTime.UtcNow,
                 Title = zuneTag + "'s Friends",
                 Author = new Author
                 {

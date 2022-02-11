@@ -4,6 +4,6 @@ namespace Zune.Xml.Catalog
 {
     public class MediaRights
     {
-        public IList<Right> Rights { get; set; }
+        public List<Right> Rights { get; set; }
     }
 }

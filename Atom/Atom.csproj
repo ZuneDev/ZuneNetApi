@@ -6,6 +6,7 @@
 
     <ItemGroup>
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+        <PackageReference Include="System.Xml.ReaderWriter" Version="4.3.1" />
         <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
     </ItemGroup>
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Atom;
+using System;
 using System.Xml.Serialization;
 
 namespace Zune.Xml.Catalog
@@ -6,7 +7,7 @@ namespace Zune.Xml.Catalog
     public class Track : Media
     {
         [XmlElement("duration")]
-        public TimeSpan Duration { get; set; }
+        public SerializableTimeSpan Duration { get; set; }
 
         [XmlElement("trackNumber")]
         public int TrackNumber { get; set; }

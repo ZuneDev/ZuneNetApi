@@ -27,12 +27,13 @@ namespace Zune.Net.Catalog.Controllers.Music
 
             string queryStr = queries[0];
             var results = _mb.FindAllRecordings(queryStr, simple: true);
+            var updated = DateTime.Now;
             Feed<Track> feed = new()
             {
                 Id = "tracks",
                 Title = "tracks",
                 Links = { new(Request.Path) },
-                Updated = DateTimeOffset.Now,
+                Updated = updated,
                 Entries = new()
             };
             
@@ -52,13 +53,14 @@ namespace Zune.Net.Catalog.Controllers.Music
 
                 Track track = new()
                 {
-                    Id = mb_rec.Id,
+                    Id = mb_rec.Id.ToString(),
                     Title = mb_rec.Title,
                     ArtistName = artist.Title,
                     PrimaryArtist = artist,
                     AlbumArtist = artist,
                     Duration = mb_rec.Length ?? TimeSpan.Zero,
                     Artists = new List<MiniArtist>(mb_rec.ArtistCredit.Count),
+                    Updated = updated,
                 };
 
                 var mb_album = mb_rec.Releases?[0];
@@ -79,7 +81,7 @@ namespace Zune.Net.Catalog.Controllers.Music
 
                 feed.Entries.Add(track);
             }
-            
+
             return feed;
         }
 

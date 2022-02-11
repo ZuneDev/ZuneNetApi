@@ -1,19 +1,12 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Localization.Routing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
-using Zune.DB;
 
 namespace Zune.Net.Catalog
 {
@@ -30,7 +23,6 @@ namespace Zune.Net.Catalog
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews(o => o.UseZestFormatters());
-            services.AddDbContext<ZuneNetContext>();
 
             var options = new RequestLocalizationOptions()
             {

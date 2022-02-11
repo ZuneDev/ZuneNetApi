@@ -7,6 +7,8 @@ namespace Atom.Xml
     [XmlRoot(ElementName = "link", Namespace = Constants.ATOM_NAMESPACE)]
     public class Link
     {
+        public Link() { }
+
         public Link(string href, string relation = "self", string type = Constants.ATOM_MIMETYPE)
         {
             Href = href;
@@ -27,7 +29,7 @@ namespace Atom.Xml
         public string Title { get; set; }
 
         [XmlAttribute(AttributeName = "updated")]
-        public DateTimeOffset Updated { get; set; }
+        public DateTime Updated { get; set; }
 
         [XmlAttribute(AttributeName = "id")]
         [Key]

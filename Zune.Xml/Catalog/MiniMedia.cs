@@ -8,7 +8,7 @@ namespace Zune.Xml.Catalog
         [XmlElement("id")]
         public Guid Id { get; set; }
 
-        [XmlElement("title")]
+        [XmlElement("name")]
         public string Title { get; set; }
     }
 

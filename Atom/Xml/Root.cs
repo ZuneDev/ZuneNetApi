@@ -16,7 +16,7 @@ namespace Atom.Xml
         public List<Link> Links { get; set; } = new List<Link>();
 
         [XmlElement(ElementName = "updated")]
-        public DateTimeOffset Updated { get; set; }
+        public DateTime Updated { get; set; }
 
         [XmlElement(ElementName = "title")]
         public Content Title { get; set; }

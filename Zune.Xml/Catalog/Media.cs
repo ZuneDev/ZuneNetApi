@@ -5,11 +5,11 @@ using System.Xml.Serialization;
 
 namespace Zune.Xml.Catalog
 {
+    /// <remarks>
+    /// <see cref="Entry.Id"/> must be a valid <see cref="Guid"/>.
+    /// </remarks>
     public abstract class Media : Entry
     {
-        [XmlElement("id")]
-        public new Guid Id { get; set; }
-
         [XmlElement("sortTitle")]
         public string SortTitle { get; set; }
 
@@ -23,7 +23,7 @@ namespace Zune.Xml.Catalog
         public MiniArtist PrimaryArtist { get; set; }
 
         [XmlArray("artists")]
-        public IList<MiniArtist> Artists { get; set; }
+        public List<MiniArtist> Artists { get; set; }
 
         [XmlElement("popularity")]
         public double Popularity { get; set; }
