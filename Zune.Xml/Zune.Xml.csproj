@@ -13,6 +13,10 @@
     </ItemGroup>
 
     <ItemGroup>
+      <None Remove="Catalog\MiniMedia.cs~RF29d7530f.TMP" />
+    </ItemGroup>
+
+    <ItemGroup>
         <ProjectReference Include="..\Atom\Atom.csproj" />
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     </ItemGroup>

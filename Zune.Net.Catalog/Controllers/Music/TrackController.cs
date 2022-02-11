@@ -1,9 +1,6 @@
 ﻿using Atom.Xml;
-using MetaBrainz.MusicBrainz;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using Zune.Net.Catalog.Helpers;
 using Zune.Xml.Catalog;
 

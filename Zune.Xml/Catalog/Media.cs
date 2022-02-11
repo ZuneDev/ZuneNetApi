@@ -14,7 +14,7 @@ namespace Zune.Xml.Catalog
         public string SortTitle { get; set; }
 
         [XmlElement("imageId")]
-        public Guid ImageId { get; set; }
+        public Guid? ImageId { get; set; }
 
         [XmlArray("rights")]
         [XmlArrayItem("right")]
@@ -27,7 +27,19 @@ namespace Zune.Xml.Catalog
         [XmlArrayItem("artist")]
         public List<MiniArtist> Artists { get; set; }
 
-        [XmlElement("popularity")]
+        [XmlElement("primaryGenre")]
+        public Genre PrimaryGenre { get; set; }
+
+        [XmlElement("playRank")]
         public double Popularity { get; set; }
+
+        [XmlElement("isExplicit")]
+        public bool Explicit { get; set; }
+
+        [XmlElement("isPremium")]
+        public bool Premium { get; set; }
+
+        [XmlElement("isActionable")]
+        public bool Actionable { get; set; } = true;
     }
 }

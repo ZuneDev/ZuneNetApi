@@ -8,13 +8,21 @@ namespace Zune.Xml.Catalog
         [XmlElement("id")]
         public Guid Id { get; set; }
 
+        //[XmlElement("title")]
+        //public abstract string Title { get; set; }
+    }
+
+    [XmlRoot("artist")]
+    public class MiniArtist : MiniMedia
+    {
         [XmlElement("name")]
         public string Title { get; set; }
     }
 
-    [XmlRoot("artist")]
-    public class MiniArtist : MiniMedia { }
-
     [XmlRoot("album")]
-    public class MiniAlbum : MiniMedia { }
+    public class MiniAlbum : MiniMedia
+    {
+        [XmlElement("title")]
+        public string Title { get; set; }
+    }
 }
