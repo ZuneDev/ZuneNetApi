@@ -16,13 +16,15 @@ namespace Zune.Xml.Catalog
         [XmlElement("imageId")]
         public Guid ImageId { get; set; }
 
-        [XmlElement("rights")]
-        public MediaRights Rights { get; set; }
+        [XmlArray("rights")]
+        [XmlArrayItem("right")]
+        public List<Right> Rights { get; set; }
 
         [XmlElement("primaryArtist")]
         public MiniArtist PrimaryArtist { get; set; }
 
         [XmlArray("artists")]
+        [XmlArrayItem("artist")]
         public List<MiniArtist> Artists { get; set; }
 
         [XmlElement("popularity")]

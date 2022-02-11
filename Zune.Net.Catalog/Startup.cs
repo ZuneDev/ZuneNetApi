@@ -34,7 +34,7 @@ namespace Zune.Net.Catalog
             };
             services.AddSingleton(options);
 
-            services.AddSingleton(new MetaBrainz.MusicBrainz.Query("Zune", "4.8", "https://github.com/ZuneDev/ZuneNetApi"));
+            services.AddSingleton(new Helpers.MusicBrainz());
 
             // allow a client to call you without specifying an api version
             // since we haven't configured it otherwise, the assumed api version will be 1.0

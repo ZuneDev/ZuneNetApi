@@ -12,7 +12,9 @@ namespace Zune.Xml.Catalog
         public string Title { get; set; }
     }
 
+    [XmlRoot("artist")]
     public class MiniArtist : MiniMedia { }
 
+    [XmlRoot("album")]
     public class MiniAlbum : MiniMedia { }
 }

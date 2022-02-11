@@ -3,13 +3,14 @@ using System.Xml.Serialization;
 
 namespace Zune.Xml.Catalog
 {
+    [XmlRoot("right")]
     public class Right
     {
         [XmlElement("licenseType")]
         public string LicenseType { get; set; }
 
         [XmlElement("licenseRight")]
-        public string LicenseRight { get; set; }
+        public MediaRightsEnum LicenseRight { get; set; }
 
         [XmlElement("providerName")]
         public string ProviderName { get; set; }
@@ -27,13 +28,13 @@ namespace Zune.Xml.Catalog
         public double OriginalPrice { get; set; }
 
         [XmlElement("currencyCode")]
-        public string CurrencyCode { get; set; }
+        public PriceTypeEnum CurrencyCode { get; set; }
 
         [XmlElement("displayPrice")]
         public string DisplayPrice { get; set; }
 
         [XmlElement("audioEncoding")]
-        public string AudioEncoding { get; set; }
+        public AudioEncodingEnum AudioEncoding { get; set; }
 
         [XmlElement("audioLocale")]
         public string AudioLocale { get; set; }
@@ -45,12 +46,12 @@ namespace Zune.Xml.Catalog
         public string VideoEncoding { get; set; }
 
         [XmlElement("videoDefinition")]
-        public string VideoDefinition { get; set; }
+        public VideoDefinitionEnum VideoDefinition { get; set; }
 
         [XmlElement("videoResolution")]
-        public string VideoResolution { get; set; }
+        public VideoResolutionEnum VideoResolution { get; set; }
 
         [XmlElement("clientType")]
-        public string ClientType { get; set; }
+        public ClientTypeEnum ClientType { get; set; }
     }
 }
