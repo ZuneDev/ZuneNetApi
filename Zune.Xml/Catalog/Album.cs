@@ -4,7 +4,7 @@ using System.Xml.Serialization;
 
 namespace Zune.Xml.Catalog
 {
-    [XmlRoot("album")]
+    [XmlRoot("feed")]
     public class Album : Media
     {
         [XmlElement("image")]

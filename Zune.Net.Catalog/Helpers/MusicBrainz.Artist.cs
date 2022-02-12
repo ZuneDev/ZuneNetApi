@@ -68,7 +68,7 @@ namespace Zune.Net.Catalog.Helpers
 
         public Feed<Album> GetArtistAlbumsByMBID(Guid mbid, string requestPath)
         {
-            var results = _query.BrowseAllArtistReleases(mbid, inc: Include.ArtistCredits);
+            var results = _query.BrowseAllArtistReleases(mbid, inc: Include.ArtistCredits | Include.ReleaseRelationships);
             var updated = DateTime.Now;
             Feed<Album> feed = new()
             {

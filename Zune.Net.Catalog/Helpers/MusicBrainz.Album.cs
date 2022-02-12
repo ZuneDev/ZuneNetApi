@@ -41,13 +41,7 @@ namespace Zune.Net.Catalog.Helpers
             {
                 album.Images = new();
                 if (mb_rel.CoverArtArchive.Front)
-                    album.Images.Add(new()
-                    {
-                        Instances = new()
-                        {
-                            new() { Id = album.Id }
-                        }
-                    });
+                    album.Images.Add(new() { Id = album.Id });
             }
 
             if (mb_rel.Media != null && mb_rel.Media.Count > 0)

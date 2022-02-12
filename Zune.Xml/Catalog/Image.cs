@@ -4,11 +4,10 @@ using System.Xml.Serialization;
 
 namespace Zune.Xml.Catalog
 {
-    [XmlRoot("image", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
+    [XmlRoot("image")]//, Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
     public class Image
     {
-        [XmlArray("instances")]
-        [XmlArrayItem("imageInstance")]
-        public List<ImageInstance> Instances { get; set; }
+        [XmlElement("id")]
+        public string Id { get; set; }
     }
 }

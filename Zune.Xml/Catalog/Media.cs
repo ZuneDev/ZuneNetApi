@@ -13,9 +13,6 @@ namespace Zune.Xml.Catalog
         [XmlElement("sortTitle")]
         public string SortTitle { get; set; }
 
-        [XmlElement("imageId")]
-        public Guid ImageId { get; set; }
-
         [XmlArray("rights")]
         [XmlArrayItem("right")]
         public List<Right> Rights { get; set; }
