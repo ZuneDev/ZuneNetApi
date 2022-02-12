@@ -1,4 +1,5 @@
-﻿using MetaBrainz.MusicBrainz;
+﻿using Atom.Xml;
+using MetaBrainz.MusicBrainz;
 using MetaBrainz.MusicBrainz.Interfaces.Entities;
 using System;
 using System.Linq;
@@ -8,6 +9,22 @@ namespace Zune.Net.Catalog.Helpers
 {
     public partial class MusicBrainz
     {
+        public Feed<Album> SearchAlbums(string query, string requestPath)
+        {
+            var results = _query.FindAllReleases(query, simple: true);
+            var updated = DateTime.Now;
+            Feed<Album> feed = new()
+            {
+                Id = "albums",
+                Title = "Albums",
+                Links = { new(requestPath) },
+                Updated = updated,
+                Entries = results.Take(40).Select(mb_rel => MBReleaseToAlbum(mb_rel.Item, updated: updated)).ToList(),
+            };
+
+            return feed;
+        }
+
         public Album GetAlbumByMBID(Guid mbid)
         {
             var mb_rel = _query.LookupRelease(mbid, Include.Genres | Include.ArtistCredits | Include.Recordings | Include.Media);
@@ -28,6 +45,10 @@ namespace Zune.Net.Catalog.Helpers
                 PrimaryArtist = artist,
                 Artists = mb_rel.ArtistCredit.Select(mb_credit => MBNameCreditToMiniArtist(mb_credit)).ToList(),
                 ReleaseDate = mb_rel.Date?.NearestDate ?? default,
+                Images = new()
+                {
+                    new() { Id = mb_rel.Id.ToString() }
+                },
                 Updated = updated.Value,
             };
 
@@ -36,13 +57,6 @@ namespace Zune.Net.Catalog.Helpers
 
             if (mb_rel.Date != null)
                 album.ReleaseDate = mb_rel.Date.NearestDate;
-
-            if (mb_rel.CoverArtArchive != null && mb_rel.CoverArtArchive.Artwork)
-            {
-                album.Images = new();
-                if (mb_rel.CoverArtArchive.Front)
-                    album.Images.Add(new() { Id = album.Id });
-            }
 
             if (mb_rel.Media != null && mb_rel.Media.Count > 0)
             {
