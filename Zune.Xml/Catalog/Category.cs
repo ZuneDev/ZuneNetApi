@@ -11,5 +11,14 @@ namespace Zune.Xml.Catalog
         public string Title { get; set; }
     }
 
-    public class Genre : Category { }
+    public class Genre : Category
+    {
+        public Genre() { }
+
+        public Genre(string id, string title)
+        {
+            Id = id;
+            Title = title;
+        }
+    }
 }
