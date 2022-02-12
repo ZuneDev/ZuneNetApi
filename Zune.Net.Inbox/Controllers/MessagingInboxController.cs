@@ -31,10 +31,7 @@ namespace Zune.Net.Inbox.Controllers
                 {
                     new MessageRoot
                     {
-                        DetailsLink = new Link
-                        {
-                            Href = $"https://inbox.zune.net/{locale}/messaging/{zuneTag}/inbox/details/{msgId}",
-                        },
+                        DetailsLink = new($"https://inbox.zune.net/{locale}/messaging/{zuneTag}/inbox/details/{msgId}"),
                         From = new Author
                         {
                             Name = "YoshiAsk"
@@ -42,11 +39,7 @@ namespace Zune.Net.Inbox.Controllers
                         Status = "hi",
                         Wishlist = false,
                         MediaId = msgId,
-                        Subject = new Content
-                        {
-                            Type = "text",
-                            Value = "Microsoft revives long-dead Zune product line"
-                        },
+                        Subject = "Microsoft revives long-dead Zune product line",
                         Received = DateTime.UtcNow,
                         Type = "message"
                     }
@@ -61,10 +54,7 @@ namespace Zune.Net.Inbox.Controllers
         {
             var message = new MessageDetails
             {
-                AltLink = new Link
-                {
-                    Href = "https://rr.noordstar.me/microsoft-revives-long-dead-zune-product--f9628d12"
-                },
+                AltLink = new("https://rr.noordstar.me/microsoft-revives-long-dead-zune-product--f9628d12"),
                 TextContent = "Tech giant Microsoft announced early Monday morning that a new Zune music player is in the works",
                 Id = id,
                 Updated = DateTime.UtcNow,
