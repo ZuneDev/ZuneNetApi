@@ -9,7 +9,7 @@ namespace Zune.Net.Catalog.Helpers
 {
     public partial class MusicBrainz
     {
-        public Feed<Genre> GetGenres(string requestPath)
+        public static Feed<Genre> GetGenres(string requestPath)
         {
             return new()
             {
@@ -21,18 +21,18 @@ namespace Zune.Net.Catalog.Helpers
             };
         }
 
-        public Genre GetGenreByMBID(Guid mbid)
+        public static Genre GetGenreByMBID(Guid mbid)
         {
             var mb_genre = _query.LookupGenre(mbid);
             return MBGenreToGenre(mb_genre);
         }
 
-        public Genre GetGenreByZID(string zid)
+        public static Genre GetGenreByZID(string zid)
         {
             return Genres.Select(g => g.Key).First(g => g.Id == zid);
         }
 
-        public Feed<Album> GetGenreAlbumsByZID(string zid, string requestPath)
+        public static Feed<Album> GetGenreAlbumsByZID(string zid, string requestPath)
         {
             var genre = Genres.First(g => g.Key.Id == zid);
             var updated = DateTime.Now;
@@ -64,15 +64,15 @@ namespace Zune.Net.Catalog.Helpers
         }
 
 
-        public Genre MBGenreToGenre(IGenre mb_genre)
+        public static Genre MBGenreToGenre(IGenre mb_genre)
         {
             return new(mb_genre.Id.ToString(), mb_genre.Name);
         }
 
 
-        public readonly DateTime GenresLastUpdated = new(2021, 2, 21);
+        public static readonly DateTime GenresLastUpdated = new(2021, 2, 21);
 
-        public readonly Dictionary<Genre, Dictionary<Guid, string>> Genres = new()
+        public static readonly Dictionary<Genre, Dictionary<Guid, string>> Genres = new()
         {
             [new("rock", "Rock")] = new()
             {

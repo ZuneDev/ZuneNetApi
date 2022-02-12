@@ -10,29 +10,23 @@ namespace Zune.Net.Catalog.Controllers.Music
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
     public class GenreController : Controller
     {
-        private readonly MusicBrainz _mb;
-
-        public GenreController(MusicBrainz mb)
-        {
-            _mb = mb;
-        }
 
         [HttpGet, Route("")]
         public ActionResult<Feed<Genre>> Genres()
         {
-            return _mb.GetGenres(Request.Path);
+            return MusicBrainz.GetGenres(Request.Path);
         }
 
         [HttpGet, Route("{mbid}")]
         public ActionResult<Genre> Details(Guid mbid)
         {
-            return _mb.GetGenreByMBID(mbid);
+            return MusicBrainz.GetGenreByMBID(mbid);
         }
 
         [HttpGet, Route("{mbid}/albums")]
         public ActionResult<Feed<Album>> Albums(string zid)
         {
-            return _mb.GetGenreAlbumsByZID(zid, Request.Path);
+            return MusicBrainz.GetGenreAlbumsByZID(zid, Request.Path);
         }
     }
 }

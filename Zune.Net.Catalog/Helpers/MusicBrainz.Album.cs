@@ -7,9 +7,9 @@ using Zune.Xml.Catalog;
 
 namespace Zune.Net.Catalog.Helpers
 {
-    public partial class MusicBrainz
+    public static partial class MusicBrainz
     {
-        public Feed<Album> SearchAlbums(string query, string requestPath)
+        public static Feed<Album> SearchAlbums(string query, string requestPath)
         {
             var results = _query.FindAllReleases(query, simple: true);
             var updated = DateTime.Now;
@@ -25,14 +25,14 @@ namespace Zune.Net.Catalog.Helpers
             return feed;
         }
 
-        public Album GetAlbumByMBID(Guid mbid)
+        public static Album GetAlbumByMBID(Guid mbid)
         {
             var mb_rel = _query.LookupRelease(mbid, Include.Genres | Include.ArtistCredits | Include.Recordings | Include.Media);
             return MBReleaseToAlbum(mb_rel);
         }
 
 
-        public Album MBReleaseToAlbum(IRelease mb_rel, DateTime? updated = null)
+        public static Album MBReleaseToAlbum(IRelease mb_rel, DateTime? updated = null)
         {
             updated ??= DateTime.Now;
             var mb_artist = mb_rel.ArtistCredit[0].Artist;
@@ -73,7 +73,7 @@ namespace Zune.Net.Catalog.Helpers
         }
 
 
-        public MiniAlbum MBReleaseToMiniAlbum(IRelease mb_rel)
+        public static MiniAlbum MBReleaseToMiniAlbum(IRelease mb_rel)
         {
             return new()
             {

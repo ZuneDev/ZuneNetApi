@@ -11,7 +11,7 @@ namespace Zune.Net.Catalog.Helpers
         private static readonly Guid ARTIST_VARIOUSARTISTS = new("89ad4ac3-39f7-470e-963a-56509c546377");
         private static readonly Guid ARTIST_NOARTIST = new("eec63d3c-3b81-4ad4-b1e4-7c147d4d2b61");
 
-        public Feed<Artist> SearchArtists(string query, string requestPath)
+        public static Feed<Artist> SearchArtists(string query, string requestPath)
         {
             var results = _query.FindAllArtists(query, simple: true);
             var updated = DateTime.Now;
@@ -36,13 +36,13 @@ namespace Zune.Net.Catalog.Helpers
             return feed;
         }
 
-        public Artist GetArtistByMBID(Guid mbid)
+        public static Artist GetArtistByMBID(Guid mbid)
         {
             var mb_artist = _query.LookupArtist(mbid, Include.Releases | Include.Recordings);
             return MBArtistToArtist(mb_artist);
         }
 
-        public Feed<Track> GetArtistTracksByMBID(Guid mbid, string requestPath, int chunkSize)
+        public static Feed<Track> GetArtistTracksByMBID(Guid mbid, string requestPath, int chunkSize)
         {
             var results = _query.BrowseAllArtistRecordings(mbid, pageSize: chunkSize, inc: Include.ArtistCredits);
             var updated = DateTime.Now;
@@ -66,7 +66,7 @@ namespace Zune.Net.Catalog.Helpers
             return feed;
         }
 
-        public Feed<Album> GetArtistAlbumsByMBID(Guid mbid, string requestPath)
+        public static Feed<Album> GetArtistAlbumsByMBID(Guid mbid, string requestPath)
         {
             var results = _query.BrowseAllArtistReleases(mbid, inc: Include.ArtistCredits | Include.ReleaseRelationships);
             var updated = DateTime.Now;
@@ -91,7 +91,7 @@ namespace Zune.Net.Catalog.Helpers
         }
 
 
-        public Artist MBArtistToArtist(IArtist mb_artist, DateTime? updated = null)
+        public static Artist MBArtistToArtist(IArtist mb_artist, DateTime? updated = null)
         {
             updated ??= DateTime.Now;
             Artist artist = new()
@@ -118,7 +118,7 @@ namespace Zune.Net.Catalog.Helpers
             return artist;
         }
 
-        public MiniArtist MBNameCreditToMiniArtist(INameCredit mb_credit)
+        public static MiniArtist MBNameCreditToMiniArtist(INameCredit mb_credit)
         {
             return new()
             {
@@ -127,7 +127,7 @@ namespace Zune.Net.Catalog.Helpers
             };
         }
 
-        public MiniArtist MBArtistToMiniArtist(IArtist mb_artist)
+        public static MiniArtist MBArtistToMiniArtist(IArtist mb_artist)
         {
             return new()
             {

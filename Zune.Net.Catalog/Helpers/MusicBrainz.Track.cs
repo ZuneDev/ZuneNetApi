@@ -9,7 +9,7 @@ namespace Zune.Net.Catalog.Helpers
 {
     public partial class MusicBrainz
     {
-        public Feed<Track> SearchTracks(string query, string requestPath)
+        public static Feed<Track> SearchTracks(string query, string requestPath)
         {
             var results = _query.FindAllRecordings(query, simple: true);
             var updated = DateTime.Now;
@@ -34,14 +34,14 @@ namespace Zune.Net.Catalog.Helpers
             return feed;
         }
 
-        public Track GetTrackByMBID(Guid mbid)
+        public static Track GetTrackByMBID(Guid mbid)
         {
             var mb_rec = _query.LookupRecording(mbid, Include.Genres | Include.ArtistCredits | Include.Releases);
             return MBRecordingToTrack(mb_rec, includeRights: true);
         }
 
 
-        public Track MBRecordingToTrack(IRecording mb_rec, DateTime? updated = null, bool includeRights = false)
+        public static Track MBRecordingToTrack(IRecording mb_rec, DateTime? updated = null, bool includeRights = false)
         {
             updated ??= DateTime.Now;
             var mb_artist = mb_rec.ArtistCredit[0].Artist;
@@ -67,7 +67,7 @@ namespace Zune.Net.Catalog.Helpers
             return track;
         }
 
-        public Track MBTrackToTrack(ITrack mb_track, MiniArtist trackArtist, DateTime? updated = null, bool includeRights = false)
+        public static Track MBTrackToTrack(ITrack mb_track, MiniArtist trackArtist, DateTime? updated = null, bool includeRights = false)
         {
             updated ??= DateTime.Now;
 

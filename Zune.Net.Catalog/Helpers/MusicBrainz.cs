@@ -4,11 +4,11 @@ using Zune.Xml.Catalog;
 
 namespace Zune.Net.Catalog.Helpers
 {
-    public partial class MusicBrainz
+    public static partial class MusicBrainz
     {
-        private readonly Query _query = new("Zune", "4.8", "https://github.com/ZuneDev/ZuneNetApi");
+        private static readonly Query _query = new("Zune", "4.8", "https://github.com/ZuneDev/ZuneNetApi");
 
-        public void AddDefaultRights<T>(ref T media) where T : Media
+        public static void AddDefaultRights<T>(ref T media) where T : Media
         {
             media.Rights ??= new();
             media.Rights.Add(new()
