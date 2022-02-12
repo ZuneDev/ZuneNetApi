@@ -6,7 +6,7 @@ namespace Zune.Net.Catalog.Helpers
 {
     public static partial class MusicBrainz
     {
-        private static readonly Query _query = new("Zune", "4.8", "https://github.com/ZuneDev/ZuneNetApi");
+        public static readonly Query _query = new("Zune", "4.8", "https://github.com/ZuneDev/ZuneNetApi");
 
         public static void AddDefaultRights<T>(ref T media) where T : Media
         {

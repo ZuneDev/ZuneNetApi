@@ -43,5 +43,17 @@ namespace Zune.Net.Catalog.Controllers.Music
         {
             return MusicBrainz.GetArtistAlbumsByMBID(mbid, Request.Path);
         }
+
+        [HttpGet, Route("{mbid}/primaryImage")]
+        public async Task<ActionResult> Image(Guid mbid)
+        {
+            (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(mbid);
+
+            string imgUrl = dc_artist["images"].First(i => i.Value<string>("type") == "primary").Value<string>("uri");
+            var imgResponse = await imgUrl.GetAsync();
+            if (imgResponse.StatusCode != 200)
+                return StatusCode(imgResponse.StatusCode);
+            return File(await imgResponse.GetStreamAsync(), "image/jpeg");
+        }
     }
 }

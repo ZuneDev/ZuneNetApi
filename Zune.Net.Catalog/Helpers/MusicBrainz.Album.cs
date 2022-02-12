@@ -7,7 +7,7 @@ using Zune.Xml.Catalog;
 
 namespace Zune.Net.Catalog.Helpers
 {
-    public static partial class MusicBrainz
+    public partial class MusicBrainz
     {
         public static Feed<Album> SearchAlbums(string query, string requestPath)
         {
