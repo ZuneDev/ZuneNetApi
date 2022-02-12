@@ -72,7 +72,7 @@ namespace Atom
         public void ReadXml(XmlReader reader)
         {
             var text = reader.ReadContentAsString();
-            value = TimeSpan.FromMilliseconds(double.Parse(text));
+            value = XmlConvert.ToTimeSpan(text);
         }
 
         public override string ToString()
@@ -87,7 +87,7 @@ namespace Atom
 
         public void WriteXml(XmlWriter writer)
         {
-            writer.WriteString(value.TotalMilliseconds.ToString());
+            writer.WriteString(XmlConvert.ToString(value));
         }
     }
 }
