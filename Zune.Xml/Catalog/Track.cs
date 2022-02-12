@@ -7,13 +7,13 @@ namespace Zune.Xml.Catalog
     public class Track : Media
     {
         [XmlElement("duration")]
-        public SerializableTimeSpan? Duration { get; set; }
+        public SerializableTimeSpan Duration { get; set; }
 
         [XmlElement("trackNumber")]
-        public int? TrackNumber { get; set; }
+        public int TrackNumber { get; set; }
 
         [XmlElement("discNumber")]
-        public int? DiscNumber { get; set; }
+        public int DiscNumber { get; set; }
 
         [XmlElement("album")]
         public MiniAlbum Album { get; set; }
@@ -22,13 +22,13 @@ namespace Zune.Xml.Catalog
         public MiniArtist AlbumArtist { get; set; }
 
         [XmlElement("playCount")]
-        public int? PlayCount { get; set; }
+        public int PlayCount { get; set; }
 
         [XmlElement("referrerContext")]
         public string ReferrerContext { get; set; }
 
         [XmlElement("musicVideoId")]
-        public Guid? MusicVideoId { get; set; }
+        public Guid MusicVideoId { get; set; }
 
 
         // Are these valid from the API?
