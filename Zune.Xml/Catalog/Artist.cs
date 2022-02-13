@@ -23,6 +23,12 @@ namespace Zune.Xml.Catalog
         [XmlElement("biographyLink")]
         public string BiographyLink { get; set; }
 
+        [XmlElement("biography")]
+        public string Biography { get; set; }
+
+        [XmlElement("shortBiography")]
+        public string ShortBiography { get; set; }
+
         [XmlElement("playCount")]
         public int PlayCount { get; set; }
 

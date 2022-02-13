@@ -25,5 +25,9 @@ namespace Atom.Xml
 
         [XmlElement(ElementName = "summary")]
         public string Summary { get; set; }
+
+
+        [XmlElement(ElementName = "content")]
+        public Content Content { get; set; }
     }
 }

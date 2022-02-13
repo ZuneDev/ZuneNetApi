@@ -9,5 +9,9 @@ namespace Zune.Xml.Catalog
     {
         [XmlElement("id")]
         public string Id { get; set; }
+
+        [XmlArray("instances", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
+        [XmlArrayItem("imageInstance")]
+        public List<ImageInstance> Instances { get; set; }
     }
 }

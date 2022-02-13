@@ -18,6 +18,8 @@ namespace Atom.Xml
                 Type = ContentType.Text
             };
         }
+
+        public override string ToString() => Value;
     }
 
     public enum ContentType

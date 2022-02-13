@@ -80,9 +80,10 @@ namespace Zune.Net.Catalog.Helpers
             };
 
             // Add results to feed
+            const int chunkSize = 100;
             foreach (var mb_release in results)
             {
-                //if (feed.Entries.Count == chunkSize) break;
+                if (feed.Entries.Count == chunkSize) break;
 
                 feed.Entries.Add(MBReleaseToAlbum(mb_release, updated: updated));
             }
