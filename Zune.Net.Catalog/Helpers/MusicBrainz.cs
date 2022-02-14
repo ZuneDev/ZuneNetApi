@@ -13,13 +13,15 @@ namespace Zune.Net.Catalog.Helpers
             media.Rights ??= new();
             media.Rights.Add(new()
             {
+                MediaInstanceId = "3b871100-1000-11db-89ca-0019b92a3933",
                 ProviderCode = "117767492:MP3_DOWNLOAD_UENC_256kb_075",
-                Price = 800,
-                CurrencyCode = PriceTypeEnum.Points,
-                LicenseType = "Preview",
-                LicenseRight = MediaRightsEnum.PreviewStream,
+                Price = 0,
+                CurrencyCode = PriceTypeEnum.None,
+                LicenseType = "Download",
+                LicenseRight = MediaRightsEnum.Download,
                 AudioEncoding = AudioEncodingEnum.MP3,
                 OfferId = Guid.Parse("9534a201-2102-11db-89ca-0019b92a3933"),
+                FileSize = 500
             });
         }
     }

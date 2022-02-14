@@ -43,7 +43,7 @@ namespace Zune.Net.Inbox.Controllers
                 Type = type.Single(),
                 Sender = sender,
                 Recipient = recipient,
-                //Id = Guid.NewGuid().ToString(),
+                Id = Guid.NewGuid().ToString(),
                 Received = DateTime.UtcNow
             };
 

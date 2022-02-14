@@ -1,15 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System;
-using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using System.Xml.Serialization;
 using Zune.DB;
-using Zune.DB.Models;
 using Zune.Xml.Commerce;
 
 namespace CommerceZuneNet.Controllers
@@ -55,6 +48,20 @@ namespace CommerceZuneNet.Controllers
         public ActionResult<GetUserResponse> User(GetUserRequest request)
         {
             return new(new GetUserResponse());
+        }
+
+        [HttpPost]
+        public ActionResult<BalancesResponse> Balances()
+        {
+            return new BalancesResponse
+            {
+                Balances = new()
+                {
+                    PointsBalance = 8000,
+                    SongCreditBalance = 0,
+                    SongCreditRenewalDate = null
+                }
+            };
         }
     }
 }

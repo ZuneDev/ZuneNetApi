@@ -53,5 +53,11 @@ namespace Zune.Xml.Catalog
 
         [XmlElement("clientType")]
         public ClientTypeEnum ClientType { get; set; }
+
+        [XmlElement("mediaInstanceId")]
+        public string MediaInstanceId { get; set; }
+
+        [XmlElement("fileSize")]
+        public int FileSize { get; set; }
     }
 }
