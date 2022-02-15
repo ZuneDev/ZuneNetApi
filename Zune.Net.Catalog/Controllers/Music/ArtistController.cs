@@ -33,8 +33,12 @@ namespace Zune.Net.Catalog.Controllers.Music
             Artist artist = MusicBrainz.MBArtistToArtist(mb_artist);
             artist.BackgroundImageId = mbid;
             artist.Images = new() { new() { Id = mbid.ToString() } };
-            artist.Biography = dc_artist.Value<string>("profile");
-            artist.Links.Add(new(Request.Path.Value + "biography", relation: "zune://artist/biography"));
+
+            if (dc_artist != null)
+            {
+                artist.Biography = dc_artist.Value<string>("profile");
+                artist.Links.Add(new(Request.Path.Value + "biography", relation: "zune://artist/biography"));
+            }
 
             return artist;
         }
@@ -58,6 +62,8 @@ namespace Zune.Net.Catalog.Controllers.Music
         public async Task<ActionResult> PrimaryImage(Guid mbid)
         {
             (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(mbid);
+            if (dc_artist == null)
+                return StatusCode(404);
 
             string imgUrl = dc_artist["images"].First(i => i.Value<string>("type") == "primary").Value<string>("uri");
             var imgResponse = await imgUrl.GetAsync();
@@ -70,6 +76,8 @@ namespace Zune.Net.Catalog.Controllers.Music
         public async Task<ActionResult<Entry>> Biography(Guid mbid)
         {
             (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(mbid);
+            if (dc_artist == null)
+                return StatusCode(404);
             DateTime updated = DateTime.Now;
 
             return new Entry

@@ -20,7 +20,9 @@ namespace Zune.Net.Catalog.Helpers
 
         public static async Task<JObject> GetDCArtistByMBArtist(IArtist mb_artist)
         {
-            var discogs_rel = mb_artist.Relationships.First(rel => rel.Type == "discogs");
+            var discogs_rel = mb_artist.Relationships.FirstOrDefault(rel => rel.Type == "discogs");
+            if (discogs_rel == null)
+                return null;
             string discogs_link = discogs_rel.Url.Resource.ToString().Replace("www", "api").Replace("artist", "artists");
 
             return await WithAuth(discogs_link).GetJsonAsync<JObject>();
