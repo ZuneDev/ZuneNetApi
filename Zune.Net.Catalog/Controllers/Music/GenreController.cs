@@ -17,16 +17,37 @@ namespace Zune.Net.Catalog.Controllers.Music
             return MusicBrainz.GetGenres(Request.Path);
         }
 
-        [HttpGet, Route("{mbid}")]
-        public ActionResult<Genre> Details(Guid mbid)
+        [HttpGet, Route("{id}")]
+        public ActionResult<Genre> Details(string id)
         {
-            return MusicBrainz.GetGenreByMBID(mbid);
+            if (Guid.TryParse(id, out Guid mbid))
+                return MusicBrainz.GetGenreByMBID(mbid);
+            return MusicBrainz.GetGenreByZID(id);
         }
 
-        [HttpGet, Route("{mbid}/albums")]
-        public ActionResult<Feed<Album>> Albums(Guid mbid)
+        [HttpGet, Route("{id}/albums")]
+        public ActionResult<Feed<Album>> Albums(string id)
         {
-            return MusicBrainz.GetGenreAlbumsByMBID(mbid, Request.Path);
+            if (Guid.TryParse(id, out Guid mbid))
+                return MusicBrainz.GetGenreAlbumsByMBID(mbid, Request.Path);
+            return MusicBrainz.GetGenreAlbumsByZID(id, Request.Path);
+        }
+
+        // Not actually used by Zune, but hey, might as well
+        [HttpGet, Route("{id}/tracks")]
+        public ActionResult<Feed<Track>> Tracks(string id)
+        {
+            if (Guid.TryParse(id, out Guid mbid))
+                return MusicBrainz.GetGenreTracksByMBID(mbid, Request.Path);
+            return MusicBrainz.GetGenreTracksByZID(id, Request.Path);
+        }
+
+        [HttpGet, Route("{id}/artists")]
+        public ActionResult<Feed<Artist>> Artists(string id)
+        {
+            if (Guid.TryParse(id, out Guid mbid))
+                return MusicBrainz.GetGenreArtistsByMBID(mbid, Request.Path);
+            return MusicBrainz.GetGenreArtistsByZID(id, Request.Path);
         }
     }
 }

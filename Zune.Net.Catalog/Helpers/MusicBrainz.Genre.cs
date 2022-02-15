@@ -90,6 +90,122 @@ namespace Zune.Net.Catalog.Helpers
             return feed;
         }
 
+        public static Feed<Artist> GetGenreArtistsByMBID(Guid mbid, string requestPath)
+        {
+            var mb_genre = _query.LookupGenre(mbid);
+            var updated = DateTime.Now;
+            Feed<Artist> feed = new()
+            {
+                Id = mbid.ToString(),
+                Title = mb_genre.Name,
+                Links = { new(requestPath) },
+                Updated = updated,
+                Entries = new()
+            };
+
+            // Get albums from genre
+            int maxNumArtists = 50;
+            var results = _query.FindAllArtists($"tag:\"{mb_genre.Name}\"").GetEnumerator();
+
+            // Add results to feed
+            while (feed.Entries.Count < maxNumArtists && results.MoveNext())
+            {
+                var mb_artist = results.Current.Item;
+                feed.Entries.Add(MBArtistToArtist(mb_artist, updated: updated));
+            }
+
+            return feed;
+        }
+
+        public static Feed<Artist> GetGenreArtistsByZID(string zid, string requestPath)
+        {
+            var genre = Genres.First(g => g.Key.Id == zid);
+            var updated = DateTime.Now;
+            Feed<Artist> feed = new()
+            {
+                Id = zid,
+                Title = genre.Key.Title,
+                Links = { new(requestPath) },
+                Updated = updated,
+                Entries = new()
+            };
+
+            // Get albums from subgenres
+            int maxNumArtists = 50;
+            var mb_genres = genre.Value.Values.GetEnumerator();
+            while (feed.Entries.Count < maxNumArtists && mb_genres.MoveNext())
+            {
+                var results = _query.FindAllArtists($"tag:\"{mb_genres.Current}\"").GetEnumerator();
+
+                // Add results to feed
+                while (feed.Entries.Count < maxNumArtists && results.MoveNext())
+                {
+                    var mb_artist = results.Current.Item;
+                    feed.Entries.Add(MBArtistToArtist(mb_artist, updated: updated));
+                }
+            }
+
+            return feed;
+        }
+
+        public static Feed<Track> GetGenreTracksByMBID(Guid mbid, string requestPath)
+        {
+            var mb_genre = _query.LookupGenre(mbid);
+            var updated = DateTime.Now;
+            Feed<Track> feed = new()
+            {
+                Id = mbid.ToString(),
+                Title = mb_genre.Name,
+                Links = { new(requestPath) },
+                Updated = updated,
+                Entries = new()
+            };
+
+            // Get albums from genre
+            int maxNumTracks = 50;
+            var results = _query.FindAllRecordings($"tag:\"{mb_genre.Name}\"").GetEnumerator();
+
+            // Add results to feed
+            while (feed.Entries.Count < maxNumTracks && results.MoveNext())
+            {
+                var mb_recording = results.Current.Item;
+                feed.Entries.Add(MBRecordingToTrack(mb_recording, updated: updated));
+            }
+
+            return feed;
+        }
+
+        public static Feed<Track> GetGenreTracksByZID(string zid, string requestPath)
+        {
+            var genre = Genres.First(g => g.Key.Id == zid);
+            var updated = DateTime.Now;
+            Feed<Track> feed = new()
+            {
+                Id = zid,
+                Title = genre.Key.Title,
+                Links = { new(requestPath) },
+                Updated = updated,
+                Entries = new()
+            };
+
+            // Get albums from subgenres
+            int maxNumTracks = 50;
+            var mb_genres = genre.Value.Values.GetEnumerator();
+            while (feed.Entries.Count < maxNumTracks && mb_genres.MoveNext())
+            {
+                var results = _query.FindAllRecordings($"tag:\"{mb_genres.Current}\"").GetEnumerator();
+
+                // Add results to feed
+                while (feed.Entries.Count < maxNumTracks && results.MoveNext())
+                {
+                    var mb_recording = results.Current.Item;
+                    feed.Entries.Add(MBRecordingToTrack(mb_recording, updated: updated));
+                }
+            }
+
+            return feed;
+        }
+
 
         public static Genre MBGenreToGenre(IGenre mb_genre)
         {
