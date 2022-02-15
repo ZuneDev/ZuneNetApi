@@ -24,9 +24,9 @@ namespace Zune.Net.Catalog.Controllers.Music
         }
 
         [HttpGet, Route("{mbid}/albums")]
-        public ActionResult<Feed<Album>> Albums(string zid)
+        public ActionResult<Feed<Album>> Albums(Guid mbid)
         {
-            return MusicBrainz.GetGenreAlbumsByZID(zid, Request.Path);
+            return MusicBrainz.GetGenreAlbumsByMBID(mbid, Request.Path);
         }
     }
 }

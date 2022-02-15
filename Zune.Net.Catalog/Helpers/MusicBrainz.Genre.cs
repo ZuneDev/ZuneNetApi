@@ -32,6 +32,33 @@ namespace Zune.Net.Catalog.Helpers
             return Genres.Select(g => g.Key).First(g => g.Id == zid);
         }
 
+        public static Feed<Album> GetGenreAlbumsByMBID(Guid mbid, string requestPath)
+        {
+            var mb_genre = _query.LookupGenre(mbid);
+            var updated = DateTime.Now;
+            Feed<Album> feed = new()
+            {
+                Id = mbid.ToString(),
+                Title = mb_genre.Name,
+                Links = { new(requestPath) },
+                Updated = updated,
+                Entries = new()
+            };
+
+            // Get albums from genre
+            int maxNumAlbums = 50;
+            var results = _query.FindAllReleases($"tag:\"{mb_genre.Name}\"").GetEnumerator();
+
+            // Add results to feed
+            while (feed.Entries.Count < maxNumAlbums && results.MoveNext())
+            {
+                var mb_release = results.Current.Item;
+                feed.Entries.Add(MBReleaseToAlbum(mb_release, updated: updated));
+            }
+
+            return feed;
+        }
+
         public static Feed<Album> GetGenreAlbumsByZID(string zid, string requestPath)
         {
             var genre = Genres.First(g => g.Key.Id == zid);
