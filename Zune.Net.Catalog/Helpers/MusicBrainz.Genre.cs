@@ -100,19 +100,9 @@ namespace Zune.Net.Catalog.Helpers
                 Title = mb_genre.Name,
                 Links = { new(requestPath) },
                 Updated = updated,
-                Entries = new()
+                Entries = _query.FindAllArtists($"tag:\"{mb_genre.Name}\"")
+                                .Select(mb_artist => MBArtistToArtist(mb_artist.Item, updated: updated)).ToList()
             };
-
-            // Get albums from genre
-            int maxNumArtists = 50;
-            var results = _query.FindAllArtists($"tag:\"{mb_genre.Name}\"").GetEnumerator();
-
-            // Add results to feed
-            while (feed.Entries.Count < maxNumArtists && results.MoveNext())
-            {
-                var mb_artist = results.Current.Item;
-                feed.Entries.Add(MBArtistToArtist(mb_artist, updated: updated));
-            }
 
             return feed;
         }
@@ -130,8 +120,8 @@ namespace Zune.Net.Catalog.Helpers
                 Entries = new()
             };
 
-            // Get albums from subgenres
-            int maxNumArtists = 50;
+            // Get artists from subgenres
+            int maxNumArtists = 150;
             var mb_genres = genre.Value.Values.GetEnumerator();
             while (feed.Entries.Count < maxNumArtists && mb_genres.MoveNext())
             {
@@ -158,19 +148,9 @@ namespace Zune.Net.Catalog.Helpers
                 Title = mb_genre.Name,
                 Links = { new(requestPath) },
                 Updated = updated,
-                Entries = new()
+                Entries = _query.FindAllRecordings($"tag:\"{mb_genre.Name}\"")
+                                .Select(mb_track => MBRecordingToTrack(mb_track.Item, updated: updated)).ToList()
             };
-
-            // Get albums from genre
-            int maxNumTracks = 50;
-            var results = _query.FindAllRecordings($"tag:\"{mb_genre.Name}\"").GetEnumerator();
-
-            // Add results to feed
-            while (feed.Entries.Count < maxNumTracks && results.MoveNext())
-            {
-                var mb_recording = results.Current.Item;
-                feed.Entries.Add(MBRecordingToTrack(mb_recording, updated: updated));
-            }
 
             return feed;
         }
@@ -188,7 +168,7 @@ namespace Zune.Net.Catalog.Helpers
                 Entries = new()
             };
 
-            // Get albums from subgenres
+            // Get tracks from subgenres
             int maxNumTracks = 50;
             var mb_genres = genre.Value.Values.GetEnumerator();
             while (feed.Entries.Count < maxNumTracks && mb_genres.MoveNext())
