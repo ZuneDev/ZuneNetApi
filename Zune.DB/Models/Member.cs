@@ -176,7 +176,7 @@ namespace Zune.DB.Models
         {
             return new Xml.SocialApi.Member
             {
-                Id = Id,
+                Id = Id.ToString(),
                 ZuneTag = ZuneTag,
                 PlayCount = PlayCount,
                 DisplayName = DisplayName,
@@ -194,7 +194,7 @@ namespace Zune.DB.Models
                         Title = "background"
                     },
                 },
-                Playlists = Playlists != null ? Playlists.ToList() : null,
+                Playlists = Playlists?.ToList(),
                 Links =
                 {
                     new Link($"https://socialapi.zune.net/{Locale}/members/{ZuneTag}"),
@@ -219,5 +219,19 @@ namespace Zune.DB.Models
         public string GetDisplayName() => string.IsNullOrEmpty(DisplayName) ? ZuneTag : DisplayName;
 
         public string GetUrl() => "http://social.zune.net/member/" + ZuneTag;
+
+        public static Guid GetGuidFromZuneTag(string zuneTag)
+        {
+            // Compute 256-bit (32-byte) hash
+            byte[] hash = System.Security.Cryptography.SHA256.Create()
+                .ComputeHash(System.Text.Encoding.UTF8.GetBytes(zuneTag));
+            
+            // GUIDs are 128 bits (16 bytes), so we XOR the first 16 bytes of the hash with the last 16 bytes.
+            // Will this cause collisions? Likely not. Should this be investigated before production? Probably.
+            byte[] guid = new byte[16];
+            for (int i = 0; i < guid.Length; i++)
+                guid[i] = (byte)(hash[i] ^ hash[i + 16]);
+            return new Guid(guid);
+        }
     }
 }

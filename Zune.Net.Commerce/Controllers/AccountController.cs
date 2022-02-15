@@ -21,7 +21,12 @@ namespace CommerceZuneNet.Controllers
         [HttpPost]
         public ActionResult<SignInResponse> SignIn(SignInRequest request)
         {
-            var zuneId = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(request.TunerInfo.ID)));
+            // TODO: Authentication is a mess. SignInRequest only provides a (device?)
+            // ID that is only seen in this endpoint. After that, all subsequent
+            // requests use a Zune tag or GUID to specify a member, and a WLID
+            // token for authorization. Most Commerce endpoints just send the WLID,
+            // which doesn't directly identify which user's data is being requested.
+            var zuneId = Zune.DB.Models.Member.GetGuidFromZuneTag("YoshiAsk").ToString();
             var member = _database.Members.Find(zuneId);
 
             SignInResponse response;

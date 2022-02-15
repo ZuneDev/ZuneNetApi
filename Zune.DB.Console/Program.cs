@@ -12,7 +12,7 @@ namespace Zune.DB.Console
         {
             using var ctx = new ZuneNetContext(true);
 
-            string memberId = "0074DBEC1EBD57DAC0AC2F08CF65940460E08EF630CBE8AC9FF7427B08FE5477";
+            string memberId = Member.GetGuidFromZuneTag("YoshiAsk").ToString();
             var newMember = new Member
             {
                 Updated = DateTime.UtcNow,
@@ -88,7 +88,7 @@ namespace Zune.DB.Console
             ctx.Messages.Add(message);
             ctx.Tuners.Add(tuner);
 
-            memberId = "61E572878F7DBDF918211F0BB7E5715C01CD2B371BA0B4481887939713D48028";
+            memberId = Member.GetGuidFromZuneTag("WamWooWam").ToString();
             var member2 = new Member
             {
                 Updated = DateTime.UtcNow,
