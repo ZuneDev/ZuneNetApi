@@ -95,22 +95,24 @@ namespace Zune.Net.Catalog.Controllers.Music
         {
             (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(mbid);
             DateTime updated = DateTime.Now;
-            // NOTE: Yes, SHA1 would be better, but this is not a security-critical
-            // application, and MD5 has the benefit of being exactly the same length
-            // as a GUID.
-            using var md5 = MD5.Create();
+            int dcid = dc_artist.Value<int>("id");
+            byte[] zero = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 };
 
-            return new Feed<Image>
+            Feed<Image> feed = new()
             {
                 Id = $"tag:catalog.zune.net,1900-01-01:/music/artist/{mbid}/images",
                 Title = mb_artist.Name,
                 Links = { new(Request.Path) },
-                Entries = dc_artist.Value<JToken>("images").Select(j =>
+                Updated = updated,
+            };
+
+            var images = dc_artist.Value<JToken>("images");
+            if (images != null)
+            {
+                feed.Entries = images.Select((j, idx) =>
                 {
-                    // Embed key parts of image URL in ID
-                    string url = j.Value<string>("uri");
-                    Regex rx = new(@"^https?:\/\/i\.discogs\.com\/(.*)\/rs:fit\/g:sm\/q:90\/(.*)\.jpe?g", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-                    string imgId = "artist-" + rx.Replace(url, "$1,$2");
+                    // Encode DCID and image index in ID
+                    string imgId = new Guid(dcid, (short)idx, 0, zero).ToString();
 
                     return new Image
                     {
@@ -120,16 +122,17 @@ namespace Zune.Net.Catalog.Controllers.Music
                             new()
                             {
                                 Id = imgId,
-                                Url = url,
+                                Url = j.Value<string>("uri"),
                                 Format = "jpg",
                                 Width = j.Value<int>("width"),
                                 Height = j.Value<int>("height"),
                             }
                         }
                     };
-                }).ToList(),
-                Updated = updated,
-            };
+                }).ToList();
+            }
+
+            return feed;
         }
     }
 }
