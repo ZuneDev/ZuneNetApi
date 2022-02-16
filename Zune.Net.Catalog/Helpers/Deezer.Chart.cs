@@ -12,8 +12,14 @@ namespace Zune.Net.Catalog.Helpers
         {
             var response = await API_BASE.AppendPathSegments("chart", genreId, "tracks")
                 .GetJsonAsync<JObject>();
-            var dz_tracks = response["data"];
-            return dz_tracks;
+            return response["data"];
+        }
+
+        public static async Task<IEnumerable<JToken>> GetChartDZAlbums(int genreId = 0)
+        {
+            var response = await API_BASE.AppendPathSegments("chart", genreId, "albums")
+                .GetJsonAsync<JObject>();
+            return response["data"];
         }
     }
 }
