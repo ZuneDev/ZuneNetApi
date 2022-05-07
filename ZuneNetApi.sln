@@ -21,7 +21,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zune.Net.Catalog", "Zune.Ne
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zune.Net.Shared", "Zune.Net.Shared\Zune.Net.Shared.csproj", "{C8FED104-7F7F-426E-B615-BADD447E31C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zune.Net.Tiles", "Zune.Net.Tiles\Zune.Net.Tiles.csproj", "{D587579A-6A6F-45CB-AE48-467BF3148A3A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zune.Net.Tiles", "Zune.Net.Tiles\Zune.Net.Tiles.csproj", "{D587579A-6A6F-45CB-AE48-467BF3148A3A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backing", "Backing", "{17BB2AA9-D664-4055-9139-6828A1C23634}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -72,6 +74,13 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{13503EFB-1391-46DC-B17C-EDB1370C99F0} = {17BB2AA9-D664-4055-9139-6828A1C23634}
+		{73A36324-79B5-4000-8343-35662402A861} = {17BB2AA9-D664-4055-9139-6828A1C23634}
+		{76E797D9-F174-4417-9EE4-0A6B959A0BF5} = {17BB2AA9-D664-4055-9139-6828A1C23634}
+		{228D09C1-6477-47E1-B454-9AC07AD56AE6} = {17BB2AA9-D664-4055-9139-6828A1C23634}
+		{C8FED104-7F7F-426E-B615-BADD447E31C9} = {17BB2AA9-D664-4055-9139-6828A1C23634}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5B0D462F-33A1-4F5C-9959-52FC4FB337A6}
