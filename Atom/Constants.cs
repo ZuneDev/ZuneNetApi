@@ -9,6 +9,9 @@
         public const string ZUNE_CATALOG_MUSIC_NAMESPACE = "http://schemas.zune.net/catalog/music/2007/10";
         public const string ZUNE_COMMERCE_NAMESPACE = "http://schemas.zune.net/commerce/2009/01";
 
+        // NOTE: There is no evidence to suggest that this is the original Xbox Live namespace.
+        public const string XBOX_LIVE_NAMESPACE = "http://live.xbox.net/catalog/2009/01";
+
         public const string ATOM_MIMETYPE = "application/atom+xml";
     }
 }
