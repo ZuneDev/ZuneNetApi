@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zune.Net.Tiles", "Zune.Net.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backing", "Backing", "{17BB2AA9-D664-4055-9139-6828A1C23634}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zune.Net.Tuners", "Zune.Net.Tuners\Zune.Net.Tuners.csproj", "{3C35D0D2-2ED0-483F-9A5C-850CB2AA901B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,10 @@ Global
 		{D587579A-6A6F-45CB-AE48-467BF3148A3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D587579A-6A6F-45CB-AE48-467BF3148A3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D587579A-6A6F-45CB-AE48-467BF3148A3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C35D0D2-2ED0-483F-9A5C-850CB2AA901B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C35D0D2-2ED0-483F-9A5C-850CB2AA901B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C35D0D2-2ED0-483F-9A5C-850CB2AA901B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C35D0D2-2ED0-483F-9A5C-850CB2AA901B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
