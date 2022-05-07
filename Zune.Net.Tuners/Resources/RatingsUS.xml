@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ratingSystems>
+  <ratingSystem name="Movies" showBlockUnrated="true" useImages="false" blockText="IDS_BLOCK" title="IDS_CATEGORY" description="IDS_CHOICE">
+    <strings language="EN" default="true">
+      <string name="IDS_CATEGORY" value="MOVIES"/>
+      <string name="IDS_CHOICE" value="Maximum allowed Movies rating:"/>
+      <string name="IDS_BLOCK" value="Block unrated Movies"/>
+      <string name="IDS_RATING_G" value="G"/>
+      <string name="IDS_RATING_PG" value="PG"/>
+      <string name="IDS_RATING_PG-13" value="PG-13"/>
+      <string name="IDS_RATING_R" value="R"/>
+      <string name="IDS_RATING_NC-17" value="NC-17"/>
+      <string name="IDS_DESC_G" value="All Ages Admitted"/>
+      <string name="IDS_DESC_PG" value="Some Material May Not Be Suitable for Children"/>
+      <string name="IDS_DESC_PG-13" value="Some Material May Be Inappropriate for Children Under 13"/>
+      <string name="IDS_DESC_R" value="Under 17 Requires Accompanying Parent Or Adult Guardian"/>
+      <string name="IDS_DESC_NC-17" value="No One 17 and Under Admitted"/>
+      <string name="IDS_TIP_G" value="General Audiences"/>
+      <string name="IDS_TIP_PG" value="Parental Guidance Suggested"/>
+      <string name="IDS_TIP_PG-13" value="Parents Strongly Cautioned"/>
+      <string name="IDS_TIP_R" value="Restricted"/>
+      <string name="IDS_TIP_NC-17" value="No One 17 and Under Admitted"/>
+    </strings>
+    <rating name="G" order="1" tip="IDS_TIP_G" text="IDS_RATING_G" description="IDS_DESC_G"/>
+    <rating name="PG" order="2" tip="IDS_TIP_PG" text="IDS_RATING_PG" description="IDS_DESC_PG"/>
+    <rating name="PG-13" order="3" tip="IDS_TIP_PG-13" text="IDS_RATING_PG-13" description="IDS_DESC_PG-13"/>
+    <rating name="R" order="4" tip="IDS_TIP_R" text="IDS_RATING_R" description="IDS_DESC_R"/>
+    <rating name="NC-17" order="5" tip="IDS_TIP_NC-17" text="IDS_RATING_NC-17" description="IDS_DESC_NC-17"/>
+    <rating name="X" order="6" treatAsUnrated="true"/>
+    <rating name="AO" order="7" treatAsUnrated="true"/>
+    <rating name="NR" order="8" treatAsUnrated="true"/>
+  </ratingSystem>
+  <ratingSystem name="TV" showBlockUnrated="true" useImages="false" blockText="IDS_BLOCK" title="IDS_CATEGORY" description="IDS_CHOICE">
+    <strings language="EN" default="true">
+      <string name="IDS_CATEGORY" value="TV"/>
+      <string name="IDS_CHOICE" value="Maximum allowed TV rating:"/>
+      <string name="IDS_BLOCK" value="Block unrated TV"/>
+      <string name="IDS_RATING_Y" value="TV-Y"/>
+      <string name="IDS_RATING_Y7" value="TV-Y7"/>
+      <string name="IDS_RATING_YFV" value="TV-YFV"/>
+      <string name="IDS_RATING_G" value="TV-G"/>
+      <string name="IDS_RATING_PG" value="TV-PG"/>
+      <string name="IDS_RATING_14" value="TV-14"/>
+      <string name="IDS_RATING_MA" value="TV-MA"/>
+      <string name="IDS_TIP_Y" value="TV-Y"/>
+      <string name="IDS_TIP_Y7" value="TV-Y7"/>
+      <string name="IDS_TIP_YFV" value="TV-YFV"/>
+      <string name="IDS_TIP_G" value="TV-G"/>
+      <string name="IDS_TIP_PG" value="TV-PG"/>
+      <string name="IDS_TIP_14" value="TV-14"/>
+      <string name="IDS_TIP_MA" value="TV-MA"/>
+      <string name="IDS_DESC_Y" value="All children"/>
+      <string name="IDS_DESC_Y7" value="Directed to children 7 and older"/>
+      <string name="IDS_DESC_YFV" value="Directed to children 7 and older (fantasy violence)"/>
+      <string name="IDS_DESC_G" value="General audience"/>
+      <string name="IDS_DESC_PG" value="Parental guidance suggested"/>
+      <string name="IDS_DESC_14" value="May be unsuitable for children under 14 years of age"/>
+      <string name="IDS_DESC_MA" value="Mature audience - may be unsuitable for children under 17"/>
+    </strings>
+    <rating name="TV-Y" order="1" text="IDS_RATING_Y" description="IDS_DESC_Y" tip="IDS_TIP_Y"/>
+    <rating name="TV-Y7" order="2" text="IDS_RATING_Y7" description="IDS_DESC_Y7" tip="IDS_TIP_Y7"/>
+    <rating name="TV-YFV" order="3" text="IDS_RATING_YFV" description="IDS_DESC_YFV" tip="IDS_TIP_YFV"/>
+    <rating name="TV-G" order="4" text="IDS_RATING_G" description="IDS_DESC_G" tip="IDS_TIP_G"/>
+    <rating name="TV-PG" order="5" text="IDS_RATING_PG" description="IDS_DESC_PG" tip="IDS_TIP_PG"/>
+    <rating name="TV-14" order="6" text="IDS_RATING_14" description="IDS_DESC_14" tip="IDS_TIP_14"/>
+    <rating name="TV-MA" order="7" text="IDS_RATING_MA" description="IDS_DESC_MA" tip="IDS_TIP_MA"/>
+  </ratingSystem>
+  <!-- Games Explicit Ratings -->
+  <ratingSystem name="Games">
+    <rating name="M" order="1"/>
+    <rating name="AO" order="2"/>
+  </ratingSystem>
+</ratingSystems>
