@@ -32,7 +32,7 @@ namespace Zune.Net.Shared.Helpers
         }
 
 
-        public static Album MBReleaseToAlbum(IRelease mb_rel, DateTime? updated = null)
+        public static Album MBReleaseToAlbum(IRelease mb_rel, DateTime? updated = null, bool includeRights = true)
         {
             updated ??= DateTime.Now;
             var mb_artist = mb_rel.ArtistCredit[0].Artist;
@@ -65,9 +65,12 @@ namespace Zune.Net.Shared.Helpers
                 {
                     album.Tracks = new();
                     foreach (var mb_track in mb_media.Tracks)
-                        album.Tracks.Add(MBTrackToTrack(mb_track, trackArtist: artist, updated: updated, includeRights: true));
+                        album.Tracks.Add(MBTrackToTrack(mb_track, trackArtist: artist, updated: updated, includeRights: includeRights));
                 }
             }
+
+            if (includeRights)
+                MusicBrainz.AddDefaultRights(ref album);
 
             return album;
         }

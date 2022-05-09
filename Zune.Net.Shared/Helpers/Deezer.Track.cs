@@ -20,7 +20,7 @@ namespace Zune.Net.Shared.Helpers
             return results.FirstOrDefault()?.Item;
         }
 
-        public static Track DZTrackToTrack(JToken dz_track, DateTime? updated = null, bool includeRights = false)
+        public static Track DZTrackToTrack(JToken dz_track, DateTime? updated = null, bool includeRights = true)
         {
             updated ??= DateTime.Now;
 

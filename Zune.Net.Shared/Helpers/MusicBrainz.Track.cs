@@ -41,7 +41,7 @@ namespace Zune.Net.Shared.Helpers
         }
 
 
-        public static Track MBRecordingToTrack(IRecording mb_rec, DateTime? updated = null, bool includeRights = false)
+        public static Track MBRecordingToTrack(IRecording mb_rec, DateTime? updated = null, bool includeRights = true)
         {
             updated ??= DateTime.Now;
             var mb_artist = mb_rec.ArtistCredit[0].Artist;
@@ -67,7 +67,7 @@ namespace Zune.Net.Shared.Helpers
             return track;
         }
 
-        public static Track MBTrackToTrack(ITrack mb_track, MiniArtist trackArtist, DateTime? updated = null, bool includeRights = false)
+        public static Track MBTrackToTrack(ITrack mb_track, MiniArtist trackArtist, DateTime? updated = null, bool includeRights = true)
         {
             updated ??= DateTime.Now;
 
