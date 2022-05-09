@@ -10,9 +10,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Zune.Xml.Catalog;
 
-namespace Zune.Net.Catalog.Helpers.AppleMusic
+namespace Zune.Net.Shared.Helpers.AppleMusic
 {
-    public partial class Client
+    public partial class AppleMusicClient
     {
         public static async Task<Feed<PodcastSeries>> GetPodcastChart(int limit = 26, int offset = 0, string locale = null)
         {

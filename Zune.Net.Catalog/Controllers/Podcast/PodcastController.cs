@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
+using Zune.Net.Shared.Helpers.AppleMusic;
 using Zune.Xml.Catalog;
 
 namespace Zune.Net.Catalog.Controllers.Podcast
@@ -14,7 +15,7 @@ namespace Zune.Net.Catalog.Controllers.Podcast
         public async Task<ActionResult> Details(Guid zid)
         {
             int amid = BitConverter.ToInt32(zid.ToByteArray().AsSpan(0, 4));
-            var podcast = await Helpers.AppleMusic.Client.LookupPodcast(amid);
+            var podcast = await AppleMusicClient.LookupPodcast(amid);
             var rss = await podcast.SourceUrl.GetStringAsync();
             return Content(rss, Atom.Constants.ATOM_MIMETYPE);
         }

@@ -1,7 +1,8 @@
 ﻿using Atom.Xml;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using Zune.Net.Catalog.Helpers;
+using Zune.Net.Shared.Helpers;
+using Zune.Net.Shared.Helpers.AppleMusic;
 using Zune.Xml.Catalog;
 
 namespace Zune.Net.Catalog.Controllers.Podcast
@@ -17,7 +18,7 @@ namespace Zune.Net.Catalog.Controllers.Podcast
             if (Request.Query.TryGetValue("chunkSize", out var chunkSizeVal))
                 limit = int.Parse(chunkSizeVal[0]);
 
-            return await Helpers.AppleMusic.Client.GetPodcastChart(limit);
+            return await AppleMusicClient.GetPodcastChart(limit);
             return await Listen.GetBestPodcastsByLNGenre();
         }
     }

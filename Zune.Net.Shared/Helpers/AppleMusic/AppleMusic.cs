@@ -3,9 +3,9 @@ using Flurl;
 using Flurl.Http;
 using System.Globalization;
 
-namespace Zune.Net.Catalog.Helpers.AppleMusic
+namespace Zune.Net.Shared.Helpers.AppleMusic
 {
-    public static partial class Client
+    public static partial class AppleMusicClient
     {
         public static readonly Author AM_AUTHOR = new()
         {

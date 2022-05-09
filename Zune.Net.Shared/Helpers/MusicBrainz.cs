@@ -2,7 +2,7 @@
 using System;
 using Zune.Xml.Catalog;
 
-namespace Zune.Net.Catalog.Helpers
+namespace Zune.Net.Shared.Helpers
 {
     public static partial class MusicBrainz
     {

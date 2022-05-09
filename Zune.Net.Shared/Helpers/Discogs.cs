@@ -1,6 +1,6 @@
 ﻿using Flurl.Http;
 
-namespace Zune.Net.Catalog.Helpers
+namespace Zune.Net.Shared.Helpers
 {
     public static partial class Discogs
     {
