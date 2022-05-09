@@ -43,7 +43,30 @@ namespace Zune.Net.Shared.Helpers
             return feed;
         }
 
-        public static Track FMTrackToTrack(LastTrack fm_track, DateTime? updated = null, bool includeRights = false)
+        public static async Task<Feed<Artist>> GetSimilarArtistsByMBID(Guid mbid)
+        {
+            var response = await _client.Artist.GetSimilarByMbidAsync(mbid.ToString());
+            var updated = DateTime.Now;
+
+            Feed<Artist> feed = new()
+            {
+                Title = "Similar",
+                Author = FM_AUTHOR,
+                Id = $"tag:catalog.zune.net,2017-03-12:/music/artist/{mbid}/similarArtists",
+                Updated = updated,
+            };
+
+            foreach (var fmArtist in response)
+            {
+                if (fmArtist.Mbid == null) continue;
+
+                feed.Entries.Add(FMArtistToArtist(fmArtist, updated));
+            }
+
+            return feed;
+        }
+
+        public static Track FMTrackToTrack(LastTrack fm_track, DateTime? updated = null, bool includeRights = true)
         {
             updated ??= DateTime.Now;
 
@@ -74,6 +97,58 @@ namespace Zune.Net.Shared.Helpers
                 MusicBrainz.AddDefaultRights(ref track);
 
             return track;
+        }
+
+        public static Artist FMArtistToArtist(LastArtist fm_artist, DateTime? updated = null)
+        {
+            updated ??= DateTime.Now;
+
+            Artist artist = new()
+            {
+                Id = fm_artist.Mbid,
+                Title = fm_artist.Name,
+                ShortBiography = fm_artist.Bio?.Summary,
+                Biography = fm_artist.Bio?.Content,
+                BiographyLink = fm_artist.Url?.ToString(),
+                PlayCount = fm_artist.PlayCount ?? 0,
+                Updated = updated.Value,
+            };
+
+            return artist;
+        }
+
+        public static Album FMAlbumToAlbum(LastAlbum fm_album, DateTime? updated = null, bool includeRights = true)
+        {
+            updated ??= DateTime.Now;
+
+            MiniArtist albumArtist = new()
+            {
+                Id = new(fm_album.ArtistMbid),
+                Title = fm_album.ArtistName,
+            };
+
+            Album album = new()
+            {
+                Id = fm_album.Mbid.ToString(),
+                Title = fm_album.Name,
+                PrimaryArtist = albumArtist,
+                Artists = new() { albumArtist },
+                Images = new()
+                {
+                    new() { Id = fm_album.Mbid }
+                },
+                Popularity = fm_album.PlayCount ?? 0,
+                Summary = fm_album.Wiki?.Summary,
+                Updated = updated.Value,
+            };
+
+            if (fm_album.ReleaseDateUtc.HasValue)
+                album.ReleaseDate = fm_album.ReleaseDateUtc.Value.DateTime;
+
+            if (includeRights)
+                MusicBrainz.AddDefaultRights(ref album);
+
+            return album;
         }
     }
 }

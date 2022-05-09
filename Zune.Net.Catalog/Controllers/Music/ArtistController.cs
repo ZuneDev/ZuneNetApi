@@ -134,5 +134,11 @@ namespace Zune.Net.Catalog.Controllers.Music
 
             return feed;
         }
+
+        [HttpGet, Route("{mbid}/similarArtists")]
+        public async Task<ActionResult<Feed<Artist>>> SimilarArtists(Guid mbid)
+        {
+            return await LastFM.GetSimilarArtistsByMBID(mbid);
+        }
     }
 }
