@@ -13,5 +13,6 @@
         public const string XBOX_LIVE_NAMESPACE = "http://live.xbox.net/catalog/2009/01";
 
         public const string ATOM_MIMETYPE = "application/atom+xml";
+        public const string XML_MIMETYPE = "application/xml";
     }
 }
