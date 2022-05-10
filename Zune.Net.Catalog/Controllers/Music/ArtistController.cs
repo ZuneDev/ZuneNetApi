@@ -3,6 +3,7 @@ using Flurl.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -55,7 +56,26 @@ namespace Zune.Net.Catalog.Controllers.Music
         [HttpGet, Route("{mbid}/albums")]
         public ActionResult<Feed<Album>> Albums(Guid mbid)
         {
-            return MusicBrainz.GetArtistAlbumsByMBID(mbid, Request.Path);
+            var feed = MusicBrainz.GetArtistAlbumsByMBID(mbid, Request.Path);
+
+            Comparison<Album> sortComparer = (a, b) => a.ReleaseDate.Year.CompareTo(b.ReleaseDate.Year);
+            if (Request.Query.TryGetValue("orderby", out var orderByValue))
+            {
+                string orderBy = orderByValue.Single().ToLower();
+                switch (orderBy)
+                {
+                    case "title":
+                        sortComparer = (a, b) => (a.SortTitle ?? a.Title.Value).CompareTo(b.SortTitle ?? b.Title.Value);
+                        break;
+
+                    case "mostplayed":
+                        sortComparer = (a, b) => a.Popularity.CompareTo(b.Popularity);
+                        break;
+                }
+            }
+
+            feed.Entries.Sort(sortComparer);
+            return feed;
         }
 
         [HttpGet, Route("{mbid}/primaryImage")]
