@@ -23,21 +23,13 @@ namespace Zune.Net.Shared.Helpers
         public static async Task<Feed<Track>> GetSimilarTracksByMBID(Guid mbid)
         {
             var response = await _client.Track.GetSimilarByMbidAsync(mbid.ToString());
-            var updated = DateTime.Now;
-
-            Feed<Track> feed = new()
-            {
-                Title = "Similar",
-                Author = FM_AUTHOR,
-                Id = $"tag:mix.zune.net,2017-03-12:/track/{mbid}/similarTracks",
-                Updated = updated,
-            };
+            var feed = CreateFeed<Track>($"/track/{mbid}/similarTracks", "Similar");
 
             foreach (var fmTrack in response)
             {
                 if (fmTrack.Mbid == null) continue;
 
-                feed.Entries.Add(FMTrackToTrack(fmTrack, updated));
+                feed.Entries.Add(FMTrackToTrack(fmTrack, feed.Updated));
             }
 
             return feed;
@@ -46,24 +38,33 @@ namespace Zune.Net.Shared.Helpers
         public static async Task<Feed<Artist>> GetSimilarArtistsByMBID(Guid mbid)
         {
             var response = await _client.Artist.GetSimilarByMbidAsync(mbid.ToString());
-            var updated = DateTime.Now;
-
-            Feed<Artist> feed = new()
-            {
-                Title = "Similar",
-                Author = FM_AUTHOR,
-                Id = $"tag:catalog.zune.net,2017-03-12:/music/artist/{mbid}/similarArtists",
-                Updated = updated,
-            };
+            var feed = CreateFeed<Artist>($"/artist/{mbid}/similarArtists", "Similar");
 
             foreach (var fmArtist in response)
             {
                 if (fmArtist.Mbid == null) continue;
 
-                feed.Entries.Add(FMArtistToArtist(fmArtist, updated));
+                feed.Entries.Add(FMArtistToArtist(fmArtist, feed.Updated));
             }
 
             return feed;
+        }
+
+        public static async Task<IReadOnlyList<LastTrack>> GetTopTracks()
+        {
+            var response = await _client.Chart.GetTopTracksAsync();
+            return response.Content;
+        }
+
+        public static MetaBrainz.MusicBrainz.Interfaces.Entities.IRecording GetMBRecordingByFMTrack(LastTrack fm_track)
+        {
+            string query = $"artistname:{fm_track.ArtistName} AND recording:{fm_track.Name}";
+            if (fm_track.AlbumName != null)
+                query += $" AND release:{fm_track.AlbumName}";
+
+            var results = MusicBrainz._query.FindAllRecordings(query, simple: false);
+
+            return results.FirstOrDefault()?.Item;
         }
 
         public static Track FMTrackToTrack(LastTrack fm_track, DateTime? updated = null, bool includeRights = true)
@@ -149,6 +150,17 @@ namespace Zune.Net.Shared.Helpers
                 MusicBrainz.AddDefaultRights(ref album);
 
             return album;
+        }
+
+        public static Feed<TMedia> CreateFeed<TMedia>(string id, string title) where TMedia : class
+        {
+            return new()
+            {
+                Title = title,
+                Author = FM_AUTHOR,
+                Id = $"tag:catalog.zune.net,2017-03-12:" + id,
+                Updated = DateTime.Now,
+            };
         }
     }
 }

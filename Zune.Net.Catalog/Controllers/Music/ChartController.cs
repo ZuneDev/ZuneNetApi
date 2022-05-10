@@ -1,6 +1,7 @@
 ﻿using Atom.Xml;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Zune.Net.Shared.Helpers;
 using Zune.Xml.Catalog;
@@ -11,31 +12,56 @@ namespace Zune.Net.Catalog.Controllers.Music
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
     public class ChartController : Controller
     {
+        private const bool useDeezer = true;
+
         [HttpGet, Route("tracks")]
         public async Task<ActionResult<Feed<Track>>> Tracks()
         {
-            var dz_tracks = await Deezer.GetChartDZTracks();
-            DateTime updated = DateTime.Now;
+            Feed<Track> feed;
 
-            Feed<Track> feed = new()
+            if (useDeezer)
             {
-                Id = "tracks",
-                Title = "Tracks",
-                Author = Deezer.DZ_AUTHOR,
-                Updated = updated
-            };
+                var dz_tracks = await Deezer.GetChartDZTracks();
+                DateTime updated = DateTime.Now;
 
-            foreach (var dz_track in dz_tracks)
+                feed = new()
+                {
+                    Id = "tracks",
+                    Title = "Tracks",
+                    Author = Deezer.DZ_AUTHOR,
+                    Updated = updated
+                };
+
+                foreach (var dz_track in dz_tracks)
+                {
+                    var mb_recording = Deezer.GetMBRecordingByDZTrack(dz_track);
+                    if (mb_recording == null)
+                        continue;
+
+                    var track = MusicBrainz.MBRecordingToTrack(mb_recording, updated: updated, includeRights: true);
+                    track.Popularity = dz_track.Value<long>("rank");
+                    track.Explicit = dz_track.Value<bool>("explicit_lyrics");
+
+                    feed.Entries.Add(track);
+                }
+            }
+            else
             {
-                var mb_recording = Deezer.GetMBRecordingByDZTrack(dz_track);
-                if (mb_recording == null)
-                    continue;
+                var fm_tracks = await LastFM.GetTopTracks();
+                feed = LastFM.CreateFeed<Track>("/music/chart/zune/tracks", "Top tracks");
 
-                var track = MusicBrainz.MBRecordingToTrack(mb_recording, updated: updated, includeRights: true);
-                track.Popularity = dz_track.Value<long>("rank");
-                track.Explicit = dz_track.Value<bool>("explicit_lyrics");
+                foreach (var fm_track in fm_tracks.Take(10))
+                {
+                    var mb_recording = LastFM.GetMBRecordingByFMTrack(fm_track);
+                    if (mb_recording == null)
+                        continue;
 
-                feed.Entries.Add(track);
+                    var track = MusicBrainz.MBRecordingToTrack(mb_recording, updated: feed.Updated, includeRights: true);
+                    track.Popularity = fm_track.Rank ?? 0;
+                    track.PlayCount = fm_track.PlayCount ?? 0;
+
+                    feed.Entries.Add(track);
+                }
             }
 
             return feed;

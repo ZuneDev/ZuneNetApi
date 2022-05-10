@@ -23,6 +23,7 @@ namespace Zune.Net.Shared.Helpers
                 OfferId = Guid.Parse("9534a201-2102-11db-89ca-0019b92a3933"),
                 FileSize = 500
             });
+            media.Actionable = true;
         }
     }
 }
