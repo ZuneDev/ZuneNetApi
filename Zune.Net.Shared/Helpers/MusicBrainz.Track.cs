@@ -36,8 +36,36 @@ namespace Zune.Net.Shared.Helpers
 
         public static Track GetTrackByMBID(Guid mbid)
         {
-            var mb_rec = _query.LookupRecording(mbid, Include.Genres | Include.ArtistCredits | Include.Releases);
-            return MBRecordingToTrack(mb_rec, includeRights: true);
+            try
+            {
+                var mb_rec = _query.LookupRecording(mbid, Include.Genres | Include.ArtistCredits | Include.Releases);
+                return MBRecordingToTrack(mb_rec, includeRights: true);
+            }
+            catch (QueryException)
+            {
+                // MusicBrainz Picard likes to put the Track ID instead of the Recording ID
+                var releases = _query.BrowseTrackReleases(mbid, limit: 1, inc: Include.ArtistCredits);
+                var mb_rel = releases.Results[0];
+
+                var mb_artist = mb_rel.ArtistCredit?[0].Artist;
+                MiniArtist artist = null;
+                if (mb_artist != null)
+                    artist = new()
+                    {
+                        Id = mb_artist.Id,
+                        Title = mb_artist.Name
+                    };
+                    
+                var mb_media = mb_rel.Media[0];
+                if (mb_media.Tracks != null && mb_media.Tracks.Count > 0)
+                {
+                    foreach (var mb_track in mb_media.Tracks)
+                        if (mb_track.Id == mbid)
+                            return MBTrackToTrack(mb_track, trackArtist: artist);
+                }
+
+                return null;
+            }
         }
 
 
