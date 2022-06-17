@@ -27,7 +27,7 @@ namespace Zune.Xml.Catalog
         [XmlElement("originalPrice")]
         public double OriginalPrice { get; set; }
 
-        [XmlElement("currencyCode")]
+        [XmlElement("priceCurrencyCode")]
         public string CurrencyCode { get; set; }
 
         [XmlElement("displayPrice")]

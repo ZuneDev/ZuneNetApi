@@ -7,7 +7,7 @@ namespace Zune.Xml.Catalog
     [XmlRoot("entry")]
     public class Track : Media
     {
-        [XmlElement("duration")]
+        [XmlElement("length")]
         public SerializableTimeSpan Duration { get; set; }
 
         [XmlElement("trackNumber")]
