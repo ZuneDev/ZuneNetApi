@@ -89,10 +89,12 @@ namespace Zune.SocialApi.Controllers
                         Description = "Restore the Zune social",
                         TypeId = BadgeType.ActiveForumsBadge_Gold,
                         Title = "Necromancer",
-                        Image = "https://i.imgur.com/dMwIZs8.png",
-                        MediaId = Guid.NewGuid(),
-                        MediaType = "Application",
-                        Summary = "Where is this shown? No idea, contact YoshiAsk if you see this in the software"
+                        Image = new("https://i.imgur.com/dMwIZs8.png", relation: "enclosure"),
+                        Media = new()
+                        {
+                            Id = Guid.NewGuid(),
+                            Type = "Application",
+                        }
                     }
                 }
             };

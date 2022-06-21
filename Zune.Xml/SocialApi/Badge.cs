@@ -11,19 +11,16 @@ namespace Zune.Xml.SocialApi
         [XmlElement("typeId", Namespace = Constants.ZUNE_PROFILES_NAMESPACE)]
         public BadgeType TypeId { get; set; }
 
-        [XmlElement("image", Namespace = Constants.ZUNE_PROFILES_NAMESPACE)]
-        public string Image { get; set; }
+        [XmlElement("link", Namespace = Constants.ATOM_NAMESPACE)]
+        public Link Image { get; set; }
 
         [XmlElement("type", Namespace = Constants.ZUNE_PROFILES_NAMESPACE)]
         public string Type { get; set; }
 
-        [XmlElement("mediaId", Namespace = Constants.ZUNE_PROFILES_NAMESPACE)]
-        public Guid MediaId { get; set; }
+        [XmlElement("media", Namespace = Constants.ZUNE_PROFILES_NAMESPACE)]
+        public BadgeMedia Media { get; set; }
 
-        [XmlElement("mediaType", Namespace = Constants.ZUNE_PROFILES_NAMESPACE)]
-        public string MediaType { get; set; }
-
-        [XmlElement("description", Namespace = Constants.ZUNE_PROFILES_NAMESPACE)]
+        [XmlElement("content", Namespace = Constants.ATOM_NAMESPACE)]
         public string Description { get; set; }
     }
 
