@@ -1,6 +1,8 @@
 ﻿using Atom.Xml;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using Zune.Net.Shared.Helpers;
 using Zune.Xml.Catalog;
@@ -11,6 +13,12 @@ namespace Zune.Net.Catalog.Controllers.Music
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
     public class TrackController : Controller
     {
+        private readonly IWebHostEnvironment _env;
+
+        public TrackController(IWebHostEnvironment env)
+        {
+            _env = env;
+        }
 
         [HttpGet, Route("")]
         public ActionResult<Feed<Track>> Search()
@@ -24,6 +32,11 @@ namespace Zune.Net.Catalog.Controllers.Music
         [HttpGet, Route("{mbid}")]
         public ActionResult<Track> Details(Guid mbid)
         {
+            if (Request.Host.Value.Contains("ssl"))
+            {
+                return PhysicalFile(Path.Combine(_env.ContentRootPath, @"Resources\test.mp3"), "audio/mp3");
+            }
+
             return MusicBrainz.GetTrackByMBID(mbid);
         }
 
