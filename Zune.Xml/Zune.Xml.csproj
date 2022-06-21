@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard1.1;netstandard2.0;netstandard2.1</TargetFrameworks>
+        <TargetFrameworks>netstandard1.1;netstandard2.0;netstandard2.1;net6.0</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.1'">
@@ -12,13 +12,17 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.8" />
     </ItemGroup>
 
-    <ItemGroup>
-      <None Remove="Catalog\MiniMedia.cs~RF29d7530f.TMP" />
+    <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.6" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Atom\Atom.csproj" />
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     </ItemGroup>
+
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0'">
+        <DefineConstants>$(DefineConstants);NETSTANDARD1_1_OR_GREATER;NETSTANDARD2_0_OR_GREATER;NETSTANDARD2_1_OR_GREATER</DefineConstants>
+    </PropertyGroup>
 
 </Project>

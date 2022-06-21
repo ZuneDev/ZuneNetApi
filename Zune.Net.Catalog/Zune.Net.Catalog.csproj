@@ -9,7 +9,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Flurl.Http" Version="3.2.2" />
+        <PackageReference Include="Flurl.Http" Version="3.2.4" />
 		
         <PackageReference Include="Microsoft.AspNetCore.Localization.Routing" Version="2.2.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />

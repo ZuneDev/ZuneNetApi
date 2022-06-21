@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net5.0</TargetFramework>
+		<TargetFramework>net6.0</TargetFramework>
 		<OutputType>Library</OutputType>
 	</PropertyGroup>
 
@@ -13,11 +13,11 @@
 		<ProjectReference Include="..\..\..\yoshiask\lastfm\src\IF.Lastfm.Core\IF.Lastfm.Core.csproj" />
 		<ProjectReference Include="..\Zune.Xml\Zune.Xml.csproj" />
 
-        <PackageReference Include="Flurl.Http" Version="3.2.2" />
+        <PackageReference Include="Flurl.Http" Version="3.2.4" />
         <PackageReference Include="MetaBrainz.MusicBrainz" Version="5.0.0" />
         <PackageReference Include="MetaBrainz.MusicBrainz.CoverArt" Version="5.0.0" />
         <PackageReference Include="MetaBrainz.MusicBrainz.DiscId" Version="3.0.0" />
-        <PackageReference Include="PodcastAPI" Version="1.1.0" />
+        <PackageReference Include="PodcastAPI" Version="1.1.1" />
         <!--<PackageReference Include="Inflatable.Lastfm" Version="1.2.0" />-->
 	</ItemGroup>
 
