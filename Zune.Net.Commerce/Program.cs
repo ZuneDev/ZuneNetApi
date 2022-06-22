@@ -2,11 +2,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Zune.Net;
 
 namespace CommerceZuneNet
 {
@@ -38,9 +34,8 @@ namespace CommerceZuneNet
                 .ConfigureServices((ctx, s) =>
                 {
                     s.AddSingleton(sp => cfg);
-                    s.Configure<Zune.DB.ZuneNetContextSettings>(ctx.Configuration.GetSection("ZuneNetContext"));
-                    s.AddSingleton<Zune.DB.ZuneNetContext>();
-                });
+                })
+                .ConfigureZuneDB();
         }
     }
 }

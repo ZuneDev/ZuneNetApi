@@ -1,4 +1,7 @@
 ﻿using Atom.Xml;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
@@ -11,23 +14,25 @@ namespace Zune.DB.Console
     {
         static async Task Main(string[] args)
         {
+            BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
             ZuneNetContext ctx = new(new ZuneNetContextSettings
             {
                 ConnectionString = "mongodb://localhost:27017",
                 DatabaseName = "Zune",
                 MemberCollectionName = "Members"
             });
+
             foreach (var member in await ctx.GetAsync())
                 await ctx.RemoveAsync(member.Id);
 
-            string memberId = Member.GetXuidFromZuneTag("YoshiAsk");
+            string zuneTag = "YoshiAsk";
             var newMember = new Member
             {
                 Updated = DateTime.UtcNow,
-                //Id = memberId,
+                Id = Member.GetGuidFromZuneTag(zuneTag),
                 PlayCount = 206,
-                Xuid = memberId,
-                ZuneTag = "YoshiAsk",
+                Xuid = Member.GetXuidFromZuneTag(zuneTag),
+                ZuneTag = zuneTag,
                 DisplayName = "Yoshi Askharoun",
                 Status = "Reviving the Zune social",
                 Bio = "A computer science student at Texas A&M Univserity that can't help but bring back dead Microsoft products.",
@@ -96,13 +101,13 @@ namespace Zune.DB.Console
             //ctx.Messages.Add(message);
             //ctx.Tuners.Add(tuner);
 
-            memberId = Member.GetXuidFromZuneTag("WamWooWam");
+            zuneTag = "WamWooWam";
             var member2 = new Member
             {
                 Updated = DateTime.UtcNow,
-                //Id = memberId,
+                Id = Member.GetGuidFromZuneTag(zuneTag),
                 PlayCount = 4123,
-                Xuid = memberId,
+                Xuid = Member.GetXuidFromZuneTag(zuneTag),
                 ZuneTag = "WamWooWam",
                 DisplayName = string.Empty,
                 Status = "Restoring Windows Phone 7",

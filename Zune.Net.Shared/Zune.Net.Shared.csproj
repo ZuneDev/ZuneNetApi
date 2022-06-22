@@ -12,6 +12,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\yoshiask\lastfm\src\IF.Lastfm.Core\IF.Lastfm.Core.csproj" />
 		<ProjectReference Include="..\Zune.Xml\Zune.Xml.csproj" />
+		<ProjectReference Include="..\Zune.DB\Zune.DB.csproj" />
 
         <PackageReference Include="Flurl.Http" Version="3.2.4" />
         <PackageReference Include="MetaBrainz.MusicBrainz" Version="5.0.0" />

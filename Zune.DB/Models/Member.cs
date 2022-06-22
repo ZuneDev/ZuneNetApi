@@ -25,7 +25,7 @@ namespace Zune.DB.Models
         }
 
         [BsonId]
-        public ObjectId Id { get; set; }
+        public Guid Id { get; set; }
 
         public string ZuneTag { get; set; }
         public int PlayCount { get; set; }
@@ -191,7 +191,7 @@ namespace Zune.DB.Models
                 {
                     new Link(UserTile, "enclosure")
                     {
-                        Title = "userTile"
+                        Title = "usertile"
                     },
                     new Link(Background, "enclosure")
                     {
@@ -227,14 +227,26 @@ namespace Zune.DB.Models
         public static string GetXuidFromZuneTag(string zuneTag)
         {
             // Compute 256-bit (32-byte) hash
-            byte[] hash = System.Security.Cryptography.SHA256.Create()
-                .ComputeHash(System.Text.Encoding.UTF8.GetBytes(zuneTag));
+            byte[] hash = System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(zuneTag));
 
             string[] hashStr = new string[hash.Length];
             for (int i = 0; i < hash.Length; i++)
                 hashStr[i] = hash[i].ToString("X2");
 
             return string.Join(string.Empty, hashStr).ToUpperInvariant();
+        }
+
+        public static Guid GetGuidFromZuneTag(string zuneTag)
+        {
+            // Compute 256-bit (32-byte) hash
+            byte[] hash = System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(zuneTag));
+
+            // GUIDs are 128 bits (16 bytes), so we XOR the first 16 bytes of the hash with the last 16 bytes.
+            // Will this cause collisions? Likely not. Should this be investigated before production? Probably.
+            byte[] guid = new byte[16];
+            for (int i = 0; i < guid.Length; i++)
+                guid[i] = (byte)(hash[i] ^ hash[i + 16]);
+            return new(guid);
         }
     }
 }

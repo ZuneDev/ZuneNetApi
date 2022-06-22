@@ -25,8 +25,9 @@ namespace CommerceZuneNet.Controllers
             // requests use a Zune tag or GUID to specify a member, and a WLID
             // token for authorization. Most Commerce endpoints just send the WLID,
             // which doesn't directly identify which user's data is being requested.
-            var xuid = Zune.DB.Models.Member.GetXuidFromZuneTag("YoshiAsk");
-            var member = await _database.GetSingleAsync(m => m.Xuid == xuid);
+            var id = Zune.DB.Models.Member.GetGuidFromZuneTag("YoshiAsk");
+            var members = await _database.GetAsync();
+            var member = members.FirstOrDefault(m => m.Id == id);
 
             SignInResponse response;
             if (member != null)
@@ -43,7 +44,7 @@ namespace CommerceZuneNet.Controllers
                         SignInErrorCode = 0x80070057,
                     }
                 };
-                return NotFound(response);
+                return Unauthorized(response);
             }
 
             return response;
