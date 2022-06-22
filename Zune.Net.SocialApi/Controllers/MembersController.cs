@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Atom;
 using Atom.Xml;
 using Microsoft.AspNetCore.Mvc;
@@ -22,10 +23,10 @@ namespace Zune.SocialApi.Controllers
             _database = database;
         }
         
-        public ActionResult<Member> Info(string zuneTag)
+        public async Task<ActionResult<Member>> Info(string zuneTag)
         {
             var requestUrl = Request.Scheme + "://" + Request.Host + Request.Path;
-            var member = _database.Members.FirstOrDefault(m => m.ZuneTag == zuneTag);
+            var member = await _database.GetSingleAsync(m => m.ZuneTag == zuneTag);
 
             Member response;
             if (member != null)
@@ -40,7 +41,7 @@ namespace Zune.SocialApi.Controllers
             return response;
         }
 
-        public ActionResult<Feed<Member>> Friends(string zuneTag)
+        public async Task<ActionResult<Feed<Member>>> Friends(string zuneTag)
         {
             string requestUrl = Request.Scheme + "://" + Request.Host + Request.Path;
 
@@ -60,20 +61,20 @@ namespace Zune.SocialApi.Controllers
                 Rights = "Copyright (c) Microsoft Corporation.  All rights reserved."
             };
 
-            var member = _database.Members.FirstOrDefault(m => m.ZuneTag == zuneTag);
+            var member = _database.GetSingleAsync(m => m.ZuneTag == zuneTag);
             if (member == null)
                 return NotFound();
 
-            foreach (var relation in member.Friends)
-            {
-                var friend = relation.MemberB;
-                feed.Entries.Add(friend.GetXmlMember());
-            }
+            //foreach (var relation in member.Friends)
+            //{
+            //    var friend = relation.MemberB;
+            //    feed.Entries.Add(friend.GetXmlMember());
+            //}
 
             return feed;
         }
 
-        public ActionResult<Feed<Badge>> Badges(string member)
+        public async Task<ActionResult<Feed<Badge>>> Badges(string member)
         {
             string requestUrl = Request.Scheme + "://" + Request.Host + Request.Path;
 

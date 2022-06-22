@@ -29,6 +29,9 @@ namespace Zune.DB
         public async Task<List<Member>> GetAsync(Expression<Func<Member, bool>> filter = null) =>
             await _memberCollection.Find(filter ?? (_ => true)).ToListAsync();
 
+        public async Task<Member?> GetSingleAsync(Expression<Func<Member, bool>> filter = null) =>
+            await _memberCollection.Find(filter ?? (_ => true)).FirstOrDefaultAsync();
+
         public async Task<Member?> GetAsync(MongoDB.Bson.ObjectId id) =>
             await _memberCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
 

@@ -26,7 +26,7 @@ namespace CommerceZuneNet.Controllers
             // token for authorization. Most Commerce endpoints just send the WLID,
             // which doesn't directly identify which user's data is being requested.
             var xuid = Zune.DB.Models.Member.GetXuidFromZuneTag("YoshiAsk");
-            var member = (await _database.GetAsync(m => m.Xuid == xuid)).FirstOrDefault();
+            var member = await _database.GetSingleAsync(m => m.Xuid == xuid);
 
             SignInResponse response;
             if (member != null)

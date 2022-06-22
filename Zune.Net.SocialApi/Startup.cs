@@ -28,7 +28,6 @@ namespace Zune.SocialApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers(o => o.UseZestFormatters());
-            services.AddDbContext<ZuneNetContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
