@@ -16,16 +16,21 @@ namespace Zune.Net.Inbox.Controllers
     [ApiController]
     public class MessagingController : ControllerBase
     {
+        private readonly ZuneNetContext _database;
+        public MessagingController(ZuneNetContext database)
+        {
+            _database = database;
+        }
+
         [HttpPost]
-        public IActionResult Send(string locale, string zuneTag)
+        public async Task<IActionResult> Send(string locale, string zuneTag)
         {
             if (!Request.Form.TryGetValue("recipients", out StringValues recipients))
                 return StatusCode(StatusCodes.Status400BadRequest, "Message must have at least one recipient.");
             if (!Request.Form.TryGetValue("type", out StringValues type))
                 return StatusCode(StatusCodes.Status400BadRequest, "Message must have specify a message type.");
 
-            using var ctx = new ZuneNetContext();
-            Member sender = ctx.Members.FirstOrDefault(m => m.ZuneTag == zuneTag);
+            Member sender = await _database.GetSingleAsync(m => m.ZuneTag == zuneTag);
             if (sender == null)
                 return StatusCode(StatusCodes.Status400BadRequest, $"Sender {zuneTag} does not exist.");
 
@@ -34,7 +39,7 @@ namespace Zune.Net.Inbox.Controllers
             if (zuneTag == recipientZuneTag)
                 recipient = sender;
             else
-                recipient = ctx.Members.FirstOrDefault(m => m.ZuneTag == recipientZuneTag);
+                recipient = await _database.GetSingleAsync(m => m.ZuneTag == recipientZuneTag);
             if (recipient == null)
                 return StatusCode(StatusCodes.Status400BadRequest, $"Recipient {zuneTag} does not exist.");
 
@@ -52,10 +57,10 @@ namespace Zune.Net.Inbox.Controllers
             if (Request.Form.TryGetValue("wishlist", out StringValues wishlist))
                 msg.Wishlist = bool.Parse(wishlist);
 
-            ctx.Messages.Add(msg);
-            ctx.Members.Attach(sender);
-            ctx.Members.Attach(recipient);
-            ctx.SaveChanges();
+            //ctx.Messages.Add(msg);
+            //ctx.Members.Attach(sender);
+            //ctx.Members.Attach(recipient);
+            //ctx.SaveChanges();
             return StatusCode(StatusCodes.Status200OK);
         }
     }
