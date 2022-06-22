@@ -14,5 +14,6 @@
 
         public const string ATOM_MIMETYPE = "application/atom+xml";
         public const string XML_MIMETYPE = "application/xml";
+        public const string SOAP_XML_MIMETYPE = "application/soap+xml";
     }
 }
