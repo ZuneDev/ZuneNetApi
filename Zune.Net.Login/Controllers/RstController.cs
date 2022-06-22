@@ -50,19 +50,14 @@ namespace Zune.Net.Login.Controllers
             XPathNavigator nav = doc.CreateNavigator();
             XmlNamespaceManager namespaceResolver = new(nav.NameTable);
             namespaceResolver.AddNamespace("psf", "http://schemas.microsoft.com/Passport/SoapServices/SOAPFault");
+            namespaceResolver.AddNamespace("wsse", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd");
 
+            var tokenElem = nav.SelectSingleNode("//wsse:BinarySecurityToken[@Id=\"Compact1\"]", namespaceResolver);
             var cidElem = nav.SelectSingleNode(string.Format(CREDPROP_XPATH, "CID"), namespaceResolver);
-            var emailElem = nav.SelectSingleNode(string.Format(CREDPROP_XPATH, "AuthMembername"), namespaceResolver);
-            var countryElem = nav.SelectSingleNode(string.Format(CREDPROP_XPATH, "Country"), namespaceResolver);
-            var languageElem = nav.SelectSingleNode(string.Format(CREDPROP_XPATH, "Language"), namespaceResolver);
-            var firstNameElem = nav.SelectSingleNode(string.Format(CREDPROP_XPATH, "FirstName"), namespaceResolver);
-            var lastNameElem = nav.SelectSingleNode(string.Format(CREDPROP_XPATH, "LastName"), namespaceResolver);
+            string? token = tokenElem?.Value;
             string? cid = cidElem?.Value;
-            string? email = emailElem?.Value;
-            string? country = countryElem?.Value;
-            int? language = languageElem?.ValueAsInt;
-            string? firstName = firstNameElem?.Value;
-            string? lastName = lastNameElem?.Value;
+            if (token != null && cid != null)
+                await _database.AddToken(token, cid);
 
             // Copy body into response
             await response.Content.CopyToAsync(Response.Body);

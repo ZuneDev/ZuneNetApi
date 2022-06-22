@@ -68,7 +68,7 @@ namespace Zune.DB
             return await GetSingleAsync(m => m.Cid == entry.Cid);
         }
 
-        public async Task AddOrUpdateToken(string token, string cid)
+        public async Task AddToken(string token, string cid)
         {
             string tokenHash = Hash(token);
             await _authCollection.DeleteManyAsync(e => e.TokenHash == token);
