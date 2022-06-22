@@ -1,6 +1,7 @@
 ﻿using Atom.Xml;
 using System;
 using System.Globalization;
+using System.Threading.Tasks;
 using Zune.DB;
 using Zune.DB.Models;
 
@@ -8,15 +9,22 @@ namespace Zune.DB.Console
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            using var ctx = new ZuneNetContext(true);
+            ZuneNetContext ctx = new(new ZuneNetContextSettings
+            {
+                ConnectionString = "mongodb://localhost:27017",
+                DatabaseName = "Zune",
+                MemberCollectionName = "Members"
+            });
+            foreach (var member in await ctx.GetAsync())
+                await ctx.RemoveAsync(member.Id);
 
-            string memberId = Member.GetGuidFromZuneTag("YoshiAsk").ToString();
+            string memberId = Member.GetXuidFromZuneTag("YoshiAsk");
             var newMember = new Member
             {
                 Updated = DateTime.UtcNow,
-                Id = memberId,
+                //Id = memberId,
                 PlayCount = 206,
                 Xuid = memberId,
                 ZuneTag = "YoshiAsk",
@@ -27,7 +35,7 @@ namespace Zune.DB.Console
                 UserTile = "http://tiles.zunes.me/tiles/avatar/default.jpg",
                 Background = "http://tiles.zunes.me/tiles/background/YoshiAsk",
 
-                AcceptedTermsOfService = false,
+                AcceptedTermsOfService = true,
                 AccountSuspended = false,
                 BillingUnavailable = true,
                 SubscriptionLapsed = true,
@@ -69,8 +77,8 @@ namespace Zune.DB.Console
                 },
                 TextContent = "Tech giant Microsoft announced early Monday morning that a new Zune music player is in the works",
             };
-            newMember.Messages ??= new System.Collections.Generic.List<Message>(1);
-            newMember.Messages.Add(message);
+            //newMember.Messages ??= new System.Collections.Generic.List<Message>(1);
+            //newMember.Messages.Add(message);
 
             Guid badgedId = Guid.Parse("fe9ab096-a072-475b-8e24-0aaacf32852f");
             var badge = new Badge
@@ -84,15 +92,15 @@ namespace Zune.DB.Console
                 //Summary = "Where is this shown? No idea, contact YoshiAsk if you see this in the software"
             };
 
-            ctx.Members.Add(newMember);
-            ctx.Messages.Add(message);
-            ctx.Tuners.Add(tuner);
+            await ctx.CreateAsync(newMember);
+            //ctx.Messages.Add(message);
+            //ctx.Tuners.Add(tuner);
 
-            memberId = Member.GetGuidFromZuneTag("WamWooWam").ToString();
+            memberId = Member.GetXuidFromZuneTag("WamWooWam");
             var member2 = new Member
             {
                 Updated = DateTime.UtcNow,
-                Id = memberId,
+                //Id = memberId,
                 PlayCount = 4123,
                 Xuid = memberId,
                 ZuneTag = "WamWooWam",
@@ -103,7 +111,7 @@ namespace Zune.DB.Console
                 UserTile = "http://i.imgur.com/06BuEKG.jpg",
                 Background = "http://i.imgur.com/KeZIsxF.jpg",
 
-                AcceptedTermsOfService = false,
+                AcceptedTermsOfService = true,
                 AccountSuspended = false,
                 BillingUnavailable = true,
                 SubscriptionLapsed = true,
@@ -125,9 +133,9 @@ namespace Zune.DB.Console
             };
             member2.TunerRegisterInfo = tuner;
 
-            ctx.Members.Add(member2);
-            ctx.Tuners.Add(tuner);
-            ctx.SaveChanges();
+            await ctx.CreateAsync(member2);
+            //ctx.Tuners.Add(tuner);
+            //ctx.SaveChanges();
         }
     }
 }

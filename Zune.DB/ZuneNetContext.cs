@@ -13,14 +13,17 @@ namespace Zune.DB
     {
         private readonly IMongoCollection<Member> _memberCollection;
 
-        public ZuneNetContext(IOptions<ZuneNetContextSettings> dbSettings)
+        public ZuneNetContext(IOptions<ZuneNetContextSettings> dbSettings) : this(dbSettings.Value)
         {
-            MongoClient mongoClient = new(dbSettings.Value.ConnectionString);
+        }
 
-            var mongoDatabase = mongoClient.GetDatabase(dbSettings.Value.DatabaseName);
+        public ZuneNetContext(ZuneNetContextSettings dbSettings)
+        {
+            MongoClient mongoClient = new(dbSettings.ConnectionString);
 
-            _memberCollection = mongoDatabase.GetCollection<Member>(
-                dbSettings.Value.MemberCollectionName);
+            var mongoDatabase = mongoClient.GetDatabase(dbSettings.DatabaseName);
+
+            _memberCollection = mongoDatabase.GetCollection<Member>(dbSettings.MemberCollectionName);
         }
 
         public async Task<List<Member>> GetAsync(Expression<Func<Member, bool>> filter = null) =>
