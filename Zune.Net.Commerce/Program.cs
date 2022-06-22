@@ -35,7 +35,12 @@ namespace CommerceZuneNet
                           .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
                     config.AddEnvironmentVariables();
                 })
-                .ConfigureServices(s => s.AddSingleton(sp => cfg));
+                .ConfigureServices((ctx, s) =>
+                {
+                    s.AddSingleton(sp => cfg);
+                    s.Configure<Zune.DB.ZuneNetContextSettings>(ctx.Configuration.GetSection("ZuneNetContext"));
+                    s.AddSingleton<Zune.DB.ZuneNetContext>();
+                });
         }
     }
 }

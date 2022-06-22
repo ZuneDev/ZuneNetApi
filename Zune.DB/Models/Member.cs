@@ -1,7 +1,8 @@
 ﻿using Atom.Xml;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Zune.DB.Models.Joining;
 using Zune.Xml.Commerce;
@@ -23,19 +24,23 @@ namespace Zune.DB.Models
                 SetFromSignInResponse(signInResponse);
         }
 
-        [Key]
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
+
         public string ZuneTag { get; set; }
         public int PlayCount { get; set; }
         public string DisplayName { get; set; }
         public string Status { get; set; }
         public string Bio { get; set; }
         public string Location { get; set; }
+
         public IList<Link> Playlists { get; set; }
         public IList<MemberBadge> Badges { get; set; }
         public IList<Comment> Comments { get; set; }
         public IList<Message> Messages { get; set; }
         public IList<MemberMember> Friends { get; set; }
+
         public DateTime Updated { get; set; }
 
         public string Xuid { get; set; }

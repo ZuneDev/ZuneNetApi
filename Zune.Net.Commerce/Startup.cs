@@ -36,7 +36,6 @@ namespace CommerceZuneNet
                 .AddMicrosoftIdentityWebApi(Configuration.GetSection("AzureAd"));
 
             services.AddControllersWithViews(o => o.UseZestFormatters());
-            services.AddDbContext<ZuneNetContext>();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("CommerceZuneNet", new OpenApiInfo { Title = "CommerceZuneNet", Version = "v2" });

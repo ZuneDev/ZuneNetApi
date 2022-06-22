@@ -12,8 +12,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.6" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Design" Version="1.1.6" />
+        <PackageReference Include="MongoDB.Driver" Version="2.16.1" />
         <ProjectReference Include="..\Zune.DB\Zune.DB.csproj" />
     </ItemGroup>
 

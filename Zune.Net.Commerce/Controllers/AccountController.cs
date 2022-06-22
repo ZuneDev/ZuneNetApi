@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Security.Cryptography;
-using System.Text;
+using System.Linq;
+using System.Threading.Tasks;
 using Zune.DB;
 using Zune.Xml.Commerce;
 
@@ -19,7 +18,7 @@ namespace CommerceZuneNet.Controllers
         }
 
         [HttpPost]
-        public ActionResult<SignInResponse> SignIn(SignInRequest request)
+        public async Task<ActionResult<SignInResponse>> SignIn(SignInRequest request)
         {
             // TODO: Authentication is a mess. SignInRequest only provides a (device?)
             // ID that is only seen in this endpoint. After that, all subsequent
@@ -27,7 +26,7 @@ namespace CommerceZuneNet.Controllers
             // token for authorization. Most Commerce endpoints just send the WLID,
             // which doesn't directly identify which user's data is being requested.
             var zuneId = Zune.DB.Models.Member.GetGuidFromZuneTag("YoshiAsk").ToString();
-            var member = _database.Members.Find(zuneId);
+            var member = (await _database.GetAsync(m => m.ZuneTag == "YoshiAsk")).FirstOrDefault();
 
             SignInResponse response;
             if (member != null)

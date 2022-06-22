@@ -1,75 +1,42 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Zune.DB.Models;
-using Zune.DB.Models.Joining;
 
 namespace Zune.DB
 {
-    public class ZuneNetContext : DbContext
+    public class ZuneNetContext
     {
-        public string DbPath { get; private set; }
+        private readonly IMongoCollection<Member> _memberCollection;
 
-        public DbSet<Member> Members { get; set; }
-        public DbSet<Message> Messages { get; set; }
-        public DbSet<Comment> Comments { get; set; }
-        public DbSet<Badge> AvailableBadges { get; set; }
-        public DbSet<Tuner> Tuners { get; set; }
-
-        public ZuneNetContext(bool reset = false)
+        public ZuneNetContext(IOptions<ZuneNetContextSettings> dbSettings)
         {
-            var folder = Environment.SpecialFolder.LocalApplicationData;
-            var path = Environment.GetFolderPath(folder);
-            DbPath = System.IO.Path.Combine(path, "Zune.Net", "zunenet.db");
-            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(DbPath));
+            MongoClient mongoClient = new(dbSettings.Value.ConnectionString);
 
-            if (reset)
-                Database.EnsureDeleted();
-            Database.Migrate();
+            var mongoDatabase = mongoClient.GetDatabase(dbSettings.Value.DatabaseName);
+
+            _memberCollection = mongoDatabase.GetCollection<Member>(
+                dbSettings.Value.MemberCollectionName);
         }
 
-        // The following configures EF to create a Sqlite database file in the
-        // special "local" folder for your platform.
-        protected override void OnConfiguring(DbContextOptionsBuilder options)
-            => options.UseSqlite("Data Source=" + DbPath);
+        public async Task<List<Member>> GetAsync(Expression<Func<Member, bool>> filter = null) =>
+            await _memberCollection.Find(filter ?? (_ => true)).ToListAsync();
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<MemberMember>().HasKey(mm => new { mm.MemberAId, mm.MemberBId });
-            modelBuilder.Entity<MemberMember>()
-                .HasOne(mm => mm.MemberA)
-                .WithMany(m => m.Friends)
-                .HasForeignKey(m => m.MemberAId);
-            //modelBuilder.Entity<MemberMember>()
-            //    .HasOne(mm => mm.MemberB)
-            //    .WithMany(m => m.Friends)
-            //    .HasForeignKey(m => m.MemberBId);
+        public async Task<Member?> GetAsync(string id) =>
+            await _memberCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
 
-            modelBuilder.Entity<Member>()
-                .HasMany(m => m.Comments)
-                .WithOne(c => c.Recipient)
-                .HasForeignKey(c => c.Id);
+        public async Task CreateAsync(Member newMember) =>
+            await _memberCollection.InsertOneAsync(newMember);
 
-            modelBuilder.Entity<Member>()
-                .HasMany(m => m.Messages)
-                .WithOne(msg => msg.Recipient)
-                .HasForeignKey(msg => msg.Id);
+        public async Task UpdateAsync(string id, Member updatedMember) =>
+            await _memberCollection.ReplaceOneAsync(x => x.Id == id, updatedMember);
 
-            modelBuilder.Entity<Member>()
-                .HasOne(m => m.TunerRegisterInfo)
-                .WithOne(t => t.Member)
-                .HasForeignKey<Tuner>(t => t.Id)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<MemberBadge>().HasKey(mb => new { mb.MemberId, mb.BadgeId });
-            modelBuilder.Entity<MemberBadge>()
-                .HasOne(mb => mb.Member)
-                .WithMany(m => m.Badges)
-                .HasForeignKey(m => m.MemberId);
-            modelBuilder.Entity<MemberBadge>()
-                .HasOne(mb => mb.Badge)
-                .WithMany(b => b.Members)
-                .HasForeignKey(m => m.BadgeId);
-        }
+        public async Task RemoveAsync(string id) =>
+            await _memberCollection.DeleteOneAsync(x => x.Id == id);
     }
 }
 
