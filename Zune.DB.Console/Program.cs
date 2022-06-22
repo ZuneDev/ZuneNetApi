@@ -5,7 +5,6 @@ using MongoDB.Bson.Serialization.Serializers;
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
-using Zune.DB;
 using Zune.DB.Models;
 
 namespace Zune.DB.Console
@@ -30,6 +29,7 @@ namespace Zune.DB.Console
             {
                 Updated = DateTime.UtcNow,
                 Id = Member.GetGuidFromZuneTag(zuneTag),
+                Cid = "16d12e23e9385f7a",
                 PlayCount = 206,
                 Xuid = Member.GetXuidFromZuneTag(zuneTag),
                 ZuneTag = zuneTag,

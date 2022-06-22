@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Linq;
 using System.Threading.Tasks;
 using Zune.DB;
+using Zune.Net.Middleware;
 using Zune.Xml.Commerce;
 
 namespace CommerceZuneNet.Controllers
@@ -25,11 +25,9 @@ namespace CommerceZuneNet.Controllers
             // requests use a Zune tag or GUID to specify a member, and a WLID
             // token for authorization. Most Commerce endpoints just send the WLID,
             // which doesn't directly identify which user's data is being requested.
-            var id = Zune.DB.Models.Member.GetGuidFromZuneTag("YoshiAsk");
-            var member = await _database.GetAsync(id);
 
             SignInResponse response;
-            if (member != null)
+            if (this.TryGetAuthedMember(out var member))
             {
                 response = member.GetSignInResponse();
             }
