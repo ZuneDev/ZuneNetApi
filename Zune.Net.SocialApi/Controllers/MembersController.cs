@@ -45,25 +45,25 @@ namespace Zune.SocialApi.Controllers
         {
             string requestUrl = Request.Scheme + "://" + Request.Host + Request.Path;
 
+            var member = await _database.GetByIdOrZuneTag(zuneTag);
+            if (member == null)
+                return NotFound();
+
             var feed = new Feed<Member>
             {
                 Namespace = Constants.ZUNE_PROFILES_NAMESPACE,
                 Links = { new Link(requestUrl) },
                 Updated = DateTime.UtcNow,
-                Title = zuneTag + "'s Friends",
+                Title = member.ZuneTag + "'s Friends",
                 Author = new Author
                 {
-                    Name = zuneTag,
-                    Url = "http://social.zune.net/member/" + zuneTag
+                    Name = member.ZuneTag,
+                    Url = "http://social.zune.net/member/" + member.ZuneTag
                 },
-                Id = "894090e7-b88e-4e3a-9ff8-eea48848638e",
+                Id = member.Id.ToString(),
                 Entries = new(),
                 Rights = "Copyright (c) Microsoft Corporation.  All rights reserved."
             };
-
-            var member = await _database.GetSingleAsync(m => m.ZuneTag == zuneTag);
-            if (member == null)
-                return NotFound();
 
             //foreach (var relation in member.Friends)
             //{
@@ -78,7 +78,7 @@ namespace Zune.SocialApi.Controllers
         {
             string requestUrl = Request.Scheme + "://" + Request.Host + Request.Path;
 
-            var member = await _database.GetSingleAsync(m => m.ZuneTag == zuneTag);
+            var member = await _database.GetByIdOrZuneTag(zuneTag);
             if (member == null)
                 return NotFound();
 

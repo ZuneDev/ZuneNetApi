@@ -1,5 +1,4 @@
 ﻿using Atom.Xml;
-using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
@@ -24,8 +23,15 @@ namespace Zune.DB.Models
                 SetFromSignInResponse(signInResponse);
         }
 
+        [BsonIgnore]
+        private Guid _id;
+
         [BsonId]
-        public Guid Id { get; set; }
+        public Guid Id
+        {
+            get => _id;
+            set => _id = value;
+        }
 
         public string ZuneTag { get; set; }
         public int PlayCount { get; set; }

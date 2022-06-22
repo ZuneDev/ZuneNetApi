@@ -35,6 +35,13 @@ namespace Zune.DB
         public async Task<Member?> GetAsync(Guid id) =>
             await _memberCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
 
+        public Task<Member?> GetByIdOrZuneTag(string value)
+        {
+            if (Guid.TryParse(value, out var id))
+                return GetAsync(id);
+            return GetSingleAsync(m => m.ZuneTag == value);
+        }
+
         public async Task CreateAsync(Member newMember) =>
             await _memberCollection.InsertOneAsync(newMember);
 
