@@ -61,7 +61,7 @@ namespace Zune.SocialApi.Controllers
                 Rights = "Copyright (c) Microsoft Corporation.  All rights reserved."
             };
 
-            var member = _database.GetSingleAsync(m => m.ZuneTag == zuneTag);
+            var member = await _database.GetSingleAsync(m => m.ZuneTag == zuneTag);
             if (member == null)
                 return NotFound();
 
@@ -74,9 +74,26 @@ namespace Zune.SocialApi.Controllers
             return feed;
         }
 
-        public async Task<ActionResult<Feed<Badge>>> Badges(string member)
+        public async Task<ActionResult<Feed<Badge>>> Badges(string zuneTag)
         {
             string requestUrl = Request.Scheme + "://" + Request.Host + Request.Path;
+
+            var member = await _database.GetSingleAsync(m => m.ZuneTag == zuneTag);
+            if (member == null)
+                return NotFound();
+
+            Badge badge1 = new()
+            {
+                Description = "Restore the Zune social",
+                TypeId = BadgeType.ActiveForumsBadge_Gold,
+                Title = "Necromancer",
+                Image = "https://i.imgur.com/dMwIZs8.png",
+                Media = new()
+                {
+                    Id = Guid.NewGuid(),
+                    Type = "Application",
+                }
+            };
 
             var feed = new Feed<Badge>
             {
@@ -85,18 +102,7 @@ namespace Zune.SocialApi.Controllers
                 Title = member + "'s Badges",
                 Entries =
                 {
-                    new Badge
-                    {
-                        Description = "Restore the Zune social",
-                        TypeId = BadgeType.ActiveForumsBadge_Gold,
-                        Title = "Necromancer",
-                        Image = new("https://i.imgur.com/dMwIZs8.png", relation: "enclosure"),
-                        Media = new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Type = "Application",
-                        }
-                    }
+                    badge1
                 }
             };
 

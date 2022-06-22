@@ -2,11 +2,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Zune.Net;
 
 namespace Zune.SocialApi
 {
@@ -23,10 +19,6 @@ namespace Zune.SocialApi
                 {
                     webBuilder.UseStartup<Startup>();
                 })
-                .ConfigureServices((ctx, s) =>
-                {
-                    s.Configure<DB.ZuneNetContextSettings>(ctx.Configuration.GetSection("ZuneNetContext"));
-                    s.AddSingleton<DB.ZuneNetContext>();
-                });
+                .ConfigureZuneDB();
     }
 }

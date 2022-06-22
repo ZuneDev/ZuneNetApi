@@ -1,6 +1,5 @@
 ﻿using Atom;
 using Atom.Xml;
-using System;
 using System.Xml.Serialization;
 
 namespace Zune.Xml.SocialApi
@@ -11,17 +10,29 @@ namespace Zune.Xml.SocialApi
         [XmlElement("typeId", Namespace = Constants.ZUNE_PROFILES_NAMESPACE)]
         public BadgeType TypeId { get; set; }
 
-        [XmlElement("link", Namespace = Constants.ATOM_NAMESPACE)]
-        public Link Image { get; set; }
-
         [XmlElement("type", Namespace = Constants.ZUNE_PROFILES_NAMESPACE)]
         public string Type { get; set; }
 
         [XmlElement("media", Namespace = Constants.ZUNE_PROFILES_NAMESPACE)]
         public BadgeMedia Media { get; set; }
 
-        [XmlElement("content", Namespace = Constants.ATOM_NAMESPACE)]
-        public string Description { get; set; }
+        [XmlIgnore]
+        public string Description
+        {
+            get => Content?.Value;
+            set => Content = value;
+        }
+
+        [XmlIgnore]
+        public string Image
+        {
+            get => Links.Find(l => l.Relation == "enclosure").Href;
+            set
+            {
+                Links.Clear();
+                Links.Add(new Link(value, relation: "enclosure"));
+            }
+        }
     }
 
     public enum BadgeType

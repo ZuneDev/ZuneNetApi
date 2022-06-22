@@ -4,6 +4,7 @@ using System.Xml.Serialization;
 
 namespace Zune.Xml.SocialApi
 {
+    [XmlRoot("media", Namespace = Constants.ZUNE_PROFILES_NAMESPACE)]
     public class BadgeMedia
     {
         [XmlElement("id", Namespace = Constants.ZUNE_PROFILES_NAMESPACE)]
