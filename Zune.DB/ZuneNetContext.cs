@@ -29,16 +29,16 @@ namespace Zune.DB
         public async Task<List<Member>> GetAsync(Expression<Func<Member, bool>> filter = null) =>
             await _memberCollection.Find(filter ?? (_ => true)).ToListAsync();
 
-        public async Task<Member?> GetAsync(string id) =>
+        public async Task<Member?> GetAsync(MongoDB.Bson.ObjectId id) =>
             await _memberCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
 
         public async Task CreateAsync(Member newMember) =>
             await _memberCollection.InsertOneAsync(newMember);
 
-        public async Task UpdateAsync(string id, Member updatedMember) =>
+        public async Task UpdateAsync(MongoDB.Bson.ObjectId id, Member updatedMember) =>
             await _memberCollection.ReplaceOneAsync(x => x.Id == id, updatedMember);
 
-        public async Task RemoveAsync(string id) =>
+        public async Task RemoveAsync(MongoDB.Bson.ObjectId id) =>
             await _memberCollection.DeleteOneAsync(x => x.Id == id);
     }
 }

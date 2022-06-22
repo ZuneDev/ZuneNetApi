@@ -25,8 +25,7 @@ namespace Zune.DB.Models
         }
 
         [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
+        public ObjectId Id { get; set; }
 
         public string ZuneTag { get; set; }
         public int PlayCount { get; set; }
