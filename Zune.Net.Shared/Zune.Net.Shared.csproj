@@ -23,4 +23,8 @@
         <!--<PackageReference Include="Inflatable.Lastfm" Version="1.2.0" />-->
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="LiveAuth\" />
+	</ItemGroup>
+
 </Project>

@@ -12,6 +12,7 @@ namespace Zune.DB
     public class ZuneNetContext
     {
         private readonly IMongoCollection<Member> _memberCollection;
+        private readonly IMongoCollection<TokenCidEntry> _authCollection;
 
         public ZuneNetContext(IOptions<ZuneNetContextSettings> dbSettings) : this(dbSettings.Value)
         {
@@ -24,6 +25,7 @@ namespace Zune.DB
             var mongoDatabase = mongoClient.GetDatabase(dbSettings.DatabaseName);
 
             _memberCollection = mongoDatabase.GetCollection<Member>(dbSettings.MemberCollectionName);
+            _authCollection = mongoDatabase.GetCollection<TokenCidEntry>(dbSettings.AuthCollectionName);
         }
 
         public async Task<List<Member>> GetAsync(Expression<Func<Member, bool>> filter = null) =>
@@ -50,6 +52,39 @@ namespace Zune.DB
 
         public async Task RemoveAsync(Guid id) =>
             await _memberCollection.DeleteOneAsync(x => x.Id == id);
+
+        public async Task<TokenCidEntry> GetCidByToken(string token)
+        {
+            string tokenHash = Hash(token);
+            return await _authCollection.Find(e => e.TokenHash == tokenHash).FirstOrDefaultAsync();
+        }
+
+        public async Task<Member> GetMemberByToken(string token)
+        {
+            var entry = await GetCidByToken(token);
+            if (entry == null)
+                return null;
+
+            return await GetSingleAsync(m => m.Cid == entry.Cid);
+        }
+
+        public async Task AddOrUpdateToken(string token, string cid)
+        {
+            string tokenHash = Hash(token);
+            await _authCollection.DeleteManyAsync(e => e.TokenHash == token);
+            await _authCollection.InsertOneAsync(new(tokenHash, cid));
+        }
+
+        private static string Hash(string str)
+        {
+            byte[] hash = System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(str));
+
+            string[] hashStr = new string[hash.Length];
+            for (int i = 0; i < hash.Length; i++)
+                hashStr[i] = hash[i].ToString("X2");
+
+            return string.Join(string.Empty, hashStr).ToUpperInvariant();
+        }
     }
 }
 

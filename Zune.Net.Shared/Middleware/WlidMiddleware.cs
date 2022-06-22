@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Zune.DB;
 using Zune.DB.Models;
-using Zune.Net.LiveAuth;
 
 namespace Zune.Net.Middleware
 {
@@ -25,11 +24,10 @@ namespace Zune.Net.Middleware
 
             if (authHeader.Count > 0)
             {
-                string authHeaderValue = authHeader[0]["WLID1.0 t=".Length..];
-                if (!string.IsNullOrWhiteSpace(authHeaderValue) && database != null
-                    && TokenStore.Current.TryGetCidForToken(authHeaderValue, out var cid))
+                string token = authHeader[0]["WLID1.0 t=".Length..];
+                if (!string.IsNullOrWhiteSpace(token) && database != null)
                 {
-                    authedMember = await database.GetSingleAsync(m => m.Cid == cid);
+                    authedMember = await database.GetMemberByToken(token);
                 }
             }
 

@@ -18,7 +18,6 @@ namespace Zune.DB.Console
             {
                 ConnectionString = "mongodb://localhost:27017",
                 DatabaseName = "Zune",
-                MemberCollectionName = "Members"
             });
 
             foreach (var member in await ctx.GetAsync())
