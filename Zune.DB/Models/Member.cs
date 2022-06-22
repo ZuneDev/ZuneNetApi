@@ -44,7 +44,7 @@ namespace Zune.DB.Models
         public IList<MemberBadge> Badges { get; set; }
         public IList<Comment> Comments { get; set; }
         public IList<Message> Messages { get; set; }
-        public IList<MemberMember> Friends { get; set; }
+        public IList<Guid> Friends { get; set; } = Array.Empty<Guid>();
 
         public DateTime Updated { get; set; }
 

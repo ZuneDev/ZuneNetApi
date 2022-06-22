@@ -25,8 +25,7 @@ namespace Zune.SocialApi.Controllers
         
         public async Task<ActionResult<Member>> Info(string zuneTag)
         {
-            var requestUrl = Request.Scheme + "://" + Request.Host + Request.Path;
-            var member = await _database.GetSingleAsync(m => m.ZuneTag == zuneTag);
+            var member = await _database.GetByIdOrZuneTag(zuneTag);
 
             Member response;
             if (member != null)
@@ -65,11 +64,12 @@ namespace Zune.SocialApi.Controllers
                 Rights = "Copyright (c) Microsoft Corporation.  All rights reserved."
             };
 
-            //foreach (var relation in member.Friends)
-            //{
-            //    var friend = relation.MemberB;
-            //    feed.Entries.Add(friend.GetXmlMember());
-            //}
+            if (member.Friends != null)
+                foreach (var friendId in member.Friends)
+                {
+                    var friend = await _database.GetAsync(friendId);
+                    feed.Entries.Add(friend.GetXmlMember());
+                }
 
             return feed;
         }
@@ -99,7 +99,7 @@ namespace Zune.SocialApi.Controllers
             {
                 Id = Guid.Empty.ToString(),
                 Links = { new Link(requestUrl) },
-                Title = member + "'s Badges",
+                Title = member.ZuneTag + "'s Badges",
                 Entries =
                 {
                     badge1
