@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Zune.Net.Shared.Helpers
+namespace Zune.Net.Helpers
 {
     public partial class Discogs
     {

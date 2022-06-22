@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Zune.Xml.Catalog;
 
-namespace Zune.Net.Shared.Helpers
+namespace Zune.Net.Helpers
 {
     public partial class MusicBrainz
     {

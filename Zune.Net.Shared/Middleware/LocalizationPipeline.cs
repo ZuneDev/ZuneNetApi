@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 
-namespace Zune.Net.Shared.Middleware
+namespace Zune.Net.Middleware
 {
     public class LocalizationPipeline
     {

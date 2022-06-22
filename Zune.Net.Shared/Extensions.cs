@@ -6,7 +6,7 @@ using Microsoft.Extensions.Hosting;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
-using Zune.Net.Shared;
+using Zune.Net;
 
 namespace Zune.Net
 {

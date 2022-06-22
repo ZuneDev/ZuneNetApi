@@ -11,7 +11,7 @@ using Atom.Attributes;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Zune.Xml;
 
-namespace Zune.Net.Shared
+namespace Zune.Net
 {
     public class ZestOutputFormatter : XmlSerializerOutputFormatter
     {

@@ -1,7 +1,7 @@
 ﻿using Atom.Xml;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using Zune.Net.Shared.Helpers;
+using Zune.Net.Helpers;
 using Zune.Xml.Catalog;
 
 namespace Zune.Net.Catalog.Controllers.Music

@@ -1,6 +1,6 @@
 ﻿using Atom.Xml;
 
-namespace Zune.Net.Shared.Helpers
+namespace Zune.Net.Helpers
 {
     public static partial class Deezer
     {

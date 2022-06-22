@@ -3,7 +3,7 @@ using Flurl;
 using Flurl.Http;
 using System.Globalization;
 
-namespace Zune.Net.Shared.Helpers.AppleMusic
+namespace Zune.Net.Helpers.AppleMusic
 {
     public static partial class AppleMusicClient
     {

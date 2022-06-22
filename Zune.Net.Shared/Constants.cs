@@ -1,4 +1,4 @@
-﻿namespace Zune.Net.Shared
+﻿namespace Zune.Net
 {
     public static partial class Constants
     {

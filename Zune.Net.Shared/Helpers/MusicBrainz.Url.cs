@@ -1,7 +1,7 @@
 ﻿using MetaBrainz.MusicBrainz;
 using System;
 
-namespace Zune.Net.Shared.Helpers
+namespace Zune.Net.Helpers
 {
     public partial class MusicBrainz
     {

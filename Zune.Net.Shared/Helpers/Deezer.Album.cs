@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System.Linq;
 
-namespace Zune.Net.Shared.Helpers
+namespace Zune.Net.Helpers
 {
     public partial class Deezer
     {

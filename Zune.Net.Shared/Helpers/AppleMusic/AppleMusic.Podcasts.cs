@@ -10,7 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Zune.Xml.Catalog;
 
-namespace Zune.Net.Shared.Helpers.AppleMusic
+namespace Zune.Net.Helpers.AppleMusic
 {
     public partial class AppleMusicClient
     {

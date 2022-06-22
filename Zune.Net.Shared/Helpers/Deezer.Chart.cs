@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Zune.Xml.Catalog;
 
-namespace Zune.Net.Shared.Helpers
+namespace Zune.Net.Helpers
 {
     public partial class Deezer
     {

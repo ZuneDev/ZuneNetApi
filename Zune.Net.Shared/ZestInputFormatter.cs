@@ -4,7 +4,7 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 
-namespace Zune.Net.Shared
+namespace Zune.Net
 {
     // so, zune is kinda dumb, and will often send XML data as application/x-www-form-urlencoded.
     // this input formatter is designed to handle that.

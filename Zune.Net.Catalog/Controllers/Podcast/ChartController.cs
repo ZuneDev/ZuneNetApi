@@ -1,8 +1,8 @@
 ﻿using Atom.Xml;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using Zune.Net.Shared.Helpers;
-using Zune.Net.Shared.Helpers.AppleMusic;
+using Zune.Net.Helpers;
+using Zune.Net.Helpers.AppleMusic;
 using Zune.Xml.Catalog;
 
 namespace Zune.Net.Catalog.Controllers.Podcast
