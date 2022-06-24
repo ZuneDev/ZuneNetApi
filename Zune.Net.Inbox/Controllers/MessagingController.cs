@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Zune.DB;
 using Zune.DB.Models;
+using Zune.Net.Middleware;
 using Zune.Xml.Inbox;
 
 namespace Zune.Net.Inbox.Controllers
@@ -30,9 +31,12 @@ namespace Zune.Net.Inbox.Controllers
             if (!Request.Form.TryGetValue("type", out StringValues type))
                 return StatusCode(StatusCodes.Status400BadRequest, "Message must have specify a message type.");
 
-            Member sender = await _database.GetSingleAsync(m => m.ZuneTag == zuneTag);
-            if (sender == null)
-                return StatusCode(StatusCodes.Status400BadRequest, $"Sender {zuneTag} does not exist.");
+            if (!this.TryGetAuthedMember(out var sender) || sender == null)
+                return Unauthorized();
+
+            Member sender2 = await _database.GetByIdOrZuneTag(zuneTag);
+            if (sender.ZuneTag != sender2?.ZuneTag)
+                return Unauthorized();
 
             string recipientZuneTag = recipients.First();
             Member recipient;
@@ -61,7 +65,7 @@ namespace Zune.Net.Inbox.Controllers
             //ctx.Members.Attach(sender);
             //ctx.Members.Attach(recipient);
             //ctx.SaveChanges();
-            return StatusCode(StatusCodes.Status200OK);
+            return Ok();
         }
     }
 }

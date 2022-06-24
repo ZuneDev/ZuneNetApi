@@ -13,7 +13,7 @@ namespace Zune.SocialApi.Controllers
 {
     [Route("/members/{zuneTag}/{action=Info}")]
     [Route("/{locale}/members/{zuneTag}/{action=Info}")]
-    [Produces("application/atom+xml")]
+    [Produces(Constants.ATOM_MIMETYPE)]
     [ApiController]
     public class MembersController : ControllerBase
     {

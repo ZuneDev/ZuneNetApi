@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Zune.DB;
 using Zune.Net;
+using Zune.Net.Middleware;
 
 namespace Zune.SocialApi
 {
@@ -44,7 +45,7 @@ namespace Zune.SocialApi
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            app.UseWlidAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

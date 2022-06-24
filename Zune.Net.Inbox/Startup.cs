@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Zune.Net.Middleware;
 
 namespace Zune.Net.Inbox
 {
@@ -40,7 +41,7 @@ namespace Zune.Net.Inbox
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            app.UseWlidAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
