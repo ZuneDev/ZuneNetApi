@@ -20,12 +20,6 @@ namespace CommerceZuneNet.Controllers
         [HttpPost]
         public async Task<ActionResult<SignInResponse>> SignIn(SignInRequest request)
         {
-            // TODO: Authentication is a mess. SignInRequest only provides a (device?)
-            // ID that is only seen in this endpoint. After that, all subsequent
-            // requests use a Zune tag or GUID to specify a member, and a WLID
-            // token for authorization. Most Commerce endpoints just send the WLID,
-            // which doesn't directly identify which user's data is being requested.
-
             SignInResponse response;
             if (this.TryGetAuthedMember(out var member))
             {

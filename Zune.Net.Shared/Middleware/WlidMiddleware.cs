@@ -27,7 +27,7 @@ namespace Zune.Net.Middleware
                 string token = authHeader[0];
                 int idxToken = token.IndexOf(' ');
                 if (idxToken >= 0)
-                    token = token[idxToken..];
+                    token = token[(idxToken + 1)..];
 
                 if (!string.IsNullOrWhiteSpace(token) && database != null)
                 {
