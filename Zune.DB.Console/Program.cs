@@ -37,7 +37,7 @@ namespace Zune.DB.Console
                 Bio = "A computer science student at Texas A&M Univserity that can't help but bring back dead Microsoft products.",
                 Location = "College Station, Texas",
                 UserTile = "http://tiles.zunes.me/tiles/avatar/default.jpg",
-                Background = "http://tiles.zunes.me/tiles/background/YoshiAsk",
+                Background = "http://tiles.zunes.me/tiles/background/USERBACKGROUND-ART-536X196-49.jpg",
 
                 AcceptedTermsOfService = true,
                 AccountSuspended = false,
