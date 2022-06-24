@@ -20,15 +20,15 @@ namespace Zune.DB.Console
                 DatabaseName = "Zune",
             });
 
-            foreach (var member in await ctx.GetAsync())
-                await ctx.RemoveAsync(member.Id);
+            await ctx.ClearMembersAsync();
+            await ctx.ClearTokensAsync();
 
             string zuneTag = "YoshiAsk";
             var newMember = new Member
             {
                 Updated = DateTime.UtcNow,
                 Id = Member.GetGuidFromZuneTag(zuneTag),
-                Cid = "16d12e23e9385f7a",
+                UserName = "yoshiask@escargot.chat",
                 PlayCount = 206,
                 Xuid = Member.GetXuidFromZuneTag(zuneTag),
                 ZuneTag = zuneTag,

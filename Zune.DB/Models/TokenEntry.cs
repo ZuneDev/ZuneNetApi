@@ -2,22 +2,22 @@
 
 namespace Zune.DB.Models
 {
-    public class TokenCidEntry
+    public class TokenEntry
     {
-        public TokenCidEntry()
+        public TokenEntry()
         {
 
         }
 
-        public TokenCidEntry(string tokenHash, string cid)
+        public TokenEntry(string tokenHash, string userName)
         {
             TokenHash = tokenHash;
-            Cid = cid;
+            UserName = userName;
         }
 
         [BsonId]
         public string TokenHash { get; set; }
         
-        public string Cid { get; set; }
+        public string UserName { get; set; }
     }
 }

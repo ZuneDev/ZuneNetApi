@@ -12,7 +12,7 @@ namespace Zune.DB
     public class ZuneNetContext
     {
         private readonly IMongoCollection<Member> _memberCollection;
-        private readonly IMongoCollection<TokenCidEntry> _authCollection;
+        private readonly IMongoCollection<TokenEntry> _authCollection;
 
         public ZuneNetContext(IOptions<ZuneNetContextSettings> dbSettings) : this(dbSettings.Value)
         {
@@ -25,7 +25,7 @@ namespace Zune.DB
             var mongoDatabase = mongoClient.GetDatabase(dbSettings.DatabaseName);
 
             _memberCollection = mongoDatabase.GetCollection<Member>(dbSettings.MemberCollectionName);
-            _authCollection = mongoDatabase.GetCollection<TokenCidEntry>(dbSettings.AuthCollectionName);
+            _authCollection = mongoDatabase.GetCollection<TokenEntry>(dbSettings.AuthCollectionName);
         }
 
         public async Task<List<Member>> GetAsync(Expression<Func<Member, bool>> filter = null) =>
@@ -53,7 +53,9 @@ namespace Zune.DB
         public async Task RemoveAsync(Guid id) =>
             await _memberCollection.DeleteOneAsync(x => x.Id == id);
 
-        public async Task<TokenCidEntry> GetCidByToken(string token)
+        public Task ClearMembersAsync() => _memberCollection.DeleteManyAsync(_ => true);
+
+        public async Task<TokenEntry> GetCidByToken(string token)
         {
             string tokenHash = Hash(token);
             return await _authCollection.Find(e => e.TokenHash == tokenHash).FirstOrDefaultAsync();
@@ -65,15 +67,17 @@ namespace Zune.DB
             if (entry == null)
                 return null;
 
-            return await GetSingleAsync(m => m.Cid == entry.Cid);
+            return await GetSingleAsync(m => m.UserName == entry.UserName);
         }
 
-        public async Task AddToken(string token, string cid)
+        public async Task AddToken(string token, string userName)
         {
             string tokenHash = Hash(token);
             await _authCollection.DeleteManyAsync(e => e.TokenHash == token);
-            await _authCollection.InsertOneAsync(new(tokenHash, cid));
+            await _authCollection.InsertOneAsync(new(tokenHash, userName));
         }
+
+        public Task ClearTokensAsync() => _authCollection.DeleteManyAsync(_ => true);
 
         private static string Hash(string str)
         {

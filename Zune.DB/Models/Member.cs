@@ -40,10 +40,7 @@ namespace Zune.DB.Models
         public string Bio { get; set; }
         public string Location { get; set; }
 
-        /// <summary>
-        /// This member's CID, as returned by login.live.com
-        /// </summary>
-        public string Cid { get; set; }
+        public string UserName { get; set; }
 
         public IList<Link> Playlists { get; set; }
         public IList<MemberBadge> Badges { get; set; }

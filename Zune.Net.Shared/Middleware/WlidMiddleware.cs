@@ -24,7 +24,11 @@ namespace Zune.Net.Middleware
 
             if (authHeader.Count > 0)
             {
-                string token = authHeader[0]["WLID1.0 ".Length..];
+                string token = authHeader[0];
+                int idxToken = token.IndexOf(' ');
+                if (idxToken >= 0)
+                    token = token[idxToken..];
+
                 if (!string.IsNullOrWhiteSpace(token) && database != null)
                 {
                     authedMember = await database.GetMemberByToken(token);
