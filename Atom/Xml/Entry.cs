@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 using Atom.Attributes;
@@ -16,7 +15,9 @@ namespace Atom.Xml
         [XmlElement(ElementName = "updated")]
         public DateTime Updated { get; set; }
 
-        [Key]
+#if NETSTANDARD
+        [System.ComponentModel.DataAnnotations.Key]
+#endif
         [XmlElement(ElementName = "id")]
         public string Id { get; set; }
 

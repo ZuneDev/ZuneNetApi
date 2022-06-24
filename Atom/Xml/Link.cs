@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 using System.Xml.Serialization;
 
 namespace Atom.Xml
@@ -32,7 +31,9 @@ namespace Atom.Xml
         public DateTime Updated { get; set; }
 
         [XmlAttribute(AttributeName = "id")]
-        [Key]
+#if NETSTANDARD
+        [System.ComponentModel.DataAnnotations.Key]
+#endif
         public string Id { get; set; }
 
         public static implicit operator Link(string href)

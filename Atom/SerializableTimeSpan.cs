@@ -82,7 +82,11 @@ namespace Atom
 
         public string ToString(string format)
         {
+#if NET40_OR_GREATER || NETSTANDARD
             return value.ToString(format);
+#else
+            return ToString();
+#endif
         }
 
         public void WriteXml(XmlWriter writer)
