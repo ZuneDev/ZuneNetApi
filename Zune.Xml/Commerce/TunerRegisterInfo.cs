@@ -1,10 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Zune.Xml.Commerce
+﻿namespace Zune.Xml.Commerce
 {
     public class TunerRegisterInfo
     {
-        [Key]
+#if NETSTANDARD1_1_OR_GREATER
+        [System.ComponentModel.DataAnnotations.Key]
+#endif
         public string Id { get; set; }
     }
 }

@@ -1,8 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard1.1;netstandard2.0;netstandard2.1;net6.0</TargetFrameworks>
+        <TargetFrameworks>netstandard1.1;netstandard2.0;netstandard2.1;net6.0;net35;net40</TargetFrameworks>
+        <AssemblyVersion>0.1.0.0</AssemblyVersion>
     </PropertyGroup>
+
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0'">
+        <DefineConstants>$(DefineConstants);NETSTANDARD1_1_OR_GREATER;NETSTANDARD2_0_OR_GREATER;NETSTANDARD2_1_OR_GREATER</DefineConstants>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Atom\Atom.csproj" />
+    </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.1'">
         <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
@@ -15,14 +24,9 @@
     <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.6" />
     </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\Atom\Atom.csproj" />
+    
+    <ItemGroup Condition="$(DefineConstants.Contains(';NETSTANDARD1_1_OR_GREATER;'))">
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     </ItemGroup>
-
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0'">
-        <DefineConstants>$(DefineConstants);NETSTANDARD1_1_OR_GREATER;NETSTANDARD2_0_OR_GREATER;NETSTANDARD2_1_OR_GREATER</DefineConstants>
-    </PropertyGroup>
 
 </Project>

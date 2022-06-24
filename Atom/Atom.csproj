@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetFrameworks>netstandard1.1;netstandard1.3;net35;net40</TargetFrameworks>
+        <AssemblyVersion>0.1.0.0</AssemblyVersion>
     </PropertyGroup>
 
     <ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
