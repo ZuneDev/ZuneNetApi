@@ -11,8 +11,8 @@ using Zune.Xml.SocialApi;
 
 namespace Zune.SocialApi.Controllers
 {
-    [Route("/members/{zuneTag}/{action=Info}")]
-    [Route("/{locale}/members/{zuneTag}/{action=Info}")]
+    [Route("/members/")]
+    [Route("/{locale}/members/")]
     [Produces(Constants.ATOM_MIMETYPE)]
     [ApiController]
     public class MembersController : ControllerBase
@@ -22,7 +22,8 @@ namespace Zune.SocialApi.Controllers
         {
             _database = database;
         }
-        
+
+        [Route("{zuneTag}")]
         public async Task<ActionResult<Member>> Info(string zuneTag)
         {
             var member = await _database.GetByIdOrZuneTag(zuneTag);
@@ -40,6 +41,7 @@ namespace Zune.SocialApi.Controllers
             return response;
         }
 
+        [Route("{zuneTag}/friends")]
         public async Task<ActionResult<Feed<Member>>> Friends(string zuneTag)
         {
             string requestUrl = Request.Scheme + "://" + Request.Host + Request.Path;
@@ -74,6 +76,7 @@ namespace Zune.SocialApi.Controllers
             return feed;
         }
 
+        [Route("{zuneTag}/badges")]
         public async Task<ActionResult<Feed<Badge>>> Badges(string zuneTag)
         {
             string requestUrl = Request.Scheme + "://" + Request.Host + Request.Path;
@@ -105,6 +108,36 @@ namespace Zune.SocialApi.Controllers
                     badge1
                 }
             };
+
+            return feed;
+        }
+
+        public async Task<ActionResult<Feed<Member>>> Search()
+        {
+            string requestUrl = Request.Scheme + "://" + Request.Host + Request.Path;
+
+            if (!Request.Query.TryGetValue("q", out var queries) || queries.Count < 1)
+                return BadRequest();
+            string query = queries[0];
+
+            var feed = new Feed<Member>
+            {
+                Namespace = Constants.ZUNE_PROFILES_NAMESPACE,
+                Links = { new Link(requestUrl) },
+                Updated = DateTime.UtcNow,
+                Title = query + " results",
+                Author = new Author
+                {
+                    Name = "ZuneDev",
+                    Url = "http://social.zune.net"
+                },
+                Entries = new(),
+                Rights = "Copyright (c) Microsoft Corporation.  All rights reserved."
+            };
+
+            var members = await _database.GetAsync();
+            foreach (var member in members.Where(m => m.ZuneTag.Contains(query, StringComparison.InvariantCultureIgnoreCase)))
+                feed.Entries.Add(member.GetXmlMember());
 
             return feed;
         }
