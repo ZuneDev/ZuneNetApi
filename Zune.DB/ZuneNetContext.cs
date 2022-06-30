@@ -13,6 +13,7 @@ namespace Zune.DB
     {
         private readonly IMongoCollection<Member> _memberCollection;
         private readonly IMongoCollection<TokenEntry> _authCollection;
+        private readonly IMongoCollection<ImageEntry> _imageCollection;
 
         public ZuneNetContext(IOptions<ZuneNetContextSettings> dbSettings) : this(dbSettings.Value)
         {
@@ -26,6 +27,7 @@ namespace Zune.DB
 
             _memberCollection = mongoDatabase.GetCollection<Member>(dbSettings.MemberCollectionName);
             _authCollection = mongoDatabase.GetCollection<TokenEntry>(dbSettings.AuthCollectionName);
+            _imageCollection = mongoDatabase.GetCollection<ImageEntry>(dbSettings.ImageCollectionName);
         }
 
         public async Task<List<Member>> GetAsync(Expression<Func<Member, bool>> filter = null) =>
@@ -57,7 +59,7 @@ namespace Zune.DB
 
         public async Task<TokenEntry> GetCidByToken(string token)
         {
-            string tokenHash = Hash(token);
+            string tokenHash = Helpers.Hash(token);
             return await _authCollection.Find(e => e.TokenHash == tokenHash).FirstOrDefaultAsync();
         }
 
@@ -72,23 +74,24 @@ namespace Zune.DB
 
         public async Task AddToken(string token, string userName)
         {
-            string tokenHash = Hash(token);
+            string tokenHash = Helpers.Hash(token);
             await _authCollection.DeleteManyAsync(e => e.TokenHash == token);
             await _authCollection.InsertOneAsync(new(tokenHash, userName));
         }
 
         public Task ClearTokensAsync() => _authCollection.DeleteManyAsync(_ => true);
 
-        private static string Hash(string str)
+        public Task<ImageEntry> GetImageEntryAsync(Guid id) =>
+            _imageCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+
+        public async Task<ImageEntry> AddImageAsync(string url)
         {
-            byte[] hash = System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(str));
-
-            string[] hashStr = new string[hash.Length];
-            for (int i = 0; i < hash.Length; i++)
-                hashStr[i] = hash[i].ToString("X2");
-
-            return string.Join(string.Empty, hashStr).ToUpperInvariant();
+            ImageEntry entry = new(Helpers.GenerateGuid(url), url);
+            await _imageCollection.InsertOneAsync(entry);
+            return entry;
         }
+
+        public Task ClearImagesAsync() => _imageCollection.DeleteManyAsync(_ => true);
     }
 }
 
