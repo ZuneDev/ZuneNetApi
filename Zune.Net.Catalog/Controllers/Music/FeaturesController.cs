@@ -64,24 +64,24 @@ namespace Zune.Net.Catalog.Controllers.Music
                                 SequenceNumber = 1,
                                 BackgroundImage = new()
                                 {
-                                    Id = "dddddddd-aaaa-aaaa-dddd-dddddddddddd",
+                                    Id = Guid.Parse("dddddddd-aaaa-aaaa-dddd-dddddddddddd"),
                                     Instances = new()
                                     {
                                         new()
                                         {
-                                            Id = "dddddddd-aaaa-aaaa-dddd-dddddddddddA",
+                                            Id = Guid.Parse("dddddddd-aaaa-aaaa-dddd-dddddddddddA"),
                                             Url = "https://wallpaperhub.app/api/v1/get/7786/0/1080p"
                                         }
                                     },
                                 },
                                 Image = new()
                                 {
-                                    Id = "dddddddd-aaaa-bbbb-dddd-dddddddddddd",
+                                    Id = Guid.Parse("dddddddd-aaaa-bbbb-dddd-dddddddddddd"),
                                     Instances = new()
                                     {
                                         new()
                                         {
-                                            Id = "dddddddd-aaaa-bbbb-dddd-ddddddddddda",
+                                            Id = Guid.Parse("dddddddd-aaaa-bbbb-dddd-ddddddddddda"),
                                             Url = "https://www.wired.com/wp-content/uploads/2015/09/zune-story.jpg"
                                         }
                                     }

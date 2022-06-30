@@ -43,11 +43,11 @@ namespace Zune.Xml.Catalog
         [XmlArrayItem("mood")]
         public List<Mood> Moods { get; set; }
 
-        [XmlElement("albumImageId")]
-        public Guid AlbumImageId { get; set; }
+        [XmlElement("latestAlbumImage")]
+        public Image AlbumImage { get; set; }
 
-        [XmlElement("backgroundImageId")]
-        public Guid BackgroundImageId { get; set; }
+        [XmlElement("backgroundImage")]
+        public Image BackgroundImage { get; set; }
 
         [XmlElement("hasRadioChannel")]
         public bool HasRadioChannel { get; set; }

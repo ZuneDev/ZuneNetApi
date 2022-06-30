@@ -1,4 +1,5 @@
 ﻿using Atom;
+using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
@@ -8,7 +9,7 @@ namespace Zune.Xml.Catalog
     public class Image
     {
         [XmlElement("id")]
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
         [XmlArray("instances", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         [XmlArrayItem("imageInstance")]

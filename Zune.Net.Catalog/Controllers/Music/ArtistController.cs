@@ -32,8 +32,8 @@ namespace Zune.Net.Catalog.Controllers.Music
         {
             (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(mbid);
             Artist artist = MusicBrainz.MBArtistToArtist(mb_artist);
-            artist.BackgroundImageId = mbid;
-            artist.Images = new() { new() { Id = mbid.ToString() } };
+            artist.BackgroundImage = new() { Id = mbid };
+            artist.Images = new() { new() { Id = mbid } };
 
             if (dc_artist != null)
             {
@@ -132,7 +132,7 @@ namespace Zune.Net.Catalog.Controllers.Music
                 feed.Entries = images.Select((j, idx) =>
                 {
                     // Encode DCID and image index in ID
-                    string imgId = new Guid(dcid, (short)idx, 0, zero).ToString();
+                    Guid imgId = new(dcid, (short)idx, 0, zero);
 
                     return new Image
                     {

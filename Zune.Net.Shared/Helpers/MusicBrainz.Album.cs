@@ -47,7 +47,7 @@ namespace Zune.Net.Helpers
                 ReleaseDate = mb_rel.Date?.NearestDate ?? default,
                 Images = new()
                 {
-                    new() { Id = mb_rel.Id.ToString() }
+                    new() { Id = mb_rel.Id }
                 },
                 Updated = updated.Value,
             };

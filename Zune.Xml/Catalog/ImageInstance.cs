@@ -1,4 +1,5 @@
 ﻿using Atom;
+using System;
 using System.Xml.Serialization;
 
 namespace Zune.Xml.Catalog
@@ -7,7 +8,7 @@ namespace Zune.Xml.Catalog
     public class ImageInstance
     {
         [XmlElement("id")]
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
         [XmlElement("url")]
         public string Url { get; set; }

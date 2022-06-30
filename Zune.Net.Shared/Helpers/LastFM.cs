@@ -136,7 +136,7 @@ namespace Zune.Net.Helpers
                 Artists = new() { albumArtist },
                 Images = new()
                 {
-                    new() { Id = fm_album.Mbid }
+                    new() { Id = Guid.Parse(fm_album.Mbid) }
                 },
                 Popularity = fm_album.PlayCount ?? 0,
                 Summary = fm_album.Wiki?.Summary,
