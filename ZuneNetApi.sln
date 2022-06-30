@@ -33,7 +33,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zune.Net.Mix", "Zune.Net.Mi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IF.Lastfm.Core", "..\..\yoshiask\lastfm\src\IF.Lastfm.Core\IF.Lastfm.Core.csproj", "{EE108CAB-9B75-42EC-88D6-BECDD1F9A9E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zune.Net.Login", "Zune.Net.Login\Zune.Net.Login.csproj", "{275266BE-7183-477E-B7AD-3A7FEA528A93}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zune.Net.Login", "Zune.Net.Login\Zune.Net.Login.csproj", "{275266BE-7183-477E-B7AD-3A7FEA528A93}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zune.Net.Catalog.Image", "Zune.Net.Catalog.Image\Zune.Net.Catalog.Image.csproj", "{A9EDB333-EBDA-4C31-B88D-B675D38401C7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -101,6 +103,10 @@ Global
 		{275266BE-7183-477E-B7AD-3A7FEA528A93}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{275266BE-7183-477E-B7AD-3A7FEA528A93}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{275266BE-7183-477E-B7AD-3A7FEA528A93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9EDB333-EBDA-4C31-B88D-B675D38401C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9EDB333-EBDA-4C31-B88D-B675D38401C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9EDB333-EBDA-4C31-B88D-B675D38401C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9EDB333-EBDA-4C31-B88D-B675D38401C7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

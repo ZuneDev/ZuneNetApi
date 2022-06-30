@@ -1,4 +1,5 @@
 ﻿using Atom.Xml;
+using Flurl;
 using Flurl.Http;
 using MetaBrainz.MusicBrainz;
 using MetaBrainz.MusicBrainz.Interfaces.Entities;
@@ -12,6 +13,11 @@ namespace Zune.Net.Helpers
 {
     public partial class Discogs
     {
+        public static async Task<JObject> GetDCArtistByDCID(int dcid)
+        {
+            return await WithAuth(API_BASE.AppendPathSegments("artists", dcid)).GetJsonAsync<JObject>();
+        }
+
         public static async Task<(JObject dc_artist, IArtist mb_artist)> GetDCArtistByMBID(Guid mbid)
         {
             var mb_artist = MusicBrainz._query.LookupArtist(mbid, Include.UrlRelationships | Include.Tags);
