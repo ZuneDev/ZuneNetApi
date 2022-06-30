@@ -20,7 +20,7 @@ namespace Zune.Net.Helpers
 
         public static async Task<(JObject dc_artist, IArtist mb_artist)> GetDCArtistByMBID(Guid mbid)
         {
-            var mb_artist = MusicBrainz._query.LookupArtist(mbid, Include.UrlRelationships | Include.Tags);
+            var mb_artist = MusicBrainz._query.LookupArtist(mbid, Include.UrlRelationships | Include.Tags | Include.Releases);
             return (await GetDCArtistByMBArtist(mb_artist), mb_artist);
         }
 

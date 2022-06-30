@@ -87,7 +87,10 @@ namespace Zune.DB
         public async Task<ImageEntry> AddImageAsync(string url)
         {
             ImageEntry entry = new(Helpers.GenerateGuid(url), url);
-            await _imageCollection.InsertOneAsync(entry);
+
+            if (await GetImageEntryAsync(entry.Id) == null)
+                await _imageCollection.InsertOneAsync(entry);
+
             return entry;
         }
 

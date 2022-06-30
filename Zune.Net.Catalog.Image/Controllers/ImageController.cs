@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Zune.DB;
 using Zune.Net.Helpers;
 
 namespace Zune.Net.Catalog.Image.Controllers
@@ -16,7 +17,13 @@ namespace Zune.Net.Catalog.Image.Controllers
     {
         private static readonly ConcurrentDictionary<int, JObject> dcArtistCache = new();
         private static readonly int[] caaSupportedSizes = new[] { 250, 500, 1200 };
-        private static readonly string zeroStr = new string('0', 12);
+        private static readonly string zeroStr = new('0', 12);
+
+        private readonly ZuneNetContext _database;
+        public ImageController(ZuneNetContext database)
+        {
+            _database = database;
+        }
 
         [HttpGet, Route("image/{id}")]
         public async Task<IActionResult> Image(string id)
@@ -55,6 +62,26 @@ namespace Zune.Net.Catalog.Image.Controllers
             }
 
             // Request the image from the API and forward it to the Zune software
+            return imageUrl != null
+                ? Redirect(imageUrl)
+                : NotFound();
+        }
+
+        [HttpGet, Route("music/artist/{id}/{type}")]
+        public async Task<IActionResult> ArtistImage(string id, string type)
+        {
+            string? imageUrl = null;
+
+            if (type == "primaryImage")
+            {
+                Guid mbid = Guid.Parse(id);
+                (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(mbid);
+
+                imageUrl = dc_artist.Value<JArray>("images")?
+                    .FirstOrDefault(i => i.Value<string>("type") == "primary")?
+                    .Value<string>("uri");
+            }
+
             return imageUrl != null
                 ? Redirect(imageUrl)
                 : NotFound();

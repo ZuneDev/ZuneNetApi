@@ -9,6 +9,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Zune.DB;
 using Zune.Net.Helpers;
 using Zune.Xml.Catalog;
 
@@ -18,6 +19,12 @@ namespace Zune.Net.Catalog.Controllers.Music
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
     public class ArtistController : Controller
     {
+        private readonly ZuneNetContext _database;
+        public ArtistController(ZuneNetContext database)
+        {
+            _database = database;
+        }
+
         [HttpGet, Route("")]
         public ActionResult<Feed<Artist>> Search()
         {
@@ -32,13 +39,24 @@ namespace Zune.Net.Catalog.Controllers.Music
         {
             (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(mbid);
             Artist artist = MusicBrainz.MBArtistToArtist(mb_artist);
-            artist.BackgroundImage = new() { Id = mbid };
             artist.Images = new() { new() { Id = mbid } };
 
             if (dc_artist != null)
             {
                 artist.Biography = dc_artist.Value<string>("profile");
                 artist.Links.Add(new(Request.Path.Value + "biography", relation: "zune://artist/biography"));
+
+                var dc_artist_image = dc_artist.Value<JArray>("images")?.FirstOrDefault(i => i.Value<string>("type") == "primary");
+                if (dc_artist_image != null)
+                {
+                    string artistImageUrl = dc_artist_image.Value<string>("uri");
+                    var artistImageEntry = await _database.AddImageAsync(artistImageUrl);
+
+                    artist.BackgroundImage = new()
+                    {
+                        Id = artistImageEntry.Id
+                    };
+                }
             }
 
             return artist;

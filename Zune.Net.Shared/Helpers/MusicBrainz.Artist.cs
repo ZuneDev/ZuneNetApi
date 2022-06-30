@@ -2,6 +2,7 @@
 using MetaBrainz.MusicBrainz;
 using MetaBrainz.MusicBrainz.Interfaces.Entities;
 using System;
+using System.Linq;
 using Zune.Xml.Catalog;
 
 namespace Zune.Net.Helpers
@@ -107,13 +108,22 @@ namespace Zune.Net.Helpers
 
             if (mb_artist.Genres != null && mb_artist.Genres.Count > 0)
             {
-                var mb_genre = mb_artist.Genres[0];
+                var mb_genre = mb_artist.Genres.MaxBy(g => g.VoteCount ?? 0);
                 if (mb_genre != null)
                     artist.PrimaryGenre = MBGenreToGenre(mb_genre);
 
                 artist.Genres ??= new();
                 foreach (var genre in mb_artist.Genres)
                     artist.Genres.Add(MBGenreToGenre(genre));
+            }
+
+            if (mb_artist.Releases != null && mb_artist.Releases.Count > 0)
+            {
+                var mb_release = mb_artist.Releases.MaxBy(rel => rel.Date);
+                artist.AlbumImage = new()
+                {
+                    Id = mb_release.Id
+                };
             }
 
             return artist;
