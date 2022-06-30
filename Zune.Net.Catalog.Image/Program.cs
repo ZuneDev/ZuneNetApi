@@ -15,6 +15,8 @@ namespace Zune.Net.Catalog.Image
 
             builder.Services.AddControllers();
 
+            builder.Host.ConfigureZuneDB();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

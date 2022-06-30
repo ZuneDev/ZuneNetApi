@@ -21,6 +21,7 @@ namespace Zune.Net.Catalog
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                });
+                })
+                .ConfigureZuneDB();
     }
 }
