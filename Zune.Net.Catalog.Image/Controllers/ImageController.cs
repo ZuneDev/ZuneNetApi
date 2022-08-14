@@ -17,7 +17,6 @@ namespace Zune.Net.Catalog.Image.Controllers
     {
         private static readonly ConcurrentDictionary<int, JObject> dcArtistCache = new();
         private static readonly int[] caaSupportedSizes = new[] { 250, 500, 1200 };
-        private static readonly string zeroStr = new('0', 12);
 
         private readonly ZuneNetContext _database;
         public ImageController(ZuneNetContext database)
@@ -26,13 +25,20 @@ namespace Zune.Net.Catalog.Image.Controllers
         }
 
         [HttpGet, Route("image/{id}")]
-        public async Task<IActionResult> Image(string id)
+        public async Task<IActionResult> Image(Guid id)
         {
             string? imageUrl = null;
-            if (id.EndsWith(zeroStr))
+
+            (var idA, var idB, var idC) = id.GetGuidParts();
+            var imageEntry = await _database.GetImageEntryAsync(id);
+
+            if (imageEntry != null)
             {
-                int dcid = int.Parse(id[..8], NumberStyles.HexNumber);
-                short imgIdx = short.Parse(id[9..13], NumberStyles.HexNumber);
+                imageUrl = imageEntry.Url;
+            }
+            else if (idC == 0)
+            {
+                int dcid = unchecked((int)idA);
 
                 // Get or update cached artist
                 if (!dcArtistCache.TryGetValue(dcid, out var dc_artist))
@@ -44,9 +50,9 @@ namespace Zune.Net.Catalog.Image.Controllers
 
                 // Get URL for requested image
                 var images = dc_artist.Value<JArray>("images");
-                if (images != null && images.Count > imgIdx)
+                if (images != null && images.Count > idB)
                 {
-                    var image = images[imgIdx];
+                    var image = images[idB];
                     imageUrl = image.Value<string>("uri");
                 }
             }

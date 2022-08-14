@@ -89,7 +89,14 @@ namespace Zune.DB
             ImageEntry entry = new(Helpers.GenerateGuid(url), url);
 
             if (await GetImageEntryAsync(entry.Id) == null)
+            {
                 await _imageCollection.InsertOneAsync(entry);
+            }
+            else
+            {
+                var update = Builders<ImageEntry>.Update.Set(nameof(ImageEntry.Url), url);
+                await _imageCollection.UpdateOneAsync(e => e.Id == entry.Id, update);
+            }
 
             return entry;
         }

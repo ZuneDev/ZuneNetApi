@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
+using System;
 using Zune.Net;
 
 namespace Zune.Net
@@ -37,6 +38,16 @@ namespace Zune.Net
                 s.Configure<DB.ZuneNetContextSettings>(ctx.Configuration.GetSection("ZuneNetContext"));
                 s.AddSingleton<DB.ZuneNetContext>();
             });
+        }
+
+        public static (uint A, ushort B, ulong C) GetGuidParts(this Guid guid)
+        {
+            byte[] bytes = guid.ToByteArray();
+            return (
+                BitConverter.ToUInt32(bytes),
+                BitConverter.ToUInt16(bytes, sizeof(uint)),
+                BitConverter.ToUInt64(bytes, sizeof(uint) + sizeof(ushort))
+            );
         }
     }
 }
