@@ -22,16 +22,17 @@ namespace Zune.DB.Console
 
             await ctx.ClearMembersAsync();
             await ctx.ClearTokensAsync();
+            await ctx.ClearImagesAsync();
 
-            string zuneTag = "YoshiAsk";
+            string userName = "yoshiask@escargot.chat";
             var newMember = new Member
             {
                 Updated = DateTime.UtcNow,
-                Id = Member.GetGuidFromZuneTag(zuneTag),
-                UserName = "yoshiask@escargot.chat",
+                Id = Member.GetGuidFromUserName(userName),
+                UserName = userName,
                 PlayCount = 206,
-                Xuid = Member.GetXuidFromZuneTag(zuneTag),
-                ZuneTag = zuneTag,
+                Xuid = Member.GetXuidFromUserName(userName),
+                ZuneTag = "YoshiAsk",
                 DisplayName = "Yoshi Askharoun",
                 Status = "Reviving the Zune social",
                 Bio = "A computer science student at Texas A&M Univserity that can't help but bring back dead Microsoft products.",
@@ -100,13 +101,14 @@ namespace Zune.DB.Console
             //ctx.Messages.Add(message);
             //ctx.Tuners.Add(tuner);
 
-            zuneTag = "WamWooWam";
+            userName = "wamwoowam@escargot.chat";
             var member2 = new Member
             {
                 Updated = DateTime.UtcNow,
-                Id = Member.GetGuidFromZuneTag(zuneTag),
+                Id = Member.GetGuidFromUserName(userName),
+                UserName = userName,
                 PlayCount = 4123,
-                Xuid = Member.GetXuidFromZuneTag(zuneTag),
+                Xuid = Member.GetXuidFromUserName(userName),
                 ZuneTag = "WamWooWam",
                 DisplayName = string.Empty,
                 Status = "Restoring Windows Phone 7",
