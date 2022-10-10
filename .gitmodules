@@ -1,0 +1,3 @@
+[submodule "Backing/lastfm"]
+	path = Backing/lastfm
+	url = https://github.com/yoshiask/lastfm
