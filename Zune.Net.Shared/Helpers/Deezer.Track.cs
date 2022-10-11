@@ -1,5 +1,4 @@
-﻿using MetaBrainz.MusicBrainz;
-using MetaBrainz.MusicBrainz.Interfaces.Entities;
+﻿using MetaBrainz.MusicBrainz.Interfaces.Entities;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;

@@ -38,36 +38,26 @@ namespace Zune.Net.Helpers
         {
             try
             {
-                var mb_rec = _query.LookupRecording(mbid, Include.Genres | Include.ArtistCredits | Include.Releases);
+                var mb_rec = _query.LookupRecording(mbid, Include.Genres | Include.ArtistCredits | Include.Releases | Include.UrlRelationships | Include.Media);
                 return MBRecordingToTrack(mb_rec, includeRights: true);
             }
             catch (QueryException)
             {
                 // MusicBrainz Picard likes to put the Track ID instead of the Recording ID
-                var releases = _query.BrowseTrackReleases(mbid, limit: 1, inc: Include.ArtistCredits);
+                var releases = _query.BrowseTrackReleases(mbid, limit: 1, inc: Include.UrlRelationships);
                 var mb_rel = releases.Results[0];
-
-                var mb_artist = mb_rel.ArtistCredit?[0].Artist;
-                MiniArtist artist = null;
-                if (mb_artist != null)
-                    artist = new()
-                    {
-                        Id = mb_artist.Id,
-                        Title = mb_artist.Name
-                    };
                     
                 var mb_media = mb_rel.Media[0];
                 if (mb_media.Tracks != null && mb_media.Tracks.Count > 0)
                 {
                     foreach (var mb_track in mb_media.Tracks)
                         if (mb_track.Id == mbid)
-                            return MBTrackToTrack(mb_track, trackArtist: artist);
+                            return GetTrackByMBID(mb_track.Recording.Id);
                 }
 
                 return null;
             }
         }
-
 
         public static Track MBRecordingToTrack(IRecording mb_rec, DateTime? updated = null, bool includeRights = true)
         {
@@ -87,7 +77,11 @@ namespace Zune.Net.Helpers
             };
 
             if (mb_rec.Releases != null && mb_rec.Releases.Count > 0)
-                track.Album = MBReleaseToMiniAlbum(mb_rec.Releases[0]);
+            {
+                var mb_rel = mb_rec.Releases[0];
+                track.Album = MBReleaseToMiniAlbum(mb_rel);
+                track.TrackNumber = mb_rel.Media.FirstOrDefault()?.Tracks[0].Position ?? 0;
+            }
 
             if (includeRights)
                 AddDefaultRights(ref track);

@@ -32,11 +32,6 @@ namespace Zune.Net.Catalog.Controllers.Music
         [HttpGet, Route("{mbid}")]
         public ActionResult<Track> Details(Guid mbid)
         {
-            if (Request.Host.Value.Contains("ssl"))
-            {
-                return PhysicalFile(Path.Combine(_env.ContentRootPath, @"Resources\test.mp3"), "audio/mp3");
-            }
-
             return MusicBrainz.GetTrackByMBID(mbid);
         }
 
