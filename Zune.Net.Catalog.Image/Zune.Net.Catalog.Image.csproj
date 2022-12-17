@@ -8,6 +8,8 @@
     <ItemGroup>
         <ProjectReference Include="..\Atom\Atom.csproj" />
         <ProjectReference Include="..\Zune.Net.Shared\Zune.Net.Shared.csproj" />
+
+        <PackageReference Include="Microsoft.NET.Build.Containers" Version="0.2.7" />
     </ItemGroup>
 
 </Project>
