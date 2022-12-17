@@ -1,5 +1,8 @@
 ﻿using MetaBrainz.MusicBrainz;
+using Microsoft.AspNetCore.Hosting;
+using OwlCore.Net.Http;
 using System;
+using System.Net.Http;
 using Zune.Xml.Catalog;
 
 namespace Zune.Net.Helpers
@@ -7,6 +10,16 @@ namespace Zune.Net.Helpers
     public static partial class MusicBrainz
     {
         public static readonly Query _query = new("Zune", "4.8", "https://github.com/ZuneDev/ZuneNetApi");
+
+        public static void Initialize(IWebHostEnvironment env)
+        {
+            _query.ConfigureClientCreation(delegate
+            {
+                var cachePath = System.IO.Path.Combine(env.ContentRootPath, "bin", "cache");
+                var cacheTime = TimeSpan.FromMinutes(5);
+                return new HttpClient(new CachedHttpClientHandler(cachePath, cacheTime));
+            });
+        }
 
         public static void AddDefaultRights<T>(ref T media) where T : Media
         {

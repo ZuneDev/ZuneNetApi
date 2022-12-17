@@ -1,5 +1,6 @@
 ﻿using Atom.Xml;
 using MetaBrainz.MusicBrainz.Interfaces.Entities;
+using MetaBrainz.MusicBrainz.Interfaces.Searches;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -100,7 +101,7 @@ namespace Zune.Net.Helpers
                 Title = mb_genre.Name,
                 Links = { new(requestPath) },
                 Updated = updated,
-                Entries = _query.FindAllArtists($"tag:\"{mb_genre.Name}\"")
+                Entries = ((IEnumerable<ISearchResult<IArtist>>)_query.FindAllArtists($"tag:\"{mb_genre.Name}\""))
                                 .Select(mb_artist => MBArtistToArtist(mb_artist.Item, updated: updated)).ToList()
             };
 
@@ -148,7 +149,7 @@ namespace Zune.Net.Helpers
                 Title = mb_genre.Name,
                 Links = { new(requestPath) },
                 Updated = updated,
-                Entries = _query.FindAllRecordings($"tag:\"{mb_genre.Name}\"")
+                Entries = ((IEnumerable<ISearchResult<IRecording>>)_query.FindAllRecordings($"tag:\"{mb_genre.Name}\""))
                                 .Select(mb_track => MBRecordingToTrack(mb_track.Item, updated: updated)).ToList()
             };
 

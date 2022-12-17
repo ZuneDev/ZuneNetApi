@@ -1,7 +1,9 @@
 ﻿using Atom.Xml;
 using MetaBrainz.MusicBrainz;
 using MetaBrainz.MusicBrainz.Interfaces.Entities;
+using MetaBrainz.MusicBrainz.Interfaces.Searches;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Zune.Xml.Catalog;
 
@@ -19,7 +21,8 @@ namespace Zune.Net.Helpers
                 Title = "Albums",
                 Links = { new(requestPath) },
                 Updated = updated,
-                Entries = results.Take(40).Select(mb_rel => MBReleaseToAlbum(mb_rel.Item, updated: updated)).ToList(),
+                Entries = ((IEnumerable<ISearchResult<IRelease>>)results)
+                    .Take(40).Select(mb_rel => MBReleaseToAlbum(mb_rel.Item, updated: updated)).ToList(),
             };
 
             return feed;

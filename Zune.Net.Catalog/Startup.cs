@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Threading.Tasks;
+using Zune.Net.Helpers;
 
 namespace Zune.Net.Catalog
 {
@@ -42,6 +43,8 @@ namespace Zune.Net.Catalog
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            MusicBrainz.Initialize(env);
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
