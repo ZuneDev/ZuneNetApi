@@ -2,8 +2,9 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
+using Mono.Options;
 using System;
-using System.Globalization;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Zune.DB.Models;
 
@@ -13,11 +14,33 @@ namespace Zune.DB.Console
     {
         static async Task Main(string[] args)
         {
+            // Set up CLI options
+            string connectionString = "mongodb://localhost:27017";
+            string dbName = "Zune";
+            var options = new OptionSet
+            {
+                { "h|host=", "The connection string for the MongoDB server.", cs => connectionString = cs },
+                { "d|db=", "The database name on the MongoDB server.", db => dbName = db },
+            };
+
+            // Parse arguments
+            try
+            {
+                _ = options.Parse(args);
+            }
+            catch (OptionException e)
+            {
+                System.Console.Write("ZuneDB: ");
+                System.Console.WriteLine(e.Message);
+                return;
+            }
+
+            // Create DB context
             BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
             ZuneNetContext ctx = new(new ZuneNetContextSettings
             {
-                ConnectionString = "mongodb://localhost:27017",
-                DatabaseName = "Zune",
+                ConnectionString = connectionString,
+                DatabaseName = dbName,
             });
 
             await ctx.ClearMembersAsync();

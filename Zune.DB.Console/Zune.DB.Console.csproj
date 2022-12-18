@@ -12,6 +12,7 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="MongoDB.Driver" Version="2.18.0" />
+		<PackageReference Include="Mono.Options" Version="6.12.0.148" />
         <ProjectReference Include="..\Zune.DB\Zune.DB.csproj" />
     </ItemGroup>
 
