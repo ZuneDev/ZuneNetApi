@@ -2,10 +2,10 @@
 <clientConfiguration xmlns="http://schemas.zune.net/ZunePCClient/2008/09">
     <targetedClient>PC,v4.8</targetedClient>
     <documentVersion>0.7</documentVersion>
-    <modifiedDate type="text">2022-05-07T00:00:00Z</modifiedDate>
+    <modifiedDate type="text">2022-12-18T00:00:00Z</modifiedDate>
     <rights>Copyright (c) Microsoft Corporation. All rights reserved.</rights>
     <mappingFlush>
-        <previousMappingExpirationDate>2008-04-01T00:00:00Z</previousMappingExpirationDate>
+        <previousMappingExpirationDate>2023-01-01T00:00:00Z</previousMappingExpirationDate>
     </mappingFlush>
     <individualizationVersions>
         <vista>
@@ -28,37 +28,37 @@
             <status>enabled</status>
         </music>
         <mixview>
-            <status>disabled</status>
+            <status>enabled</status>
         </mixview>
         <picks>
-            <status>disabled</status>
+            <status>enabled</status>
         </picks>
         <videos>
-            <status>disabled</status>
+            <status>enabled</status>
         </videos>
         <tv>
-            <status>disabled</status>
+            <status>enabled</status>
         </tv>
         <movieTrailers>
-            <status>disabled</status>
+            <status>enabled</status>
         </movieTrailers>
         <social>
             <culture>en-US</culture>
         </social>
         <musicVideos>
-            <status>disabled</status>
+            <status>enabled</status>
         </musicVideos>
         <podcastMarketplace>
-            <status>disabled</status>
+            <status>enabled</status>
         </podcastMarketplace>
         <channels>
-            <status>disabled</status>
+            <status>enabled</status>
         </channels>
         <games>
-            <status>disabled</status>
+            <status>enabled</status>
         </games>
         <apps>
-            <status>disabled</status>
+            <status>enabled</status>
         </apps>
         <quickMixLocal>
             <status>enabled</status>
@@ -67,13 +67,13 @@
             <status>enabled</status>
         </quickMixZmp>
         <social>
-            <status>disabled</status>
+            <status>enabled</status>
         </social>
         <socialMarketplace>
             <status>enabled</status>
         </socialMarketplace>
         <signInAvailable>
-            <status>disabled</status>
+            <status>enabled</status>
         </signInAvailable>
         <subscription>
           <status>enabled</status>
@@ -87,7 +87,7 @@
           </music>
           <musicVideo>
             <musicVideoStreaming>
-              <status>disabled</status>
+              <status>enabled</status>
             </musicVideoStreaming>
           </musicVideo>
           <trial>
@@ -96,7 +96,7 @@
           </trial>
         </subscription>
         <videoAllHub>
-            <status>disabled</status>
+            <status>enabled</status>
         </videoAllHub>
         <ratingSystem>
             zunepcclient/v4.8/RatingsUS.xml
