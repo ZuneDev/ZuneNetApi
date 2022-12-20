@@ -15,10 +15,10 @@
                 "ASPNETCORE_ENVIRONMENT": "Development"
             }
         },
-        "Zune.SocialApi": {
+        "Zune.Net.SocialApi": {
             "commandName": "Project",
-            "dotnetRunMessages": "true",
-            "applicationUrl": "https://127.0.0.5:443;http://127.0.0.5:80",
+            "dotnetRunMessages": true,
+            "applicationUrl": "https://127.0.0.5:443;http://127.0.0.5:80;https://127.0.0.13:443;http://127.0.0.13:80",
             "environmentVariables": {
                 "ASPNETCORE_ENVIRONMENT": "Development"
             }
