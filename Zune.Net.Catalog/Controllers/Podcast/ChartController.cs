@@ -26,22 +26,15 @@ namespace Zune.Net.Catalog.Controllers.Podcast
 
             var feed = await Listen.GetBestPodcasts(culture[(culture.IndexOf('-') + 1)..], limit: limit);
 
-            foreach (var entry in feed.Entries)
+            foreach (var podcast in feed.Entries)
             {
-                if (entry.Images.Count > 0)
-                {
-                    // Add image ID
-                    var img = entry.Images[0];
-                    var imgInst = img.Instances[0];
-                    var imgEntry = await _database.AddImageAsync(imgInst.Url);
-                    img.Id = imgInst.Id = imgEntry.Id;
-                }
+                await PodcastController.AddImagesToDatabase(_database, podcast);
 
                 // Search on Taddy for RSS URL
-                var td_pod = await Taddy.GetMinimalPodcastInfo(entry.Title.Value);
-                entry.Id = td_pod.Id.ToString();
-                entry.FeedUrl = td_pod.RssUrl;
-                entry.Content = td_pod.Description;
+                var td_pod = await Taddy.GetMinimalPodcastInfo(podcast.Title.Value);
+                podcast.Id = td_pod.Id.ToString();
+                podcast.FeedUrl = td_pod.RssUrl;
+                podcast.Content = td_pod.Description;
             }
 
             return feed;

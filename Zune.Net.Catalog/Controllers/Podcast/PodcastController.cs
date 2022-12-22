@@ -23,16 +23,7 @@ namespace Zune.Net.Catalog.Controllers.Podcast
         public async Task<PodcastSeries> Details(Guid tdid)
         {
             var podcast = await Taddy.GetPodcastByTDID(tdid);
-
-            if (podcast.Images.Count > 0)
-            {
-                // Add image ID
-                var img = podcast.Images[0];
-                var imgInst = img.Instances[0];
-                var imgEntry = await _database.AddImageAsync(imgInst.Url);
-                img.Id = imgInst.Id = imgEntry.Id;
-            }
-
+            await AddImagesToDatabase(_database, podcast);
             return podcast;
         }
 
@@ -49,6 +40,19 @@ namespace Zune.Net.Catalog.Controllers.Podcast
                 });
 
             return feed;
+        }
+
+        [NonAction]
+        internal static async Task AddImagesToDatabase(ZuneNetContext database, PodcastSeries podcast)
+        {
+            if (podcast.Images.Count > 0)
+            {
+                // Add image ID
+                var img = podcast.Images[0];
+                var imgInst = img.Instances[0];
+                var imgEntry = await database.AddImageAsync(imgInst.Url);
+                img.Id = imgInst.Id = imgEntry.Id;
+            }
         }
     }
 }
