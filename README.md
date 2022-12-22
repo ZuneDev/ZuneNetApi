@@ -55,6 +55,7 @@ If you would rather host the servers yourself, you can add the following to your
 /music/hub/podcast
 /podcastchart/zune/podcasts
 /podcast?url={rssUrl}
+/podcastCategories/{catId}
 ```
 
 ### Channel hub

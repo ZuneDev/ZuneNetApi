@@ -1,10 +1,10 @@
-﻿using Flurl.Http;
+﻿using Atom.Xml;
+using Flurl.Http;
 using Newtonsoft.Json.Linq;
 using OwlCore.Extensions;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Zune.Xml.Catalog;
 
 namespace Zune.Net.Helpers
@@ -21,6 +21,27 @@ namespace Zune.Net.Helpers
                 .WithHeader("Content-Type", "application/json")
                 .WithHeader("X-USER-ID", Constants.TD_USER_ID)
                 .WithHeader("X-API-KEY", Constants.TD_API_KEY);
+        }
+
+        public static async Task<Feed<PodcastSeries>> SearchPodcasts(string query, params string[] props)
+        {
+            if (props == null || props.Length == 0)
+                props = DEFAULT_PODCAST_PROPS;
+
+            RequestData request = new($"{{ searchForTerm(term: \"{query}\") {{ searchId podcastSeries {{ {string.Join(' ', props)} }} }} }}");
+
+            var response = await GetBase().PostJsonAsync(request);
+            var responseObj = await response.GetJsonAsync<JToken>();
+
+            var data = responseObj["data"]["searchForTerm"]["podcastSeries"];
+
+            return new()
+            {
+                Id = "podcasts",
+                Title = "Podcasts",
+                Updated = DateTime.Now,
+                Entries = data.Select(TDPodcastSeriesToPodcastSeries).ToList()
+            };
         }
 
         public static async Task<TaddyPodcastSeries> GetMinimalPodcastInfo(string name)
@@ -49,19 +70,22 @@ namespace Zune.Net.Helpers
             var responseObj = await response.GetJsonAsync<JToken>();
 
             var data = responseObj["data"]["getPodcastSeries"];
+            return TDPodcastSeriesToPodcastSeries(data);
+        }
+
+        public static PodcastSeries TDPodcastSeriesToPodcastSeries(JToken data)
+        {
             PodcastSeries podcast = new()
             {
-                Id = tdid.ToString()
-            };
-
-            podcast.Title = data.Value<string>("name");
-            podcast.Content = data.Value<string>("description");
-            podcast.WebsiteUrl = data.Value<string>("websiteUrl");
-            podcast.FeedUrl = data.Value<string>("rssUrl");
-
-            podcast.Author = new()
-            {
-                Name = data.Value<string>("authorName"),
+                Id = data.Value<string>("uuid"),
+                Title = data.Value<string>("name"),
+                Content = data.Value<string>("description"),
+                WebsiteUrl = data.Value<string>("websiteUrl"),
+                FeedUrl = data.Value<string>("rssUrl"),
+                Author = new()
+                {
+                    Name = data.Value<string>("authorName"),
+                }
             };
 
             var datePublished = data.Value<int?>("datePublished");

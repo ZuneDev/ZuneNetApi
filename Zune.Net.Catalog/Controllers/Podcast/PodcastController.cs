@@ -19,6 +19,19 @@ namespace Zune.Net.Catalog.Controllers.Podcast
             _database = database;
         }
 
+        [HttpGet, Route("podcast")]
+        public async Task<ActionResult<Feed<PodcastSeries>>> Search()
+        {
+            if (!Request.Query.TryGetValue("q", out var queries) || queries.Count != 1)
+                return BadRequest();
+
+            var feed = await Taddy.SearchPodcasts(queries[0]);
+            foreach (var podcast in feed.Entries)
+                await AddImagesToDatabase(_database, podcast);
+
+            return feed;
+        }
+
         [HttpGet, Route("podcast/{tdid}")]
         public async Task<PodcastSeries> Details(Guid tdid)
         {
@@ -30,6 +43,7 @@ namespace Zune.Net.Catalog.Controllers.Podcast
         [HttpGet, Route("podcastCategories")]
         public Feed<Category> Categories()
         {
+            // TODO: Narrow the categories down to a few, not 110
             Feed<Category> feed = new();
 
             foreach (var genre in Taddy.Genres)
@@ -45,7 +59,7 @@ namespace Zune.Net.Catalog.Controllers.Podcast
         [NonAction]
         internal static async Task AddImagesToDatabase(ZuneNetContext database, PodcastSeries podcast)
         {
-            if (podcast.Images.Count > 0)
+            if (podcast != null && podcast.Images != null && podcast.Images.Count > 0)
             {
                 // Add image ID
                 var img = podcast.Images[0];
