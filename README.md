@@ -53,7 +53,6 @@ If you would rather host the servers yourself, you can add the following to your
 ### Podcast hub
 ```
 /music/hub/podcast
-/podcastCategories
 /podcastchart/zune/podcasts
 /podcast?url={rssUrl}
 ```
