@@ -2,7 +2,8 @@
 
 namespace Zune.Xml.Catalog
 {
-    public abstract class Category
+    [XmlRoot("category")]
+    public class Category
     {
         [XmlElement("id")]
         public string Id { get; set; }

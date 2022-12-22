@@ -1,5 +1,6 @@
 ﻿using Atom;
 using Atom.Attributes;
+using Atom.Xml;
 using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
@@ -16,26 +17,23 @@ namespace Zune.Xml.Catalog
         [XmlElement("imageUrl")]
         public string ImageUrl { get; set; }
 
-        [XmlElement("longDescription")]
-        public string LongDescription { get; set; }
+        [XmlElement("contentType")]
+        public string Type { get; set; }
 
-        [XmlElement("shortDescription")]
-        public string ShortDescription { get; set; }
-
-        [XmlElement("podcastType")]
-        public string PodcastType { get; set; }
-
-        [XmlElement("sourceUrl")]
-        public string SourceUrl { get; set; }
+        [XmlElement("feedUrl")]
+        public string FeedUrl { get; set; }
 
         [XmlElement("websiteUrl")]
         public string WebsiteUrl { get; set; }
 
-        [XmlElement("releaseDate")]
-        public DateTime EarliestAvailableDate { get; set; }
+        [XmlElement("dateAdded")]
+        public DateTime ReleaseDate { get; set; }
+
+        [XmlElement("author")]
+        public Author Author { get; set; }
 
         [XmlArray("categories")]
         [XmlArrayItem("category")]
-        public List<SeriesCategory> Categories { get; set; }
+        public List<Category> Categories { get; set; }
     }
 }
