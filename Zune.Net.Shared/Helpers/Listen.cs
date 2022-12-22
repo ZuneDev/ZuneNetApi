@@ -19,7 +19,7 @@ namespace Zune.Net.Helpers
             Url = "https://www.listennotes.com"
         };
 
-        public static async Task<Feed<PodcastSeries>> GetBestPodcastsByLNGenre(int? lnid = null, int page = 1)
+        public static async Task<Feed<PodcastSeries>> GetBestPodcasts(string region = null, int? lnid = null, int limit = int.MaxValue, int page = 1)
         {
             Dictionary<string, string> parameters = new()
             {
@@ -27,6 +27,8 @@ namespace Zune.Net.Helpers
             };
             if (lnid != null)
                 parameters.Add("genre_id", lnid.ToString());
+            if (region != null)
+                parameters.Add("region", region.ToLowerInvariant());
             var result = await _client.FetchBestPodcasts(parameters);
 
             var ln_podcasts = result.ToJSON<JToken>()["podcasts"];
@@ -36,7 +38,7 @@ namespace Zune.Net.Helpers
                 Id = "podcasts",
                 Title = "Podcasts",
                 Author = LN_AUTHOR,
-                Entries = ln_podcasts.Select(ln_podcast => LNPodcastToPodcastSeries(ln_podcast)).ToList(),
+                Entries = ln_podcasts.Select(LNPodcastToPodcastSeries).Take(limit).ToList(),
                 Updated = updated,
             };
 
@@ -45,20 +47,28 @@ namespace Zune.Net.Helpers
 
         public static PodcastSeries LNPodcastToPodcastSeries(JToken ln_podcast)
         {
+            string authorName = ln_podcast.Value<string>("publisher");
+
             return new()
             {
-                Id = ln_podcast.Value<string>("id"),
+                // Convert LNID to GUID just for consistency
+                Id = new Guid(ln_podcast.Value<string>("id")).ToString(),
                 Title = ln_podcast.Value<string>("title"),
-                SourceUrl = ln_podcast.Value<string>("rss"),
-                PodcastType = ln_podcast.Value<string>("type"),
-                LongDescription = ln_podcast.Value<string>("description"),
+                FeedUrl = ln_podcast.Value<string>("rss"),
+                Type = ln_podcast.Value<string>("type"),
+                Content = ln_podcast.Value<string>("description"),
                 PrimaryArtist = new()
                 {
-                    Title = ln_podcast.Value<string>("publisher"),
+                    Title = authorName,
+                },
+                Author = new()
+                {
+                    Name = authorName,
                 },
                 WebsiteUrl = ln_podcast.Value<string>("website"),
                 Explicit = ln_podcast.Value<bool>("explicit_content"),
-                EarliestAvailableDate = DateTimeOffset.FromUnixTimeMilliseconds(ln_podcast.Value<long>("earliest_pub_date_ms")).LocalDateTime,
+                ReleaseDate = DateTimeOffset.FromUnixTimeMilliseconds(ln_podcast.Value<long>("earliest_pub_date_ms")).LocalDateTime,
+                Updated = DateTimeOffset.FromUnixTimeMilliseconds(ln_podcast.Value<long>("latest_pub_date_ms")).LocalDateTime,
                 Images = new()
                 {
                     new Image()
@@ -67,7 +77,6 @@ namespace Zune.Net.Helpers
                         {
                             new()
                             {
-                                // TODO: Image ID
                                 Url = ln_podcast.Value<string>("image"),
                                 Format = "jpg",
                             }
