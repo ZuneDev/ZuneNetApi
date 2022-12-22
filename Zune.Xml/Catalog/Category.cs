@@ -2,7 +2,7 @@
 
 namespace Zune.Xml.Catalog
 {
-    [XmlRoot("category")]
+    [XmlRoot("entry")]
     public class Category
     {
         [XmlElement("id")]

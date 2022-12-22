@@ -7,8 +7,7 @@ using System.Xml.Serialization;
 
 namespace Zune.Xml.Catalog
 {
-    [XmlRoot(ElementName = "podcast", Namespace = Constants.XBOX_LIVE_NAMESPACE)]
-    [NamespacePrefix("live", Constants.XBOX_LIVE_NAMESPACE)]
+    [XmlRoot("entry")]
     public class PodcastSeries : Media
     {
         [XmlElement("image")]
