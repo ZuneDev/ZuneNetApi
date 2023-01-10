@@ -68,12 +68,13 @@ namespace Zune.Net.Inbox.Controllers
         [HttpGet]
         public IActionResult UnreadCont(string locale, string zuneTag)
         {
-            using var ctx = new ZuneNetContext();
-            Member member = ctx.Members.First(m => m.ZuneTag == zuneTag);
-            if (member == null)
-                return StatusCode(StatusCodes.Status400BadRequest, $"User {zuneTag} does not exist.");
+        //     using var ctx = new ZuneNetContext();
+        //     Member member = ctx.Members.First(m => m.ZuneTag == zuneTag);
+        //     if (member == null)
+        //         return StatusCode(StatusCodes.Status400BadRequest, $"User {zuneTag} does not exist.");
 
-            return Content(member.Messages.Count(msg => !msg.IsRead).ToString());
+        //     return Content(member.Messages.Count(msg => !msg.IsRead).ToString());
+        return Content("1");
         }
     }
 }
