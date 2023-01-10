@@ -32,7 +32,7 @@ namespace CommerceZuneNet.Controllers
                         Content = "Purchased something from Chuck Berry",
                         Links =
                         {
-                            new("http://catalog.zunes.me/v3.2/en-US/music/album/06d4ec5e-a1b2-4895-9a09-ca3e8451bcc7")
+                            new("http://catalog.zune.net/v3.2/en-US/music/album/06d4ec5e-a1b2-4895-9a09-ca3e8451bcc7")
                         },
                         Title = "Oh Baby Doll / Lajaunda (espanol)"
                     }

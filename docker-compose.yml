@@ -1,0 +1,65 @@
+version: '3.4'
+
+services:
+  mongodb:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data_container:/data/db
+
+  catalog:
+    build:
+      context: ./
+      dockerfile: Zune.Net.Catalog/Dockerfile
+
+  catalog.image:
+    build:
+      context: ./
+      dockerfile: Zune.Net.Catalog.Image/Dockerfile
+
+  commerce:
+    build:
+      context: ./
+      dockerfile: Zune.Net.Commerce/Dockerfile
+
+  inbox:
+    build:
+      context: ./
+      dockerfile: Zune.Net.Inbox/Dockerfile
+
+  login:
+    build:
+      context: ./
+      dockerfile: Zune.Net.Login/Dockerfile
+
+  metaservices:
+    build:
+      context: ./
+      dockerfile: Zune.Net.MetaServices/Dockerfile
+
+  mix:
+    build:
+      context: ./
+      dockerfile: Zune.Net.Mix/Dockerfile
+
+  social:
+    build:
+      context: ./
+      dockerfile: Zune.Net.SocialApi/Dockerfile
+
+  tiles:
+    build:
+      context: ./
+      dockerfile: Zune.Net.Tiles/Dockerfile
+
+  tuners:
+    build:
+      context: ./
+      dockerfile: Zune.Net.Tuners/Dockerfile
+
+volumes:
+  mongodb_data_container:
