@@ -7,20 +7,20 @@ It is highly advised to use the Community Webservices mod from [Zune Modding Hel
 If you would rather host the servers yourself, you can add the following to your `hosts` file to redirect all requests made to the Zune.net endpoints to your local servers. Make sure you have also modified each project's `launchSettings.json` to use the correct `applicationUrl`.
 ```
 127.0.0.1 fai.music.metaservices.microsoft.com
-127.0.0.2 catalog.zunes.me
-127.0.0.2 catalog-ssl.zunes.me
-127.0.0.3 commerce.zunes.me
-127.0.0.4 image.catalog.zunes.me
-127.0.0.5 socialapi.zunes.me
-127.0.0.6 comments.zunes.me
-127.0.0.7 inbox.zunes.me
-127.0.0.8 mix.zunes.me
-127.0.0.9 stats.zunes.me
-127.0.0.10 cache-tiles.zunes.me
-127.0.0.11 tuners.zunes.me
-127.0.0.12 tiles.zunes.me
-127.0.0.13 social.zunes.me
-127.0.0.14 login.zunes.me
+127.0.0.2 catalog.zune.net
+127.0.0.2 catalog-ssl.zune.net
+127.0.0.3 commerce.zune.net
+127.0.0.4 image.catalog.zune.net
+127.0.0.5 socialapi.zune.net
+127.0.0.6 comments.zune.net
+127.0.0.7 inbox.zune.net
+127.0.0.8 mix.zune.net
+127.0.0.9 stats.zune.net
+127.0.0.10 cache-tiles.zune.net
+127.0.0.11 tuners.zune.net
+127.0.0.12 tiles.zune.net
+127.0.0.13 social.zune.net
+127.0.0.14 login.zune.net
 ```
 
 # hosting these servers on linux
