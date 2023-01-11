@@ -3,6 +3,9 @@ version: '3.4'
 networks:
   backend:
     name: backend
+  zune.net:
+    name: zune.net
+    driver: bridge
 
 services:
   mongodb:
@@ -16,15 +19,16 @@ services:
       - mongodb_data_container:/data/db
     networks:
       - backend
+      - zune.net
 
   nginx:
     build:
       context: nginx
     ports:
-      - 81:81
+      - 80:80
     networks:
       - backend
-      - default
+      - zune.net
 
   catalog:
     build:
@@ -56,12 +60,15 @@ services:
     networks:
       - backend
 
-  # inbox:
-  #   build:
-  #     context: ./
-  #     dockerfile: Zune.Net.Inbox/Dockerfile
-  #   ports:
-  #     - 80:8083
+  inbox:
+    build:
+      context: ./
+      dockerfile: Zune.Net.Inbox/Dockerfile
+    depends_on:
+      - mongodb
+      - nginx
+    networks:
+      - backend
 
   login:
     build:

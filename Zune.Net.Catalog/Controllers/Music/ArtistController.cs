@@ -15,7 +15,7 @@ using Zune.Xml.Catalog;
 
 namespace Zune.Net.Catalog.Controllers.Music
 {
-    [Route("/v3.2/{culture}/music/artist/")]
+    [Route("/v{version:decimal}/{culture}/music/artist/")]
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
     public class ArtistController : Controller
     {
