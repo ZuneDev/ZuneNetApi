@@ -11,7 +11,7 @@ using Zune.Net.Helpers;
 
 namespace Zune.Net.Catalog.Image.Controllers
 {
-    [Route("/v3.2/{culture}/")]
+    [Route("/v{version:decimal}/{culture}/")]
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
     public class ImageController : Controller
     {

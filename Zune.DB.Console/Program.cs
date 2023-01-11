@@ -15,7 +15,7 @@ namespace Zune.DB.Console
         static async Task Main(string[] args)
         {
             // Set up CLI options
-            string connectionString = "mongodb://mongo:27017";
+            string connectionString = "mongodb://root:rootpassword@192.168.1.2:27017";
             string dbName = "Zune";
             var options = new OptionSet
             {
