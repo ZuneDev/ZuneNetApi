@@ -73,23 +73,28 @@ namespace Zune.Net.Catalog.Image.Controllers
                 : NotFound();
         }
 
-        [HttpGet, Route("music/artist/{id}/{type}")]
-        public async Task<IActionResult> ArtistImage(string id, string type)
+        [HttpGet, Route("music/{imageKind}/{id}/{type}")]
+        public async Task<IActionResult> ArtistImage(Guid id, string type)
         {
-            string? imageUrl = null;
+            Uri? imageUrl = null;
 
             if (type == "primaryImage")
             {
-                Guid mbid = Guid.Parse(id);
-                (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(mbid);
+                (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(id);
 
-                imageUrl = dc_artist.Value<JArray>("images")?
+                imageUrl = new Uri(dc_artist.Value<JArray>("images")?
                     .FirstOrDefault(i => i.Value<string>("type") == "primary")?
-                    .Value<string>("uri");
+                    .Value<string>("uri"));
+            }
+            if(type == "albumImage")
+            {
+                imageUrl = MusicBrainz.GetAlbumArtByMBID(id);
+                // var imageId = album.Images.ToArray().First().Id;
+
             }
 
             return imageUrl != null
-                ? Redirect(imageUrl)
+                ? Redirect(imageUrl.AbsoluteUri)
                 : NotFound();
         }
     }
