@@ -2,9 +2,10 @@
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /source
 
-# copy csproj and restore as distinct layers
+#  cache the build result to speed up subsequent package steps
 COPY ./ .
 RUN dotnet restore
+RUN dotnet build --no-restore
 
 WORKDIR /source/Zune.Net.Catalog.Image
 RUN dotnet publish -c release -o /app --no-restore

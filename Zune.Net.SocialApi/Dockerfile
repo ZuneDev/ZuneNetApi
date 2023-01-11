@@ -5,6 +5,7 @@ WORKDIR /source
 # copy csproj and restore as distinct layers
 COPY ./ .
 RUN dotnet restore
+RUN dotnet build --no-restore
 
 WORKDIR /source/Zune.Net.SocialApi
 RUN dotnet publish -c release -o /app --no-restore

@@ -1,5 +1,9 @@
 version: '3.4'
 
+networks:
+  backend:
+    name: backend
+
 services:
   mongodb:
     image: mongo:latest
@@ -10,56 +14,114 @@ services:
       - 27017:27017
     volumes:
       - mongodb_data_container:/data/db
+    networks:
+      - backend
+
+  nginx:
+    build:
+      context: nginx
+    ports:
+      - 81:81
+    networks:
+      - backend
+      - default
 
   catalog:
     build:
       context: ./
       dockerfile: Zune.Net.Catalog/Dockerfile
+    depends_on:
+      - mongodb
+      - nginx
+    networks:
+      - backend
 
   catalog.image:
     build:
       context: ./
       dockerfile: Zune.Net.Catalog.Image/Dockerfile
+    depends_on:
+      - mongodb
+      - nginx
+    networks:
+      - backend
 
   commerce:
     build:
       context: ./
       dockerfile: Zune.Net.Commerce/Dockerfile
+    depends_on:
+      - mongodb
+      - nginx
+    networks:
+      - backend
 
-  inbox:
-    build:
-      context: ./
-      dockerfile: Zune.Net.Inbox/Dockerfile
+  # inbox:
+  #   build:
+  #     context: ./
+  #     dockerfile: Zune.Net.Inbox/Dockerfile
+  #   ports:
+  #     - 80:8083
 
   login:
     build:
       context: ./
       dockerfile: Zune.Net.Login/Dockerfile
+    depends_on:
+      - mongodb
+      - nginx
+    networks:
+      - backend
 
   metaservices:
     build:
       context: ./
       dockerfile: Zune.Net.MetaServices/Dockerfile
+    depends_on:
+      - mongodb
+      - nginx
+    networks:
+      - backend
 
   mix:
     build:
       context: ./
       dockerfile: Zune.Net.Mix/Dockerfile
+    depends_on:
+      - mongodb
+      - nginx
+    networks:
+      - backend
 
   social:
     build:
       context: ./
       dockerfile: Zune.Net.SocialApi/Dockerfile
+    depends_on:
+      - mongodb
+      - nginx
+    networks:
+      - backend
 
   tiles:
     build:
       context: ./
       dockerfile: Zune.Net.Tiles/Dockerfile
+    depends_on:
+      - mongodb
+      - nginx
+    networks:
+      - backend
 
   tuners:
     build:
       context: ./
       dockerfile: Zune.Net.Tuners/Dockerfile
+    depends_on:
+      - mongodb
+      - nginx
+    networks:
+      - backend
 
 volumes:
   mongodb_data_container:
