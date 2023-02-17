@@ -26,6 +26,7 @@ services:
       context: nginx
     ports:
       - 80:80
+      - 443:443
     networks:
       - backend
       - zune.net

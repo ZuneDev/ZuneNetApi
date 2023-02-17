@@ -1,8 +1,14 @@
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Mvc.Formatters.Xml;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Zune.Net;
+using Zune.Net.Middleware;
 
 namespace CommerceZuneNet
 {
@@ -10,32 +16,40 @@ namespace CommerceZuneNet
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
-        }
+            var builder = WebApplication.CreateBuilder(args);
+            builder.Host.ConfigureLogging(cfg => 
+            {
+                cfg.AddConsole();
+            });
 
-        public static IHostBuilder CreateHostBuilder(string[] args)
-        {
-            Config cfg = new(args);
+            // Add services to the container.
+            builder.Services.AddControllers().AddXmlSerializerFormatters(); 
+            builder.Services.AddReverseProxy()
+            .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
-            return Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
+            builder.Host.ConfigureZuneDB();
+
+            var app = builder.Build();
+
+            // Configure the HTTP request pipeline.
+            app.UseRequestBuffering();
+
+            app.UseRouting();
+
+            app.UseWlidAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+
+                endpoints.MapGet("/", ctx =>
                 {
-                    webBuilder.UseStartup<Startup>();
-                    if (cfg.Host != null)
-                        webBuilder.UseUrls($"http://{cfg.Host}:{cfg.Port}", $"https://{cfg.Host}:{cfg.SslPort}");
-                })
-                .ConfigureAppConfiguration((hostingContext, config) =>
-                {
-                    var env = hostingContext.HostingEnvironment;
-                    config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                          .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
-                    config.AddEnvironmentVariables();
-                })
-                .ConfigureServices((ctx, s) =>
-                {
-                    s.AddSingleton(sp => cfg);
-                })
-                .ConfigureZuneDB();
+                    return Task.FromResult(new OkObjectResult("Welcome to the Social"));
+                });
+                endpoints.MapReverseProxy();
+            });
+
+            app.Run();
         }
     }
 }

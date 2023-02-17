@@ -39,16 +39,16 @@ namespace Zune.Xml.Catalog
         public int PointsPrice { get; set; }
 
         [XmlElement("CanPlay")]
-        public bool CanPlay { get; set; }
+        public bool CanPlay { get; set; } = true;
 
         [XmlElement("CanDownload")]
-        public bool CanDownload { get; set; }
+        public bool CanDownload { get; set; } = true;
 
         [XmlElement("CanPurchase")]
-        public bool CanPurchase { get; set; }
+        public bool CanPurchase { get; set; } = true;
 
         [XmlElement("CanPurchaseMP3")]
-        public bool CanPurchaseMP3 { get; set; }
+        public bool CanPurchaseMP3 { get; set; } = true;
 
         [XmlElement("CanPurchaseAlbumOnly")]
         public bool CanPurchaseAlbumOnly { get; set; }

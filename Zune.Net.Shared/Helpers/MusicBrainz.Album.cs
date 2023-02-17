@@ -34,16 +34,12 @@ namespace Zune.Net.Helpers
             return MBReleaseToAlbum(mb_rel);
         }
 
-        public static Uri GetAlbumArtByMBID(Guid mbid)
+        public static Album GetAlbumByRecordingId(Guid mbid)
         {
-            var mb_rel = _query.LookupRelease(mbid, Include.Genres | Include.ArtistCredits | Include.Recordings | Include.Media);
-            if(mb_rel.CoverArtArchive.Front)
-            {
-                new Uri($"http://coverartarchive.org/release/{mbid}/front");
-            }
-            return null;
-        }
+            var mb_rel = _query.LookupRecording(mbid, Include.Releases | Include.ArtistCredits);
 
+            return MBReleaseToAlbum(mb_rel.Releases.First());
+        }
 
         public static Album MBReleaseToAlbum(IRelease mb_rel, DateTime? updated = null, bool includeRights = true)
         {

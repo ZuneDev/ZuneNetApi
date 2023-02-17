@@ -44,22 +44,27 @@ namespace Zune.DB.Console
             });
 
             await ctx.ClearMembersAsync();
-            await ctx.ClearTokensAsync();
-            await ctx.ClearImagesAsync();
+            // await ctx.ClearTokensAsync();
+            // await ctx.ClearImagesAsync();
 
-            string userName = "yoshiask@escargot.chat";
+            string userName = "EmailAddress@live.com";
+            string SID = "S-1-5-21-414912484-GET YOUR OWN PUNK";
+
+            // var user = await ctx.GetMemberByName(userName);
+
             var newMember = new Member
             {
                 Updated = DateTime.UtcNow,
                 Id = Member.GetGuidFromUserName(userName),
+                SID = SID, // This is my LiveID SID
                 UserName = userName,
                 PlayCount = 206,
                 Xuid = Member.GetXuidFromUserName(userName),
-                ZuneTag = "YoshiAsk",
-                DisplayName = "Yoshi Askharoun",
+                ZuneTag = "xerootg",
+                DisplayName = "xerootg",
                 Status = "Reviving the Zune social",
-                Bio = "A computer science student at Texas A&M Univserity that can't help but bring back dead Microsoft products.",
-                Location = "College Station, Texas",
+                Bio = "resident hacker",
+                Location = "the internet",
                 UserTile = "http://tiles.zune.net/tiles/avatar/default.jpg",
                 Background = "http://tiles.zune.net/tiles/background/USERBACKGROUND-ART-536X196-49.jpg",
 
@@ -79,92 +84,58 @@ namespace Zune.DB.Console
                 BillingInstanceId = "6cba2616-c59a-4dd5-bc9e-d41a45215cfa"
             };
 
-            var tuner = new Tuner
-            {
-                Id = "6cba2616-c59a-4dd5-bc9e-d41a45215cfb"
-            };
-            newMember.TunerRegisterInfo = tuner;
-
-            Guid msgId = Guid.Parse("7e366cd9-6d16-4ddf-9dfe-963acdef4450");
-            Guid linkId = Guid.Parse("fe9ab096-a072-475b-8e24-0aaacf32852d");
-            var message = new Message
-            {
-                DetailsLink = string.Empty,
-                Sender = newMember,
-                Status = "hi",
-                Wishlist = false,
-                MediaId = msgId,
-                Subject = "Microsoft revives long-dead Zune product line",
-                Received = DateTime.UtcNow,
-                Type = "message",
-                Id = msgId.ToString(),
-                AltLink = new Link
-                {
-                    Href = "https://rr.noordstar.me/microsoft-revives-long-dead-zune-product--f9628d12",
-                    Id = linkId.ToString()
-                },
-                TextContent = "Tech giant Microsoft announced early Monday morning that a new Zune music player is in the works",
-            };
+           
+            // Guid msgId = Guid.Parse("7e366cd9-6d16-4ddf-9dfe-963acdef4450");
+            // Guid linkId = Guid.Parse("fe9ab096-a072-475b-8e24-0aaacf32852d");
+            // var message = new Message
+            // {
+            //     DetailsLink = string.Empty,
+            //     Sender = user,
+            //     Status = "hi",
+            //     Wishlist = false,
+            //     MediaId = msgId,
+            //     Subject = "Microsoft revives long-dead Zune product line",
+            //     Received = DateTime.UtcNow,
+            //     Type = "message",
+            //     Id = msgId.ToString(),
+            //     AltLink = new Link
+            //     {
+            //         Href = "https://rr.noordstar.me/microsoft-revives-long-dead-zune-product--f9628d12",
+            //         Id = linkId.ToString()
+            //     },
+            //     TextContent = "Tech giant Microsoft announced early Monday morning that a new Zune music player is in the works",
+            // };
             //newMember.Messages ??= new System.Collections.Generic.List<Message>(1);
             //newMember.Messages.Add(message);
 
-            Guid badgedId = Guid.Parse("fe9ab096-a072-475b-8e24-0aaacf32852f");
-            var badge = new Badge
-            {
-                Description = "Restore the Zune social",
-                TypeId = Xml.SocialApi.BadgeType.ActiveForumsBadge_Gold,
-                Title = "Necromancer",
-                Image = "https://i.imgur.com/dMwIZs8.png",
-                MediaId = Guid.NewGuid(),
-                MediaType = "Application",
-                //Summary = "Where is this shown? No idea, contact YoshiAsk if you see this in the software"
-            };
+            // Guid badgedId = Guid.Parse("fe9ab096-a072-475b-8e24-0aaacf32852f");
+            // var badge = new Badge
+            // {
+            //     Description = "Restore the Zune social",
+            //     TypeId = Xml.SocialApi.BadgeType.ActiveForumsBadge_Gold,
+            //     Title = "Necromancer",
+            //     Image = "https://i.imgur.com/dMwIZs8.png",
+            //     MediaId = Guid.NewGuid(),
+            //     MediaType = "Application",
+            //     // Summary = "Where is this shown? No idea, contact YoshiAsk if you see this in the software"
+            // };
 
             await ctx.CreateAsync(newMember);
+
+            // var tuner = new Tuner
+            // {
+            //     Id = "6cba2616-c59a-4dd5-bc9e-d41a45215cfb"
+            // };
+            // user.TunerRegisterInfo = tuner;
+            // user.SID = SID;
+            // // user.Badges.Add(badge);
+            // await ctx.UpdateAsync(user);
+
+            // System.Console.WriteLine($"Set SID for {user.UserName} to {user.SID}");
+
             //ctx.Messages.Add(message);
-            //ctx.Tuners.Add(tuner);
+            // ctx.Tuners.Add(tuner);
 
-            userName = "wamwoowam@escargot.chat";
-            var member2 = new Member
-            {
-                Updated = DateTime.UtcNow,
-                Id = Member.GetGuidFromUserName(userName),
-                UserName = userName,
-                PlayCount = 4123,
-                Xuid = Member.GetXuidFromUserName(userName),
-                ZuneTag = "WamWooWam",
-                DisplayName = string.Empty,
-                Status = "Restoring Windows Phone 7",
-                Bio = "he/they, pan, nerd with a strange obsession for windows phone",
-                Location = "Ireland",
-                UserTile = "http://i.imgur.com/06BuEKG.jpg",
-                Background = "http://i.imgur.com/KeZIsxF.jpg",
-
-                AcceptedTermsOfService = true,
-                AccountSuspended = false,
-                BillingUnavailable = true,
-                SubscriptionLapsed = true,
-                TagChangeRequired = false,
-                UsageCollectionAllowed = false,
-                ExplicitPrivilege = false,
-                Lightweight = false,
-                Locale = "en-GB",
-                ParentallyControlled = false,
-                PointsBalance = 100.0,
-                SongCreditBalance = 0.0,
-                SongCreditRenewalDate = DateTime.Now.AddDays(1).ToString("O"),
-                BillingInstanceId = "6cba2616-c59a-4dd5-bc9e-d41a5f215cfa"
-            };
-
-            tuner = new Tuner
-            {
-                Id = "6cba2616-c59a-4dd5-bc9e-d441f315cfb"
-            };
-            member2.TunerRegisterInfo = tuner;
-
-            await ctx.CreateAsync(member2);
-            //ctx.Tuners.Add(tuner);
-            //ctx.SaveChanges();
         }
     }
 }

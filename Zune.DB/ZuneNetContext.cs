@@ -49,6 +49,9 @@ namespace Zune.DB
         public async Task CreateAsync(Member newMember) =>
             await _memberCollection.InsertOneAsync(newMember);
 
+        public async Task UpdateAsync(Member updatedMember) =>
+            await _memberCollection.ReplaceOneAsync(x => x.Id == updatedMember.Id, updatedMember);
+
         public async Task UpdateAsync(Guid id, Member updatedMember) =>
             await _memberCollection.ReplaceOneAsync(x => x.Id == id, updatedMember);
 
@@ -60,7 +63,18 @@ namespace Zune.DB
         public async Task<TokenEntry> GetCidByToken(string token)
         {
             string tokenHash = Helpers.Hash(token);
+            Console.WriteLine($"hashedToken = {tokenHash}");
             return await _authCollection.Find(e => e.TokenHash == tokenHash).FirstOrDefaultAsync();
+        }
+
+        public async Task<Member> GetMemberByName(string UserName)
+        {
+            return await GetSingleAsync(m => m.UserName == UserName);
+        }
+
+        public async Task<Member> GetMemberBySid(string sid)
+        {
+            return await GetSingleAsync(user => user.SID == sid);
         }
 
         public async Task<Member> GetMemberByToken(string token)
