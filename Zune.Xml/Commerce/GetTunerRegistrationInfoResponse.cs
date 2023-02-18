@@ -1,7 +1,6 @@
 using Atom;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Xml.Serialization;
 
 // this class is not production-ready. The signin workflow needs to actually build this correctly
@@ -16,7 +15,6 @@ namespace Zune.Xml.Commerce
     public class TunerInfoDef
     {
         [XmlElement("ID")]
-        [Required]
         public string TunerId { get; set; }
 
         [XmlElement("Name")]

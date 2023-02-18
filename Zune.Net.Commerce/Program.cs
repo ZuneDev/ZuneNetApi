@@ -24,8 +24,6 @@ namespace CommerceZuneNet
 
             // Add services to the container.
             builder.Services.AddControllers().AddXmlSerializerFormatters(); 
-            builder.Services.AddReverseProxy()
-            .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
             builder.Host.ConfigureZuneDB();
 
@@ -46,7 +44,6 @@ namespace CommerceZuneNet
                 {
                     return Task.FromResult(new OkObjectResult("Welcome to the Social"));
                 });
-                endpoints.MapReverseProxy();
             });
 
             app.Run();

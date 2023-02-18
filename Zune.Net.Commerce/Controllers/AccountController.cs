@@ -83,8 +83,10 @@ namespace CommerceZuneNet.Controllers
                             await _database.UpdateAsync(member);
                             _logger.LogInformation("Updating the database!");
                             member = await _database.GetMemberBySid(user_sid);
+
+                            // TODO: We need to be adding the TunerInfo as a tuner to the db when we see a NEW one.
+
                             return member.GetSignInResponse();
-                            // attempt to get the user by SID and tie the session back to it.
                         } else 
                         {
                             _logger.LogInformation("No sid was recovered, rejecting the request");
