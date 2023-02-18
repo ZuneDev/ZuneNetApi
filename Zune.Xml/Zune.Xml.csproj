@@ -22,6 +22,10 @@
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <IsPublishable>false</IsPublishable>
+    </PropertyGroup>
+
     <PropertyGroup Condition="'$(TargetFramework)' == 'net7.0'">
         <DefineConstants>$(DefineConstants);NETSTANDARD1_1_OR_GREATER;NETSTANDARD2_0_OR_GREATER;NETSTANDARD2_1_OR_GREATER</DefineConstants>
     </PropertyGroup>

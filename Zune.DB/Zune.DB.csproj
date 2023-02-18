@@ -4,6 +4,10 @@
         <TargetFrameworks>net7.0</TargetFrameworks>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <IsPublishable>false</IsPublishable>
+    </PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include="MongoDB.Driver" Version="3.0.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.6">
