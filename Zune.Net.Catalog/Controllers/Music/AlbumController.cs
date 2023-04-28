@@ -20,7 +20,7 @@ namespace Zune.Net.Catalog.Controllers.Music
             return MusicBrainz.SearchAlbums(queries[0], Request.Path);
         }
 
-        [HttpGet, Route("{mbid}")]
+        [HttpGet("{mbid}"), HttpGet("details/{mbid}")]
         public ActionResult<Album> Details(Guid mbid)
         {
             return MusicBrainz.GetAlbumByMBID(mbid);

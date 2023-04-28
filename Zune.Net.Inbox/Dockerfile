@@ -6,11 +6,11 @@ WORKDIR /source
 COPY ./ .
 RUN dotnet restore
 
-RUN dotnet publish -c release -o /app --no-restore
+RUN dotnet publish -c release -p:PublishDir=./publish --no-restore
 
 # final stage/image
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /app
-COPY --from=build /app/Zune.Net.Inbox ./
+COPY --from=build /source/Zune.Net.Inbox/publish/ ./
 ENV DOTNET_EnableDiagnostics=0
 ENTRYPOINT ["dotnet", "Zune.Net.Inbox.dll"]

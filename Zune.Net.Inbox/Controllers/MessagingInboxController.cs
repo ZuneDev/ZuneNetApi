@@ -56,7 +56,8 @@ namespace Zune.Net.Inbox.Controllers
             return message;
         }
 
-        [HttpGet]
+        [HttpGet("unreadcount")]
+        [HttpGet("UnreadCount")]
         public IActionResult UnreadCont(string locale, string zuneTag)
         {
             
