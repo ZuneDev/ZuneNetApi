@@ -1,11 +1,13 @@
+using System.Collections.Concurrent;
 using MetaBrainz.MusicBrainz;
+using Zune.DB;
 using Zune.Net.MetaServices.DomainModels.MDSR;
 
 namespace Zune.Net.Helpers
 {
-    public static class WMIS
+    public class WMIS
     {
-        public static readonly Query _query = new("Zune", "4.8", "https://github.com/xerootg/ZuneNetApi");
+        public static readonly Query Query = new("Zune", "4.8", "https://github.com/xerootg/ZuneNetApi");
         // public static async Task<List<Album>> SearchForAlbums(string query)
         // {
         //     var results = await _query.FindReleasesAsync(query, simple: true, limit: 1);
@@ -45,21 +47,40 @@ namespace Zune.Net.Helpers
         //     }
         //     return ret;
         // }
+        private readonly ZuneNetContext _database;
+        private readonly ILogger _logger;
 
-        public static async Task<MDSRCDMetadata> SearchAlbums(string query)
+
+        public WMIS(ZuneNetContext database, ILogger<WMIS> logger)
         {
-            var results = await _query.FindReleasesAsync(query, simple: true, limit: 10);
+            _database = database;
+            _logger = logger;
+        }
+
+        public async Task<MDSRCDMetadata> SearchAlbums(string query)
+        {
+            _logger.LogInformation($"Getting MDSR-CD results for AlbumSearch: {query}");
+            var results = await Query.FindReleasesAsync(query, simple: true);
             var releases = results.Results.Select(x => x.Item).ToList();
-            var resultList = new List<Result>();
-            foreach (var release in releases)
+
+            var resultList = new ConcurrentBag<Result>();
+
+            await Parallel.ForEachAsync(releases, async (release, ct) =>
             {
-                var deepRelease = await _query.LookupReleaseAsync(release.Id, inc: Include.Labels | Include.DiscIds | Include.Recordings | Include.Genres | Include.ArtistCredits | Include.ReleaseGroups);
+                if(ct.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                _logger.LogInformation($"Getting all data for MBID: {release.Id}");
+                var deepRelease = await Query.LookupReleaseAsync(release.Id, inc: Include.Labels | Include.DiscIds | Include.Recordings | Include.Genres | Include.ArtistCredits | Include.ReleaseGroups);
 
                 var label = string.Empty;
-                var genre = string.Empty;
-                var performerName = string.Empty;
+                var genre = "Unknown";
+                var performerName = "Unknown Artist";
                 var artistGuid = Guid.Empty;
                 var releaseDate = $"{DateTime.Now.Year}-{DateTime.Now.Month}-{DateTime.Now.Day}";
+                var albumArtMbid = "default";
                 if (deepRelease.Genres?.Count > 0)
                 {
                     genre = deepRelease.Genres[0].Name;
@@ -75,13 +96,21 @@ namespace Zune.Net.Helpers
                 }
                 if (deepRelease.Date != null)
                 {
+                    
                     releaseDate = $"{deepRelease.Date.Year ?? DateTime.Now.Year}-{deepRelease.Date.Month ?? DateTime.Now.Month}-{deepRelease.Date.Day ?? DateTime.Now.Day}";
                 }
+                if(deepRelease.CoverArtArchive?.Front ?? false)
+                {
+                    _logger.LogInformation($"Release {release.Id} HAS ARTWORK");
+                    albumArtMbid = release.Id.ToString();
+                }
 
-                var result = new Result()
+                //var id = _database.AddOrGetAlbumLookupRecordAsync(release.Id);
+
+                resultList.Add(new Result()
                 {
                     bestmatch = (int)results.Results.Where(x => x.Item.Id == deepRelease.Id).First().Score == 100,
-                    album_id = int.Parse(release.Id.ToString("N")[0..6], System.Globalization.NumberStyles.HexNumber),
+                    album_id = 123456789,//int.Parse(release.Id.ToString("N")[0..6], System.Globalization.NumberStyles.HexNumber),
                     Volume = 1,
                     albumPerformer = performerName,
                     buyNowLink = "http://google.com",
@@ -89,10 +118,12 @@ namespace Zune.Net.Helpers
                     albumGenre = genre,
                     numberOfTracks = deepRelease.Media != null && deepRelease.Media.Count > 0 ? deepRelease.Media[0].TrackCount : 0,
                     IsMultiDisk = deepRelease.Media != null && deepRelease.Media.Count > 0 ? deepRelease.Media.Count > 1 : false,
-                    albumCover = release.Id.ToString()
-                };
-                resultList.Add(result);
-            }
+                    albumCover = albumArtMbid
+                });
+                _logger.LogInformation($"Finished building MDSR-CD result for MBID: {release.Id}");
+            });
+
+            _logger.LogInformation($"Found {resultList.Count} results");
 
             // How's that for a stackup?
             var ret = new MDSRCDMetadata()
@@ -101,7 +132,7 @@ namespace Zune.Net.Helpers
                 {
                     SearchResult = new SearchResult()
                     {
-                        Results = resultList
+                        Results = resultList.ToList()
                     }
                 }
             };

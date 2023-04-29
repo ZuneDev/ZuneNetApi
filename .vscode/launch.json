@@ -10,9 +10,9 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/Zune.Net.Catalog/bin/Debug/net7.0/Zune.Net.Catalog.dll",
+            "program": "${workspaceFolder}/Zune.Net.MetaServices/bin/Debug/net7.0/Zune.Net.MetaServices.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/Zune.Net.Catalog",
+            "cwd": "${workspaceFolder}/Zune.Net.MetaServices",
             "stopAtEntry": false,
             // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
             // "serverReadyAction": {

@@ -5,6 +5,7 @@ namespace Zune.Net.MetaServices.Controllers
 {
     [ApiController]
     [Route("/redir/")]
+    [Produces("application/xml")]
     public class Redir : ControllerBase{
         [HttpGet("ZuneFAI/")]
         public IActionResult ZuneFai()

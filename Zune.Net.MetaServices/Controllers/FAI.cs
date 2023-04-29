@@ -7,6 +7,11 @@ namespace Zune.Net.MetaServices.Controllers
     [Route("/ZuneFAI/")]
     public class FAI : Controller
     {
+        private readonly WMIS _wmis;
+        public FAI(WMIS wmis)
+        {
+            _wmis = wmis;
+        }
         [HttpGet("Search")]
         [Produces("application/xml")]
         public async Task<ActionResult> Search(string SearchString, string resultTypeString)
@@ -22,7 +27,7 @@ namespace Zune.Net.MetaServices.Controllers
                     //   ReturnCode = "SUCCESS",
                     //   Items = await MusicBrainz.SearchForAlbums(SearchString)
                     // });
-                    return Ok(await WMIS.SearchAlbums(SearchString));
+                    return Ok(await _wmis.SearchAlbums(SearchString));
                 // case "artist":
                 //     return Ok(new ArtistList(){
                 //       ReturnCode = "SUCCESS",
