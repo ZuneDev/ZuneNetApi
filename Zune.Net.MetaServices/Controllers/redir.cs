@@ -12,5 +12,11 @@ namespace Zune.Net.MetaServices.Controllers
         {
             return Ok(new Metadata());
         }
+
+        [HttpGet("getmdrcdposturlbackgroundzune")]
+        public IActionResult mdrcdposturl()
+        {
+            return Ok(new Metadata());
+        }
     }
 }

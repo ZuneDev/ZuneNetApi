@@ -11,5 +11,7 @@
         public string AuthCollectionName { get; set; } = "Auth";
 
         public string ImageCollectionName { get; set; } = "Images";
+
+        public string AlbumLookupCollectionName { get; set; } = "AlbumLookup";
     }
 }

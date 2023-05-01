@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Zune.Net.Helpers;
 using Zune.Net.MetaServices.DomainModels.Endpoints;
+using Zune.Net.MetaServices.DomainModels.MdqCd;
 
 namespace Zune.Net.MetaServices.Controllers
 {
@@ -8,9 +9,11 @@ namespace Zune.Net.MetaServices.Controllers
     public class FAI : Controller
     {
         private readonly WMIS _wmis;
-        public FAI(WMIS wmis)
+        private readonly ILogger _logger;
+        public FAI(WMIS wmis, ILogger<FAI> logger)
         {
             _wmis = wmis;
+            _logger = logger;
         }
         [HttpGet("Search")]
         [Produces("application/xml")]
@@ -27,7 +30,7 @@ namespace Zune.Net.MetaServices.Controllers
                     //   ReturnCode = "SUCCESS",
                     //   Items = await MusicBrainz.SearchForAlbums(SearchString)
                     // });
-                    return Ok(await _wmis.SearchAlbums(SearchString));
+                    return Ok(await _wmis.SearchAlbumsAsync(SearchString));
                 // case "artist":
                 //     return Ok(new ArtistList(){
                 //       ReturnCode = "SUCCESS",
@@ -44,10 +47,15 @@ namespace Zune.Net.MetaServices.Controllers
         }
 
         // Also known as WMISFAIGetAlbumsByArtistQuery in the UIX side
-        [HttpGet("GetAlbumDetailsFromAlbumId")]
+        [HttpPost("GetAlbumDetailsFromAlbumId")]
         [Produces("application/xml")]
-        public async Task<ActionResult> MDARGetAlbumDetailsFromAlbumId()
+        public async Task<ActionResult> MDARGetAlbumDetailsFromAlbumId([FromBody]MdqRequestMetadata request, int albumId, int locale, int volume)
         {
+            _logger.LogInformation($"MDQ-CD request for Album: {request.MdqCd.Album.AlbumTitle.Text} by {request.MdqCd.Album.AlbumArtist.Text}");
+            foreach(var track in request.MdqCd.Tracks)
+            {
+                _logger.LogInformation($"Track: {track.TrackNumber} - {track.Title.Text}: RequestID: {track.trackRequestId}");
+            }
             return Ok();
         }
     }
