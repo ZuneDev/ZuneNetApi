@@ -8,13 +8,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers().AddXmlSerializerFormatters();
+builder.Services.AddResponseCaching();
 builder.Host.ConfigureZuneDB(true);
 builder.Services.AddTransient<ZuneNetContext>();
-builder.Services.AddSingleton<Query>(new Query("Zune", "4.8", "https://github.com/xerootg/ZuneNetApi"));
+builder.Services.AddSingleton(new Query("Zune", "4.8", "https://github.com/xerootg/ZuneNetApi"));
 builder.Services.AddTransient(typeof(WMIS));
 
 var app = builder.Build();
 
 app.MapControllers();
+app.UseResponseCaching();
 
 app.Run();
