@@ -8,8 +8,10 @@ namespace Zune.DB.Models
     {
         [BsonId]
         public string Id;
-        public Int64 AlbumId {get; set;}
-        public Guid AlbumGuid {get; set;}
+
+        public long AlbumId { get; set; }
+
+        public Guid AlbumGuid { get; set; }
 
         public WMISAlbumIdEntry(Int64 id, Guid guid)
         {

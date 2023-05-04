@@ -18,5 +18,11 @@ namespace Zune.Net.MetaServices.DomainModels.MdarCd
 
         [XmlElement("ReturnCode")]
         public string ReturnCode = "SUCCESS";
+
+        [XmlElement("WmCollectionId")]
+        public Guid AlbumMBID {get; set;}
+
+        [XmlElement("WmCollectiongroupId")]
+        public Guid AlbumGroupMBID {get; set;}
     }
 }

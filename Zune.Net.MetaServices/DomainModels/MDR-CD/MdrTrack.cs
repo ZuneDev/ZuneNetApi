@@ -7,33 +7,33 @@ namespace Zune.Net.MetaServices.DomainModels.MdrCd
     {
 
         [XmlElement("uniqueFileID")]
-        public object UniqueFileID { get; set; }
+        public string UniqueFileID { get; set; } = string.Empty;
 
         [XmlElement("WMContentID")]
-        public string WMContentID { get; set; }
+        public string WMContentID { get; set; } = string.Empty;
 
         [XmlElement("trackRequestID")]
         public int TrackRequestID { get; set; }
 
         [XmlElement("trackTitle")]
-        public string TrackTitle { get; set; }
+        public string TrackTitle { get; set; } = string.Empty;
 
         [XmlElement("trackNumber")]
-        public int TrackNumber { get; set; }
+        public string TrackNumber { get; set; } = string.Empty;
 
         [XmlElement("trackPerformer")]
-        public int TrackPerformer { get; set; }
+        public string TrackPerformer { get; set; } = string.Empty;
 
         [XmlElement("trackComposer")]
-        public object TrackComposer { get; set; }
+        public string TrackComposer { get; set; } = string.Empty;
 
         [XmlElement("trackConductor")]
-        public object TrackConductor { get; set; }
+        public string TrackConductor { get; set; } = string.Empty;
 
         [XmlElement("period")]
-        public string Period { get; set; }
+        public string Period { get; set; } = string.Empty;
 
         [XmlElement("explicitLyrics")]
-        public int ExplicitLyrics { get; set; }
+        public int ExplicitLyrics { get; set; } = 0;
     }
 }

@@ -13,5 +13,7 @@
         public string ImageCollectionName { get; set; } = "Images";
 
         public string AlbumLookupCollectionName { get; set; } = "AlbumLookup";
+
+        public string TrackLookupCollectionName { get; set; } = "TrackLookup";
     }
 }

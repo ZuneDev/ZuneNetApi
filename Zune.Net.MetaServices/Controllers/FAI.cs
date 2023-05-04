@@ -42,10 +42,22 @@ namespace Zune.Net.MetaServices.Controllers
         // Also known as WMISFAIGetAlbumDetailsQuery in the UIX side
         // Looking for AlbumDetails - AKA mdar-cd
         [HttpPost("GetAlbumDetailsFromAlbumId")]
+        [HttpGet("GetAlbumDetailsFromAlbumId")]
         [Produces("application/xml")]
-        public async Task<ActionResult> MDARGetAlbumDetailsFromAlbumId([FromBody]MdqRequestMetadata request, Int64 albumId, int locale, int volume)
+        public async Task<ActionResult> MDARGetAlbumDetailsFromAlbumId(Int64 albumId, int locale, string volume, [FromBody]MdqRequestMetadata request = null)
         {
-            return Ok(await _wmis.GetMdarCdRequestFromInt64(albumId, volume));
+            var response = await _wmis.GetMdarCdRequestFromInt64(albumId, volume, request);
+            if(request?.MdqCd?.MdqRequestId != null)
+            {
+                response.mdqRequestID = new Guid(request?.MdqCd?.MdqRequestId);
+            }
+            return Ok(response);
+        }
+
+        [HttpPost("SubmitAddFeedback")]
+        public IActionResult SubmitAddFeedback()
+        {
+            return Ok();
         }
     }
 }

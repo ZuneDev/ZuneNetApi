@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers().AddXmlSerializerFormatters();
+builder.Services.AddSwaggerDocument();
 builder.Services.AddResponseCaching();
 builder.Host.ConfigureZuneDB(true);
 builder.Services.AddTransient<ZuneNetContext>();
@@ -18,5 +19,8 @@ var app = builder.Build();
 
 app.MapControllers();
 app.UseResponseCaching();
+
+app.UseOpenApi();
+app.UseSwaggerUi3();
 
 app.Run();

@@ -7,46 +7,46 @@ namespace Zune.Net.MetaServices.DomainModels.MdrCd
     {
 
         [XmlElement("uniqueFileID")]
-        public object UniqueFileID { get; set; }
+        public string UniqueFileID { get; set; }
 
         [XmlElement("providerStyle")]
-        public object ProviderStyle { get; set; }
+        public string ProviderStyle { get; set; }
 
         [XmlElement("publisherRating")]
-        public object PublisherRating { get; set; }
+        public string PublisherRating { get; set; }
 
         [XmlElement("buyParams")]
-        public object BuyParams { get; set; }
+        public string BuyParams { get; set; }
 
         [XmlElement("moreInfoParams")]
-        public object MoreInfoParams { get; set; }
+        public string MoreInfoParams { get; set; }
 
         [XmlElement("dataProvider")]
-        public object DataProvider { get; set; }
+        public string DataProvider { get; set; }
 
         [XmlElement("dataProviderParams")]
-        public object DataProviderParams { get; set; }
+        public string DataProviderParams { get; set; }
 
         [XmlElement("dataProviderLogo")]
-        public object DataProviderLogo { get; set; }
+        public string DataProviderLogo { get; set; }
 
         [XmlElement("version")]
         public int Version { get; set; }
 
         [XmlElement("mdqRequestID")]
-        public string MdqRequestID { get; set; }
+        public Guid MdqRequestID { get; set; }
 
         [XmlElement("WMCollectionID")]
-        public string WMCollectionID { get; set; }
+        public Guid WMCollectionID { get; set; }
 
         [XmlElement("WMCollectionGroupID")]
-        public string WMCollectionGroupID { get; set; }
+        public Guid WMCollectionGroupID { get; set; }
 
         [XmlElement("albumTitle")]
         public string AlbumTitle { get; set; }
 
         [XmlElement("albumArtist")]
-        public int AlbumArtist { get; set; }
+        public string AlbumArtist { get; set; }
 
         [XmlElement("releaseDate")]
         public DateTime ReleaseDate { get; set; }
@@ -59,6 +59,12 @@ namespace Zune.Net.MetaServices.DomainModels.MdrCd
 
         [XmlElement("needIDs")]
         public int NeedIDs { get; set; }
+
+        [XmlElement("largeCoverParams")]
+        public string LargeCoverAddress { get; set; }
+
+        [XmlElement("smallCoverParams")]
+        public string SmallCoverAddress { get; set; }
 
         [XmlElement("track")]
         public List<Track> Track { get; set; }

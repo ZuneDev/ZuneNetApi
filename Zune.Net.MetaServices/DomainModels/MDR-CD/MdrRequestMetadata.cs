@@ -13,6 +13,6 @@ namespace Zune.Net.MetaServices.DomainModels.MdrCd
         public Backoff Backoff { get; set; }
 
         [XmlElement("mdqRequestID")]
-        public string MdqRequestID { get; set; }
+        public Guid MdqRequestID { get; set; }
     }
 }
