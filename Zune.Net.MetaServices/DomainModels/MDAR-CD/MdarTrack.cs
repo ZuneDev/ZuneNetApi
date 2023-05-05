@@ -15,5 +15,8 @@ namespace Zune.Net.MetaServices.DomainModels.MdarCd
 
         [XmlElement("TrackWmid")]
         public Guid TrackWmid {get; set;}
+
+        [XmlElement("TrackRequestID")]
+        public int TrackRequestID {get; set;} = 0;
     }
 }

@@ -69,7 +69,7 @@ namespace Zune.Net.Helpers
             }
 
             _logger.LogInformation($"Getting all data for MBID: {guid}");
-            var release = await _query.LookupReleaseAsync(guid, inc: Include.Labels | Include.DiscIds | Include.Recordings | Include.Genres | Include.ArtistCredits | Include.ReleaseGroups);
+            var release = await _query.LookupReleaseAsync(guid, inc: Include.Labels | Include.DiscIds | Include.Recordings | Include.Genres | Include.Tags | Include.ArtistCredits | Include.ReleaseGroups);
 
             if (release.Title == null)
             {
@@ -84,6 +84,11 @@ namespace Zune.Net.Helpers
             {
                 genre = release.Genres?[0]?.Name;
             }
+            else if (release.Tags?.Any() ?? false)
+            {
+                genre = release.Tags.ToList().OrderBy(x => x.VoteCount).ToList()[0].Name;
+            }
+
             if (release.ArtistCredit?.Count > 0)
             {
                 performerName = release.ArtistCredit?[0]?.Artist.Name;
@@ -138,28 +143,37 @@ namespace Zune.Net.Helpers
                 foreach (var track in release.Media[0].Tracks)
                 {
                     var trackTitle = track.Title ?? "Unknown Title";
-                    var trackNumber = int.Parse(track.Number ?? "0");
+                    int trackNumber = 0;
+                    if (track.Number != null && int.TryParse(GetFirstInt().Match(track.Number).Value, out var tryTrackNum))
+                    {
+                        trackNumber = tryTrackNum;
+                    }
+
                     var trackArtist = track.ArtistCredit?[0]?.Name ?? release.ArtistCredit?[0]?.Name ?? "Unknown Artist";
                     var trackMbid = track.Id;
 
-                    if (requestMetadata != null)
-                    {
-                        // attempt to bind a trackid to a trackmbid
-                        var thisTrackIntId = requestMetadata.MdqCd.Tracks.Where(x => x.TrackNumber == trackNumber).ToArray();
-
-                        if (thisTrackIntId != null && thisTrackIntId.Any())
-                        {
-                            await _database.CreateTrackReverseLookupRecordAsync(release.Id, trackMbid, thisTrackIntId[0].trackRequestId, thisTrackIntId[0].TrackDurationMs);
-                        }
-                    }
-
-                    tracks.Add(new MdarTrack()
+                    var trackObj = new MdarTrack()
                     {
                         Title = trackTitle,
                         Performers = trackArtist,
                         TrackNumber = trackNumber,
                         TrackWmid = trackMbid
-                    });
+                    };
+
+                    if (requestMetadata != null)
+                    {
+                        // attempt to bind a trackid to a trackmbid
+                        // Shuld probably also validate track name, string.CompareOrdinal(thisTrackIntId[0].Title.Text, trackTitle) == 0
+                        var thisTrackIntId = requestMetadata.MdqCd.Tracks.Where(x => x.TrackNumber == trackNumber).ToArray();
+
+                        if (thisTrackIntId != null && thisTrackIntId.Any())
+                        {
+                            await _database.CreateTrackReverseLookupRecordAsync(release.Id, trackMbid, thisTrackIntId[0].trackRequestId, thisTrackIntId[0].TrackDurationMs);
+                            trackObj.TrackRequestID = thisTrackIntId[0].trackRequestId;
+                        }
+                    }
+
+                    tracks.Add(trackObj);
                 }
             }
             return tracks;
@@ -176,10 +190,44 @@ namespace Zune.Net.Helpers
 
             var tracks = await GetTracksFromIReleaseAsync(release, requestMetadata);
 
+            // If we have bound a trackRequestID to every track, this is a match
+            var isExactMatch = tracks.All(x=>x.TrackRequestID > 0);
+
             var intVolume = 1;
             if (int.TryParse(GetFirstInt().Match(volume).Value, out var tryVolume))
             {
                 intVolume = tryVolume;
+            }
+
+            var artistMbid = Guid.Empty;
+            var artistName = string.Empty;
+            if (release.ArtistCredit?.Any() ?? false)
+            {
+                artistMbid = release.ArtistCredit[0].Artist?.Id ?? Guid.Empty;
+                artistName = release.ArtistCredit[0].Artist?.Name ?? string.Empty;
+            }
+
+            var label = string.Empty;
+            if (release.LabelInfo != null)
+            {
+                label = release.LabelInfo[0].Label?.Name ?? release.LabelInfo[0].CatalogNumber;
+            }
+
+            var genre = string.Empty;
+            if (release.Genres?.Count > 0)
+            {
+                genre = release.Genres?[0]?.Name;
+            }
+            else if (release.Tags?.Any() ?? false)
+            {
+                genre = release.Tags.ToList().OrderBy(x => x.VoteCount).ToList()[0].Name;
+            }
+
+            var albumArtMbid = "default";
+            if (release.CoverArtArchive?.Front ?? false)
+            {
+                _logger.LogInformation($"Release {release.Id} HAS ARTWORK");
+                albumArtMbid = release.Id.ToString();
             }
 
             return new MdarCdRequestMetadata()
@@ -187,12 +235,24 @@ namespace Zune.Net.Helpers
                 mdqRequestID = release.Id,
                 MdarCd = new MdarCd()
                 {
+                    AId = $"R {albumId}", // will always be 10 characters
                     Title = release.Title,
                     AlbumId = albumId,
                     Volume = intVolume,
                     Items = tracks,
                     AlbumGroupMBID = release.Id,
-                    AlbumMBID = release.Id
+                    AlbumMBID = release.Id,
+                    AlbumWmid = release.Id,
+                    ArtistWmid = artistMbid,
+                    SmallCoverArtURL = albumArtMbid,
+                    LargeCoverArtURL = albumArtMbid,
+                    ArtistName = artistName,
+                    UniqueFileID = $"AMGa_id=R {albumId}",
+                    MoreInfoID = $"a_id=R {albumId}",
+                    LabelName = label,
+                    Genre = genre,
+                    BuyNowLink = albumId.ToString(),
+                    IsExactMatch = isExactMatch
                 }
             };
         }
@@ -201,8 +261,9 @@ namespace Zune.Net.Helpers
         {
             var albumMbid = await _database.GetAlbumMbidFromTrackIdAndDurationAsync(TrackRequestID, trackDuration);
             var trackMbid = await _database.GetTrackMbidFromTrackIdAndDurationAsync(TrackRequestID, trackDuration);
+            var albumId = await _database.GetAlbumIDFromTrackIdAndDurationAsync(TrackRequestID, trackDuration);
 
-            var release = await _query.LookupReleaseAsync(albumMbid.Value, inc: Include.Labels | Include.DiscIds | Include.Recordings | Include.Genres | Include.ArtistCredits | Include.ReleaseGroups);
+            var release = await _query.LookupReleaseAsync(albumMbid.Value, inc: Include.Labels | Include.DiscIds | Include.Recordings | Include.Genres | Include.ArtistCredits | Include.ReleaseGroups | Include.Tags);
             var track = release.Media[0].Tracks.Where(x => x.Id == trackMbid).ToList()[0];
 
             var performerName = string.Empty;
@@ -231,9 +292,29 @@ namespace Zune.Net.Helpers
             {
                 genre = release.Genres?[0]?.Name;
             }
+            else if (release.Tags?.Any() ?? false)
+            {
+                genre = release.Tags.ToList().OrderBy(x => x.VoteCount).ToList()[0].Name;
+            }
+
+            var label = string.Empty;
+            if (release.LabelInfo != null)
+            {
+                label = release.LabelInfo[0].Label?.Name ?? release.LabelInfo[0].CatalogNumber;
+            }
+
+            var albumArtMbid = "default";
+            if (release.CoverArtArchive?.Front ?? false)
+            {
+                _logger.LogInformation($"Release {release.Id} HAS ARTWORK");
+                albumArtMbid = release.Id.ToString();
+            }
+
+            var padding = string.Empty.PadRight(8 - albumId.ToString().Length);;
 
             return new MdrRequestMetadata()
             {
+                AlbumId = release.Id,
                 MdqRequestID = requestId,
                 Backoff = new Backoff()
                 {
@@ -241,12 +322,15 @@ namespace Zune.Net.Helpers
                 },
                 MDRCD = new MDRCD()
                 {
+                    NeedIDs = 1,
                     MdqRequestID = requestId,
                     WMCollectionGroupID = release.Id,
                     WMCollectionID = release.Id,
+                    //A_id = R xxxx
+                    //P_id = P xxxx
                     Track = new List<Track>(){new Track()
                     {
-                        UniqueFileID = trackMbid.Value.ToString("N"),
+                        UniqueFileID = trackMbid.Value.ToString("N"), // AMGp_id=P xxxx;AMGt_id=T xxxxxx
                         TrackRequestID = TrackRequestID,
                         WMContentID = trackMbid.Value.ToString(),
                         TrackTitle = track.Title,
@@ -254,14 +338,17 @@ namespace Zune.Net.Helpers
                         TrackPerformer = trackPerformer,
                         Period = period
                     }},
-                    UniqueFileID = albumMbid.Value.ToString("N"),
-                    Version = 1,
+                    Label = label,
+                    UniqueFileID = $"AMGa_ID=R {albumId}",
                     AlbumTitle = release.Title,
                     AlbumArtist = performerName,
                     ReleaseDate = release.Date.NearestDate,
                     Genre = genre,
-                    LargeCoverAddress = release.Id.ToString(),
-                    SmallCoverAddress = release.Id.ToString()
+                    AlbumStyle = genre,
+                    LargeCoverAddress = albumArtMbid,
+                    SmallCoverAddress = albumArtMbid,
+                    MoreInfoId = $"R {padding}albumId",
+                    VolumeNumber = 1
                 }
             };
         }

@@ -23,9 +23,11 @@ namespace Zune.Net.MetaServices.DomainModels.MdqCd
         public int Bitrate;
 
         [XmlElement("drmProtected")]
-        public int DRMProtected;
+        public int DRMProtected = 0;
 
         [XmlElement("trackRequestID")]
         public int trackRequestId;
+        [XmlArray("trace")]
+        public List<string> Trace = new();
     }
 }

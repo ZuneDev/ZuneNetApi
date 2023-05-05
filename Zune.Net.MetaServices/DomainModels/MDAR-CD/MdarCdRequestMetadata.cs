@@ -10,5 +10,8 @@ namespace Zune.Net.MetaServices.DomainModels.MdarCd
 
         [XmlElement("MDAR-CD")]
         public MdarCd MdarCd {get; set;}
+
+        [XmlElement("BackOff")]
+        public MdarBackoff Backoff = new();
     }
 }

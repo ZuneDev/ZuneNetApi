@@ -64,6 +64,12 @@ namespace Zune.DB
 
         public Task ClearMembersAsync() => _memberCollection.DeleteManyAsync(_ => true);
 
+        public async Task ClearAlbumLookupAsync()
+        {
+            await _albumLookupCollection.DeleteManyAsync(_ => true);
+            await _trackLookupCollection.DeleteManyAsync(_ => true);
+        }
+
         public async Task<TokenEntry> GetCidByToken(string token)
         {
             string tokenHash = Helpers.Hash(token);
@@ -121,7 +127,7 @@ namespace Zune.DB
 
         public Task ClearImagesAsync() => _imageCollection.DeleteManyAsync(_ => true);
 
-        public async Task<Guid?> GetAlbumIdRecordAsync(Int64 id)
+        public async Task<Guid?> GetAlbumIdRecordAsync(long id)
         {
             try
             {
@@ -135,7 +141,7 @@ namespace Zune.DB
             }
         }
 
-        public async Task<Int64?> GetAlbumIdRecordAsync(Guid id)
+        public async Task<long?> GetAlbumIdRecordAsync(Guid id)
         {
             try
             {
@@ -150,7 +156,7 @@ namespace Zune.DB
         }
 
         // It's ugly, but it maps a MBID to an Int64 for WMIS's crazy lookup
-        public async Task<Int64> CreateOrGetAlbumIdInt64Async(Guid guid)
+        public async Task<long> CreateOrGetAlbumIdInt64Async(Guid guid)
         {
             var existing = await GetAlbumIdRecordAsync(guid);
             if (existing.HasValue)
@@ -159,7 +165,8 @@ namespace Zune.DB
             }
             while (true)
             {
-                var id = new Random().NextInt64();
+                var id = new Random().NextInt64(99_999_999); // Max of 8 digits for... reasons.
+
                 var found = await GetAlbumIdRecordAsync(id);
                 if (!found.HasValue)
                 {
@@ -187,6 +194,17 @@ namespace Zune.DB
                 var record = await _trackLookupCollection.FindAsync(x => x.TrackId == trackNumber && x.TrackDuration == trackDuration);
                 var first = await record.FirstOrDefaultAsync();
                 return first.AlbumMbid;
+            }
+            catch { return null; }
+        }
+
+        public async Task<long?> GetAlbumIDFromTrackIdAndDurationAsync(int trackNumber, int trackDuration)
+        {
+            try
+            {
+                var record = await _trackLookupCollection.FindAsync(x => x.TrackId == trackNumber && x.TrackDuration == trackDuration);
+                var first = await record.FirstOrDefaultAsync();
+                return await CreateOrGetAlbumIdInt64Async(first.AlbumMbid);
             }
             catch { return null; }
         }

@@ -6,8 +6,10 @@ namespace Zune.Net.MetaServices.DomainModels.MdrCd
     public class MdrRequestMetadata
     {
 
+        [XmlElement("AlbumId")]
+        public Guid AlbumId { get; set; }
         [XmlElement("MDR-CD")]
-        public MdrCd.MDRCD MDRCD { get; set; }
+        public MDRCD MDRCD { get; set; }
 
         [XmlElement("Backoff")]
         public Backoff Backoff { get; set; }
