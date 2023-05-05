@@ -6,6 +6,10 @@
         <VersionPrefix>0.1.0</VersionPrefix>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <IsPublishable>false</IsPublishable>
+    </PropertyGroup>
+
     <ItemGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
         <PackageReference Include="System.Xml.ReaderWriter" Version="4.3.1" />

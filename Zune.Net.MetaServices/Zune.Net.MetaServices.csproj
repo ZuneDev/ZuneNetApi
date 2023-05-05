@@ -8,6 +8,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Atom\Atom.csproj" />
+    <ProjectReference Include="..\Zune.Net.Shared\Zune.Net.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NSwag.AspNetCOre" Version="13.18.5" />
   </ItemGroup>
 
 </Project>

@@ -9,7 +9,7 @@ using Zune.Xml.Catalog;
 
 namespace Zune.Net.Catalog.Controllers.Music
 {
-    [Route("/v3.2/{culture}/music/track/")]
+    [Route("/v{version:decimal}/{culture}/music/track/")]
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
     public class TrackController : Controller
     {

@@ -14,6 +14,8 @@ namespace Zune.DB
         private readonly IMongoCollection<Member> _memberCollection;
         private readonly IMongoCollection<TokenEntry> _authCollection;
         private readonly IMongoCollection<ImageEntry> _imageCollection;
+        private readonly IMongoCollection<WMISAlbumIdEntry> _albumLookupCollection;
+        private readonly IMongoCollection<WMISAlbumTrackEntry> _trackLookupCollection;
 
         public ZuneNetContext(IOptions<ZuneNetContextSettings> dbSettings) : this(dbSettings.Value)
         {
@@ -28,6 +30,8 @@ namespace Zune.DB
             _memberCollection = mongoDatabase.GetCollection<Member>(dbSettings.MemberCollectionName);
             _authCollection = mongoDatabase.GetCollection<TokenEntry>(dbSettings.AuthCollectionName);
             _imageCollection = mongoDatabase.GetCollection<ImageEntry>(dbSettings.ImageCollectionName);
+            _albumLookupCollection = mongoDatabase.GetCollection<WMISAlbumIdEntry>(dbSettings.AlbumLookupCollectionName);
+            _trackLookupCollection = mongoDatabase.GetCollection<WMISAlbumTrackEntry>(dbSettings.TrackLookupCollectionName);
         }
 
         public async Task<List<Member>> GetAsync(Expression<Func<Member, bool>> filter = null) =>
@@ -49,6 +53,9 @@ namespace Zune.DB
         public async Task CreateAsync(Member newMember) =>
             await _memberCollection.InsertOneAsync(newMember);
 
+        public async Task UpdateAsync(Member updatedMember) =>
+            await _memberCollection.ReplaceOneAsync(x => x.Id == updatedMember.Id, updatedMember);
+
         public async Task UpdateAsync(Guid id, Member updatedMember) =>
             await _memberCollection.ReplaceOneAsync(x => x.Id == id, updatedMember);
 
@@ -57,10 +64,27 @@ namespace Zune.DB
 
         public Task ClearMembersAsync() => _memberCollection.DeleteManyAsync(_ => true);
 
+        public async Task ClearAlbumLookupAsync()
+        {
+            await _albumLookupCollection.DeleteManyAsync(_ => true);
+            await _trackLookupCollection.DeleteManyAsync(_ => true);
+        }
+
         public async Task<TokenEntry> GetCidByToken(string token)
         {
             string tokenHash = Helpers.Hash(token);
+            Console.WriteLine($"hashedToken = {tokenHash}");
             return await _authCollection.Find(e => e.TokenHash == tokenHash).FirstOrDefaultAsync();
+        }
+
+        public async Task<Member> GetMemberByName(string UserName)
+        {
+            return await GetSingleAsync(m => m.UserName == UserName);
+        }
+
+        public async Task<Member> GetMemberBySid(string sid)
+        {
+            return await GetSingleAsync(user => user.SID == sid);
         }
 
         public async Task<Member> GetMemberByToken(string token)
@@ -102,6 +126,97 @@ namespace Zune.DB
         }
 
         public Task ClearImagesAsync() => _imageCollection.DeleteManyAsync(_ => true);
+
+        public async Task<Guid?> GetAlbumIdRecordAsync(long id)
+        {
+            try
+            {
+                var existing = await _albumLookupCollection.FindAsync(x => x.AlbumId == id);
+                var record = await existing.SingleAsync();
+                return record.AlbumGuid;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public async Task<long?> GetAlbumIdRecordAsync(Guid id)
+        {
+            try
+            {
+                var existing = await _albumLookupCollection.FindAsync(x => x.AlbumGuid == id);
+                var record = await existing.SingleAsync();
+                return record.AlbumId;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        // It's ugly, but it maps a MBID to an Int64 for WMIS's crazy lookup
+        public async Task<long> CreateOrGetAlbumIdInt64Async(Guid guid)
+        {
+            var existing = await GetAlbumIdRecordAsync(guid);
+            if (existing.HasValue)
+            {
+                return existing.Value;
+            }
+            while (true)
+            {
+                var id = new Random().NextInt64(99_999_999); // Max of 8 digits for... reasons.
+
+                var found = await GetAlbumIdRecordAsync(id);
+                if (!found.HasValue)
+                {
+                    await _albumLookupCollection.InsertOneAsync(new WMISAlbumIdEntry(id, guid));
+                    return id;
+                }
+            }
+        }
+
+        public async Task<Guid?> GetTrackMbidFromTrackIdAndDurationAsync(int trackNumber, int trackDuration)
+        {
+            try
+            {
+                var record = await _trackLookupCollection.FindAsync(x => x.TrackId == trackNumber && x.TrackDuration == trackDuration);
+                var first = await record.FirstOrDefaultAsync();
+                return first.TrackMbid;
+            }
+            catch { return null; }
+        }
+
+        public async Task<Guid?> GetAlbumMbidFromTrackIdAndDurationAsync(int trackNumber, int trackDuration)
+        {
+            try
+            {
+                var record = await _trackLookupCollection.FindAsync(x => x.TrackId == trackNumber && x.TrackDuration == trackDuration);
+                var first = await record.FirstOrDefaultAsync();
+                return first.AlbumMbid;
+            }
+            catch { return null; }
+        }
+
+        public async Task<long?> GetAlbumIDFromTrackIdAndDurationAsync(int trackNumber, int trackDuration)
+        {
+            try
+            {
+                var record = await _trackLookupCollection.FindAsync(x => x.TrackId == trackNumber && x.TrackDuration == trackDuration);
+                var first = await record.FirstOrDefaultAsync();
+                return await CreateOrGetAlbumIdInt64Async(first.AlbumMbid);
+            }
+            catch { return null; }
+        }
+
+        public async Task CreateTrackReverseLookupRecordAsync(Guid albumMbid, Guid trackMbid, int trackNumber, int trackDuration)
+        {
+            if (await GetAlbumMbidFromTrackIdAndDurationAsync(trackNumber, trackDuration) == null)
+            {
+                await _trackLookupCollection.InsertOneAsync(
+                new WMISAlbumTrackEntry(trackNumber, trackDuration, albumMbid, trackMbid));
+            }
+        }
     }
 }
 

@@ -7,7 +7,7 @@ using Zune.Xml.Catalog;
 
 namespace Zune.Net.Catalog.Controllers.Podcast
 {
-    [Route("/v3.2/{culture}/podcastchart/zune/")]
+    [Route("/v{version:decimal}/{culture}/podcastchart/zune/")]
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
     public class ChartController : Controller
     {

@@ -23,3 +23,6 @@
 **/values.dev.yaml
 LICENSE
 README.md
+
+#ignore nginx so loadbalancer changes don't trigger a rebuild of the rest of the application
+/nginx

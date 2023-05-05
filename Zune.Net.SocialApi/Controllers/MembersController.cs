@@ -28,17 +28,12 @@ namespace Zune.SocialApi.Controllers
         {
             var member = await _database.GetByIdOrZuneTag(zuneTag);
 
-            Member response;
             if (member != null)
             {
-                response = member.GetXmlMember();
-            }
-            else
-            {
-                return NotFound();
+                return member.GetXmlMember();
             }
 
-            return response;
+            return NotFound();
         }
 
         [Route("{zuneTag}/friends")]

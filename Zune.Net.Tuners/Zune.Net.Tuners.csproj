@@ -6,8 +6,10 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
 
-	<ItemGroup>
-		<Folder Include="Resources\" />
+	<ItemGroup> 
+		<Content Include="Resources\**"> 
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory> 
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content> 
 	</ItemGroup>
-
 </Project>

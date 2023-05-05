@@ -30,13 +30,16 @@ namespace Zune.Net
             });
         }
 
-        public static IHostBuilder ConfigureZuneDB(this IHostBuilder host)
+        public static IHostBuilder ConfigureZuneDB(this IHostBuilder host, bool skipRegisterContext = false)
         {
             return host.ConfigureServices((ctx, s) =>
             {
                 BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
                 s.Configure<DB.ZuneNetContextSettings>(ctx.Configuration.GetSection("ZuneNetContext"));
-                s.AddSingleton<DB.ZuneNetContext>();
+                if(!skipRegisterContext)
+                {
+                    s.AddSingleton<DB.ZuneNetContext>();
+                }
             });
         }
 

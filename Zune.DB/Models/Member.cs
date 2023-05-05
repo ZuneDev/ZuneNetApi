@@ -42,6 +42,9 @@ namespace Zune.DB.Models
 
         public string UserName { get; set; }
 
+        [BsonDefaultValue("NotSet")]
+        public string SID { get; set; }
+
         public IList<Link> Playlists { get; set; }
         public IList<MemberBadge> Badges { get; set; }
         public IList<Comment> Comments { get; set; }
@@ -81,6 +84,7 @@ namespace Zune.DB.Models
         public string LastLabelTakedownDate { get; set; }
         public Tuner MediaTypeTunerRegisterInfo { get; set; }
 
+        // this is supposed to be a list.
         public Tuner TunerRegisterInfo { get; set; }
 
         public string UserTile { get; set; }

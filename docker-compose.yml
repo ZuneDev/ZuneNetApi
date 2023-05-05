@@ -1,0 +1,147 @@
+version: '3.4'
+
+networks:
+  backend:
+    name: backend
+  zune.net:
+    name: zune.net
+    driver: bridge
+
+services:
+  mongodb:
+    restart: unless-stopped
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data_container:/data/db
+    networks:
+      - backend
+      - zune.net
+
+  nginx:
+    restart: unless-stopped
+    build:
+      context: nginx
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - backend
+      - zune.net
+
+  catalog:
+    restart: unless-stopped
+    build:
+      context: ./
+      dockerfile: Zune.Net.Catalog/Dockerfile
+    depends_on:
+      - mongodb
+      - nginx
+    networks:
+      - backend
+
+  catalog.image:
+    restart: unless-stopped
+    build:
+      context: ./
+      dockerfile: Zune.Net.Catalog.Image/Dockerfile
+    depends_on:
+      - mongodb
+      - nginx
+    networks:
+      - backend
+
+  commerce:
+    restart: unless-stopped
+    build:
+      context: ./
+      dockerfile: Zune.Net.Commerce/Dockerfile
+    depends_on:
+      - mongodb
+      - nginx
+    networks:
+      - backend
+
+  inbox:
+    restart: unless-stopped
+    build:
+      context: ./
+      dockerfile: Zune.Net.Inbox/Dockerfile
+    depends_on:
+      - mongodb
+      - nginx
+    networks:
+      - backend
+
+  login:
+    restart: unless-stopped
+    build:
+      context: ./
+      dockerfile: Zune.Net.Login/Dockerfile
+    depends_on:
+      - mongodb
+      - nginx
+    networks:
+      - backend
+
+  metaservices:
+    restart: unless-stopped
+    build:
+      context: ./
+      dockerfile: Zune.Net.MetaServices/Dockerfile
+    depends_on:
+      - mongodb
+      - nginx
+    networks:
+      - backend
+
+  mix:
+    restart: unless-stopped
+    build:
+      context: ./
+      dockerfile: Zune.Net.Mix/Dockerfile
+    depends_on:
+      - mongodb
+      - nginx
+    networks:
+      - backend
+
+  social:
+    restart: unless-stopped
+    build:
+      context: ./
+      dockerfile: Zune.Net.SocialApi/Dockerfile
+    depends_on:
+      - mongodb
+      - nginx
+    networks:
+      - backend
+
+  tiles:
+    restart: unless-stopped
+    build:
+      context: ./
+      dockerfile: Zune.Net.Tiles/Dockerfile
+    depends_on:
+      - mongodb
+      - nginx
+    networks:
+      - backend
+
+  tuners:
+    restart: unless-stopped
+    build:
+      context: ./
+      dockerfile: Zune.Net.Tuners/Dockerfile
+    depends_on:
+      - mongodb
+      - nginx
+    networks:
+      - backend
+
+volumes:
+  mongodb_data_container:

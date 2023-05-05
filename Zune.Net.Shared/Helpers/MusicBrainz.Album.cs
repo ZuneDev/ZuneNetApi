@@ -34,6 +34,12 @@ namespace Zune.Net.Helpers
             return MBReleaseToAlbum(mb_rel);
         }
 
+        public static Album GetAlbumByRecordingId(Guid mbid)
+        {
+            var mb_rel = _query.LookupRecording(mbid, Include.Releases | Include.ArtistCredits);
+
+            return MBReleaseToAlbum(mb_rel.Releases.First());
+        }
 
         public static Album MBReleaseToAlbum(IRelease mb_rel, DateTime? updated = null, bool includeRights = true)
         {
