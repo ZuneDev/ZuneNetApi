@@ -24,6 +24,20 @@ namespace Zune.Net.Helpers
             return response["data"];
         }
 
+        public static async Task<IEnumerable<JToken>> GetChartDZArtists(int genreId = 0)
+        {
+            var response = await API_BASE.AppendPathSegments("chart", genreId, "albums")
+                .GetJsonAsync<JObject>();
+            return response["data"];
+        }
+
+        public static async Task<IEnumerable<JToken>> GetChartDZPlaylists(int genreId = 0)
+        {
+            var response = await API_BASE.AppendPathSegments("chart", genreId, "playlists")
+                .GetJsonAsync<JObject>();
+            return response["data"];
+        }
+
         public static async Task<IEnumerable<PodcastSeries>> GetChartPodcasts(int genreId = 0)
         {
             var response = await API_BASE.AppendPathSegments("chart", genreId, "podcasts")
