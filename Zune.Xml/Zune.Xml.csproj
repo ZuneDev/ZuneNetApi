@@ -2,8 +2,24 @@
 
     <PropertyGroup>
         <TargetFrameworks>netstandard1.1;netstandard2.0;netstandard2.1;net6.0;net35;net40</TargetFrameworks>
-        <AssemblyVersion>0.1.0.0</AssemblyVersion>
-        <VersionPrefix>0.1.0</VersionPrefix>
+        <VersionPrefix>0.1.1</VersionPrefix>
+        <AssemblyVersion>$(VersionPrefix).0</AssemblyVersion>
+		
+		<!-- NuGet properties -->
+		<Authors>Joshua Askharoun</Authors>
+		<Company>ZuneDev</Company>
+		<Product>Zune.Xml</Product>
+		<Description>
+			A simple library containing serializable XML models for use with the Zune web APIs.
+		</Description>
+		<PackageProjectUrl>https://github.com/ZuneDev/ZuneNetApi/tree/master/Zune.Xml</PackageProjectUrl>
+		<PackageTags>Zune, OpenZune, Atom</PackageTags>
+
+		<!-- SourceLink and NuGet symbols -->
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0'">
