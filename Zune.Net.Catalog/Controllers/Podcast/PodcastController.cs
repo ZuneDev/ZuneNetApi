@@ -1,6 +1,5 @@
 ﻿using Atom.Xml;
 using Microsoft.AspNetCore.Mvc;
-using SharpCompress.Common;
 using System;
 using System.Threading.Tasks;
 using Zune.DB;
