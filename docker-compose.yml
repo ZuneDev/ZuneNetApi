@@ -9,7 +9,7 @@ networks:
 
 services:
   mongodb:
-    restart: unless-stopped
+    restart: always
     image: mongo:latest
     environment:
       MONGO_INITDB_ROOT_USERNAME: root

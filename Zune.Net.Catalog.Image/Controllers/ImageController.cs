@@ -11,7 +11,7 @@ using Zune.Net.Helpers;
 
 namespace Zune.Net.Catalog.Image.Controllers
 {
-    [Route("/v{version:decimal}/{culture}/")]
+    [Route("/v3.2/{culture}/")]
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
     public class ImageController : Controller
     {
@@ -127,8 +127,8 @@ namespace Zune.Net.Catalog.Image.Controllers
                     _logger.LogInformation($"Getting image from RecordingID");
                     var albumId = MusicBrainz.GetAlbumByRecordingId(id).Id;
                     _logger.LogInformation($"Got ID{albumId}");
-                    //e.g.: http://coverartarchive.org/release/93c488f3-1739-455d-a609-85b846b45344/front-250
-                    imageUrl = new Uri($"http://coverartarchive.org/release/{albumId}/front-250");
+                    imageUrl = new Uri($"https://coverartarchive.org/release/{id}/front");
+
                 } catch (Exception e) 
                 {
                     _logger.LogError(e, "Failed to get AlbumID");
@@ -137,7 +137,7 @@ namespace Zune.Net.Catalog.Image.Controllers
                 if(imageUrl == null)
                 {
                     _logger.LogInformation($"Getting image failed, falling back");
-                    imageUrl = new Uri($"http://coverartarchive.org/release/{id}/front-250");
+                    imageUrl = new Uri($"http://coverartarchive.org/release/{id}/front");
                 }
 
                 _logger.LogInformation($"Getting image from: {imageUrl.AbsoluteUri}");

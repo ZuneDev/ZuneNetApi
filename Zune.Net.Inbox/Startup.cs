@@ -37,7 +37,7 @@ namespace Zune.Net.Inbox
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
+            app.UseHttpLogging();
 
             app.UseRouting();
 

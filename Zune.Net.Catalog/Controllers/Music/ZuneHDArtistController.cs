@@ -92,43 +92,6 @@ namespace Zune.Net.Catalog.Controllers.Music
             return feed;
         }
 
-        //width=480&resize=true&contenttype=image/jpeg
-        [HttpGet, Route("{mbid}/deviceBackgroundImage")]
-        public async Task<ActionResult> PrimaryImage(Guid mbid, string contenttype = "image/jpeg", int width = 480, bool resize = true)
-        {
-            (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(mbid);
-            if (dc_artist == null)
-                return StatusCode(404);
-
-            string imgUrl = dc_artist["images"].First(i => i.Value<string>("type") == "primary").Value<string>("uri");
-            var imgResponse = await imgUrl.GetAsync();
-            if (imgResponse.StatusCode != 200)
-                return StatusCode(imgResponse.StatusCode);
-
-            var image = await SixLabors.ImageSharp.Image.LoadAsync(await imgResponse.GetStreamAsync());
-            if (resize && image.Size.Width > width)
-            {
-                image.Mutate(x => x.Resize(width, 0));
-            }
-
-            using var stream = new MemoryStream();
-
-            if (contenttype.Contains("jpeg"))
-            {
-                image.Save(stream, new JpegEncoder());
-            }
-            else if (contenttype.Contains("bmp"))
-            {
-                image.Save(stream, new BmpEncoder());
-            }
-            else if (contenttype.Contains("png"))
-            {
-                image.Save(stream, new PngEncoder());
-            }
-
-            return File(stream.ToArray(), contenttype);
-        }
-
         [HttpGet, Route("{mbid}/biography")]
         public async Task<ActionResult<Entry>> Biography(Guid mbid)
         {

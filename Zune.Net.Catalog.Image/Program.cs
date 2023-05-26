@@ -26,6 +26,8 @@ namespace Zune.Net.Catalog.Image
 
             var app = builder.Build();
 
+            app.UseHttpLogging();
+
             // Configure the HTTP request pipeline.
 
             app.UseRouting();
