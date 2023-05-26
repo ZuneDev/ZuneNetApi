@@ -23,6 +23,57 @@ If you would rather host the servers yourself, you can add the following to your
 127.0.0.14 login.zunes.me
 ```
 
+# hosting these servers on linux
+
+to use these first install `git`, `screen` and the `dotnet` runtime. installing screen is easy just run:
+```shell
+sudo apt update && sudo apt upgrade -y
+sudo apt install screen git
+```
+
+to install dotnet please look at https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu
+
+now to run the services you can do:
+
+```shell
+cd /opt/; git clone https://github.com/ZuneDev/ZuneNetApi.git && cd ./ZuneNetApi
+bash ./run_all.sh
+```
+
+and to stop them all you can do
+```shell
+bash ./stop_all.sh
+```
+
+They will all run in their own screen sessions, which means you can close your SSH connection, and they will continue to run. Basic commands for managing screen sessions are:
+
+To list all the running screens:
+
+```shell
+screen -ls
+```
+
+To reconnect to a specific screen session:
+
+```shell
+screen -rd <name>
+```
+look at the screen documentation for more information.
+
+
+To access these services, you will need to use a proxy like Nginx and configure the following ports to point to the respective domains. Please note that if you are using your own domain, it cannot be more or less than 7 characters long.
+
+```
+8001 catalog.zunes.me
+8802 catalog-ssl.zunes.me
+8002 commerce.zunes.me
+8003 image.catalog.zunes.me
+8004 socialapi.zunes.me
+8005 mix.zunes.me
+8006 tiles.zunes.me
+8007 login.zunes.me
+```
+
 # Unimplemented endpoints
 
 ## Catalog
