@@ -6,7 +6,8 @@ using Zune.Xml.Catalog;
 
 namespace Zune.Net.Catalog.Controllers.Music
 {
-    [Route("/v{version:decimal}/{culture}/music/features/")]
+    [Route("/v3.2/{culture}/music/features/")]
+    [Route("/v3.0/{culture}/music/features/")]
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
     public class FeaturesController : Controller
     {

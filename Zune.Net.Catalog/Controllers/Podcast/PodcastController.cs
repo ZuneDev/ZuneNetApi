@@ -9,7 +9,8 @@ using Zune.Xml.Catalog;
 
 namespace Zune.Net.Catalog.Controllers.Podcast
 {
-    [Route("/v{version:decimal}/{culture}/")]
+    [Route("/v3.0/{culture}/")]
+    [Route("/v3.2/{culture}/")]
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
     public class PodcastController : Controller
     {

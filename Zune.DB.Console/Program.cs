@@ -43,6 +43,9 @@ namespace Zune.DB.Console
                 DatabaseName = dbName,
             });
 
+            await ctx.ClearAlbumLookupAsync();
+            return;
+
             await ctx.ClearMembersAsync();
             // await ctx.ClearTokensAsync();
             // await ctx.ClearImagesAsync();
