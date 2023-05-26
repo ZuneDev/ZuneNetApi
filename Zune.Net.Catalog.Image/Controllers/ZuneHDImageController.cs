@@ -46,37 +46,43 @@ namespace Zune.Net.Catalog.Image
             if (imageEntry != null)
             {
                 imageUrl = imageEntry.Url;
+                _logger.LogDebug("using database backed image");
             }
             else if (idC == 0)
             {
+                // wtf is this???
                 int dcid = unchecked((int)idA);
 
                 // Get or update cached artist
                 if (!dcArtistCache.TryGetValue(dcid, out var dc_artist))
                 {
-                    // Artist not in cache
+                    _logger.LogDebug("artist not in cache, adding");
                     dc_artist = await Discogs.GetDCArtistByDCID(dcid);
                     dcArtistCache.AddOrUpdate(dcid, _ => dc_artist, (_, _) => dc_artist);
                 }
 
                 // Get URL for requested image
+                _logger.LogDebug("getting discogs artist images");
                 var images = dc_artist.Value<JArray>("images");
                 if (images != null && images.Count > idB)
                 {
+                    _logger.LogDebug("got discogs artist image, sending");
                     var thisImage = images[idB];
                     imageUrl = thisImage.Value<string>("uri");
                 }
             }
-            else
+            if (string.IsNullOrEmpty(imageUrl))
             {
                 try
                 {
+                    _logger.LogDebug("Trying discogs artistID");
                     (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(id);
                     if (dc_artist != null)
                         imageUrl = dc_artist["images"].First(i => i.Value<string>("type") == "primary").Value<string>("uri");
                 }
                 catch
                 {
+                    _logger.LogDebug("using coverart archive");
                     imageUrl = $"https://coverartarchive.org/release/{id}/front";
                 }
             }
@@ -84,12 +90,14 @@ namespace Zune.Net.Catalog.Image
             var imgResponse = await imageUrl.GetAsync();
             if (imgResponse.StatusCode != 200)
             {
+                _logger.LogDebug("failed to fetch image");
                 return StatusCode(imgResponse.StatusCode);
             }
 
             var image = await SixLabors.ImageSharp.Image.LoadAsync(await imgResponse.GetStreamAsync());
             if (resize && image.Size.Width > width)
             {
+                _logger.LogDebug("resizing");
                 image.Mutate(x => x.Resize(width, 0));
             }
 
@@ -97,14 +105,17 @@ namespace Zune.Net.Catalog.Image
 
             if (contenttype.Contains("jpeg"))
             {
+                _logger.LogDebug("sending as jpg");
                 image.Save(stream, new JpegEncoder());
             }
             else if (contenttype.Contains("bmp"))
             {
+                _logger.LogDebug("bmp");
                 image.Save(stream, new BmpEncoder());
             }
             else if (contenttype.Contains("png"))
             {
+                _logger.LogDebug("sending as png");
                 image.Save(stream, new PngEncoder());
             }
 
@@ -112,21 +123,30 @@ namespace Zune.Net.Catalog.Image
         }
 
         //width=480&resize=true&contenttype=image/jpeg
-        [HttpGet, Route("{mbid}/deviceBackgroundImage")]
+        [HttpGet("music/artist/{mbid}/deviceBackgroundImage")]
         public async Task<ActionResult> PrimaryImage(Guid mbid, string contenttype = "image/jpeg", int width = 480, bool resize = true)
         {
+            _logger.LogDebug("getting by mbid");
             (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(mbid);
             if (dc_artist == null)
+            {
+                _logger.LogDebug("failed to fetch by mbid");
                 return StatusCode(404);
+            }
 
+            _logger.LogDebug("getting primary image");
             string imgUrl = dc_artist["images"].First(i => i.Value<string>("type") == "primary").Value<string>("uri");
             var imgResponse = await imgUrl.GetAsync();
             if (imgResponse.StatusCode != 200)
+            {
+                _logger.LogDebug("failed to fetch image uri");
                 return StatusCode(imgResponse.StatusCode);
+            }
 
             var image = await SixLabors.ImageSharp.Image.LoadAsync(await imgResponse.GetStreamAsync());
             if (resize && image.Size.Width > width)
             {
+                _logger.LogDebug("resizing");
                 image.Mutate(x => x.Resize(width, 0));
             }
 
@@ -134,14 +154,17 @@ namespace Zune.Net.Catalog.Image
 
             if (contenttype.Contains("jpeg"))
             {
+                _logger.LogDebug("sending as jpg");
                 image.Save(stream, new JpegEncoder());
             }
             else if (contenttype.Contains("bmp"))
             {
+                _logger.LogDebug("bmp");
                 image.Save(stream, new BmpEncoder());
             }
             else if (contenttype.Contains("png"))
             {
+                _logger.LogDebug("sending as png");
                 image.Save(stream, new PngEncoder());
             }
 

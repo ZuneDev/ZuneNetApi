@@ -1,6 +1,7 @@
 using Atom.Xml;
 using Flurl.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using SixLabors.ImageSharp.Formats.Bmp;
 using SixLabors.ImageSharp.Formats.Jpeg;
@@ -21,8 +22,10 @@ namespace Zune.Net.Catalog.Controllers.Music
     public class ZuneHDArtistController : Controller
     {
         private readonly ZuneNetContext _database;
-        public ZuneHDArtistController(ZuneNetContext database)
+        private readonly ILogger _logger;
+        public ZuneHDArtistController(ILogger<ZuneHDArtistController> logger, ZuneNetContext database)
         {
+            _logger = logger;
             _database = database;
         }
 
@@ -116,6 +119,10 @@ namespace Zune.Net.Catalog.Controllers.Music
         {
             (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(mbid);
             DateTime updated = DateTime.Now;
+            if(dc_artist == null)
+            {
+                return StatusCode(404);
+            }
             int dcid = dc_artist.Value<int>("id");
             byte[] zero = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 };
 
