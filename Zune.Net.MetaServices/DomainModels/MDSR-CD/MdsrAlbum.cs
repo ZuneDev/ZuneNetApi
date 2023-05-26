@@ -8,7 +8,7 @@ namespace Zune.Net.MetaServices.DomainModels.MdsrCd
         public string Title { get; set; }
 
         [XmlElement("id_album")]
-        public long Id { get; set; }
+        public long AlbumId { get; set; }
 
         [XmlElement("albumPerformer")]
         public string AlbumArtist { get; set; }

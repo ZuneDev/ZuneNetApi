@@ -123,7 +123,7 @@ namespace Zune.Net.Helpers
             {
                 Title = release.Title,
                 BestMatch = bestmatch,
-                Id = recordId,
+                AlbumId = recordId,
                 Volume = 1,
                 AlbumArtist = performerName,
                 BuyNowParms = release.Id.ToString(),

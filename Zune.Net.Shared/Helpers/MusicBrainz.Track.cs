@@ -41,7 +41,7 @@ namespace Zune.Net.Helpers
                 var mb_rec = _query.LookupRecording(mbid, Include.Genres | Include.ArtistCredits | Include.Releases | Include.UrlRelationships | Include.Media);
                 return MBRecordingToTrack(mb_rec, includeRights: true);
             }
-            catch (QueryException)
+            catch
             {
                 // MusicBrainz Picard likes to put the Track ID instead of the Recording ID
                 var releases = _query.BrowseTrackReleases(mbid, limit: 1, inc: Include.UrlRelationships);
@@ -89,12 +89,13 @@ namespace Zune.Net.Helpers
             return track;
         }
 
-        public static Track MBTrackToTrack(ITrack mb_track, MiniArtist trackArtist, DateTime? updated = null, bool includeRights = true)
+        public static Track MBTrackToTrack(ITrack mb_track, MiniArtist trackArtist, int diskNumber = 1, DateTime? updated = null, bool includeRights = true)
         {
             updated ??= DateTime.Now;
 
             Track track = new()
             {
+                DiscNumber = diskNumber,
                 Id = mb_track.Id.ToString(),
                 Title = mb_track.Title,
                 PrimaryArtist = trackArtist,

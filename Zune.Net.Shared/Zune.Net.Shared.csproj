@@ -21,6 +21,7 @@
         <PackageReference Include="MetaBrainz.MusicBrainz.CoverArt" Version="5.0.0" />
         <PackageReference Include="MetaBrainz.MusicBrainz.DiscId" Version="3.0.0" />
         <PackageReference Include="PodcastAPI" Version="1.1.4" />
+        <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
         <!--<PackageReference Include="Inflatable.Lastfm" Version="1.2.0" />-->
     </ItemGroup>
 

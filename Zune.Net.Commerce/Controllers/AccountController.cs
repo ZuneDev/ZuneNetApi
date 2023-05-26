@@ -123,6 +123,7 @@ namespace CommerceZuneNet.Controllers
         }
 
         [HttpPost]
+        [Produces("application/xml")]
         public ActionResult<BalancesResponse> Balances()
         {
             return new BalancesResponse
@@ -130,7 +131,7 @@ namespace CommerceZuneNet.Controllers
                 Balances = new()
                 {
                     PointsBalance = 8000,
-                    SongCreditBalance = 0,
+                    SongCreditBalance = 100,
                     SongCreditRenewalDate = null
                 }
             };

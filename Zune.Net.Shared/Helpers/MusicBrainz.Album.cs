@@ -69,13 +69,21 @@ namespace Zune.Net.Helpers
 
             if (mb_rel.Media != null && mb_rel.Media.Count > 0)
             {
-                var mb_media = mb_rel.Media[0];
-                if (mb_media.Tracks != null && mb_media.Tracks.Count > 0)
+                album.Tracks = new();
+
+                for(var mediaId = 0; mediaId < mb_rel.Media.Count; mediaId++)
                 {
-                    album.Tracks = new();
-                    foreach (var mb_track in mb_media.Tracks)
-                        album.Tracks.Add(MBTrackToTrack(mb_track, trackArtist: artist, updated: updated, includeRights: includeRights));
+                    var mb_media = mb_rel.Media[mediaId];
+
+                    if (mb_media.Tracks != null && mb_media.Tracks.Count > 0)
+                    {
+                        foreach (var mb_track in mb_media.Tracks)
+                        {
+                            album.Tracks.Add(MBTrackToTrack(mb_track, diskNumber: mediaId + 1, trackArtist: artist, updated: updated, includeRights: includeRights));
+                        }
+                    }
                 }
+
             }
 
             if (includeRights)

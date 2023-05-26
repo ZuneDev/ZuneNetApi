@@ -15,7 +15,7 @@ namespace Zune.Net.MetaServices.Controllers
         [Route("{coverId}")]
         public async Task<IActionResult> GetCover(string coverId)
         {
-            var catalogImageUri = new Uri($"https://coverartarchive.org/release/{coverId}/front-250");
+            var catalogImageUri = new Uri($"https://coverartarchive.org/release/{coverId}/front");
             if(coverId.Equals("default"))
             {
                 _logger.LogInformation($"default albumart requested");
