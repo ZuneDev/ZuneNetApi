@@ -39,7 +39,7 @@ namespace Zune.SocialApi
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpLogging();
+            // app.UseHttpLogging();
 
             app.UseRequestBuffering();
 

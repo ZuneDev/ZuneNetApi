@@ -1,8 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Flurl.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using SixLabors.ImageSharp.Formats.Bmp;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Processing;
 using System;
 using System.Collections.Concurrent;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -11,13 +17,13 @@ using Zune.Net.Helpers;
 
 namespace Zune.Net.Catalog.Image.Controllers
 {
+    [Route("/test/{culture}/")]
     [Route("/v3.2/{culture}/")]
+    [Route("/v3.0/{culture}/")]
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
     public class ImageController : Controller
     {
-        private static readonly Uri defaultImage = new Uri("https://hellofromseattle.com/wp-content/uploads/sites/6/2020/03/Zune-Basic.png");
         private static readonly ConcurrentDictionary<int, JObject> dcArtistCache = new();
-        private static readonly int[] caaSupportedSizes = new[] { 250, 500, 1200 };
 
         private readonly ZuneNetContext _database;
         private readonly ILogger _logger;
@@ -28,132 +34,143 @@ namespace Zune.Net.Catalog.Image.Controllers
         }
 
         [HttpGet, Route("image/{id}")]
-        public async Task<IActionResult> Image(Guid id)
+        public async Task<IActionResult> Image(Guid id, bool resize = true, int width = 480, string contenttype = "image/jpeg")
         {
             string? imageUrl = null;
 
             (var idA, var idB, var idC) = id.GetGuidParts();
-            var imageEntry = await _database.GetImageEntryAsync(id);
 
-            if (imageEntry != null)
+            if (idC == 0)
             {
-                imageUrl = imageEntry.Url;
-            }
-            else if (idC == 0)
-            {
+                // do better. this is... sketch.
                 int dcid = unchecked((int)idA);
 
                 // Get or update cached artist
                 if (!dcArtistCache.TryGetValue(dcid, out var dc_artist))
                 {
-                    // Artist not in cache
+                    _logger.LogDebug("artist not in cache, adding");
                     dc_artist = await Discogs.GetDCArtistByDCID(dcid);
                     dcArtistCache.AddOrUpdate(dcid, _ => dc_artist, (_, _) => dc_artist);
                 }
 
                 // Get URL for requested image
+                _logger.LogDebug("getting discogs artist images");
                 var images = dc_artist.Value<JArray>("images");
                 if (images != null && images.Count > idB)
                 {
-                    var image = images[idB];
-                    imageUrl = image.Value<string>("uri");
+                    _logger.LogDebug("got discogs artist image, sending");
+                    var thisImage = images[idB];
+                    imageUrl = thisImage.Value<string>("uri");
                 }
-            }
-            else
+            } else
             {
-                // The Cover Art Archive API supports sizes of 250, 500, and 1200
-                int requestedWidth = 500;
-                if (Request.Query.TryGetValue("width", out var widthValues) && widthValues.Count > 0)
-                    int.TryParse(widthValues[0], out requestedWidth);
-
-                int width = caaSupportedSizes.MinBy(x => Math.Abs(x - requestedWidth));
-                imageUrl = $"https://coverartarchive.org/release/{id}/front-{width}";
-            }
-
-            if(Request.Query.TryGetValue("resize", out var resize))
-            {
-                if(bool.TryParse(resize, out var _resize))
+                try
                 {
-                    if(_resize) // this flag basically states the zune is expecting the image to be the payload, so we hackily respond with that
+                    var imageEntry = await _database.GetImageEntryAsync(id);
+                    if (imageEntry != null)
                     {
-                        _logger.LogInformation("streaming the image to the zune now!");
-                        // Probably should pull the contenttype value out of the query...
-                        using var client = new HttpClient();
-                        var result = await client.GetAsync(imageUrl);
-                        if(!result.IsSuccessStatusCode)
+                        if (!string.IsNullOrEmpty(imageEntry.Url))
                         {
-                            _logger.LogInformation("Falling back to the default image, failed to resolve actual artwork");
-                            result = await client.GetAsync(defaultImage);
+                            _logger.LogDebug("using database backed image");
+                            imageUrl = imageEntry.Url;
                         }
-                        return new HttpResponseMessageResult(result);
                     }
-                }
+                } catch {}
             }
 
-            // Request the image from the API and forward it to the Zune software
-            return imageUrl != null
-                ? Redirect(imageUrl)
-                : NotFound();
+            if(string.IsNullOrEmpty(imageUrl))
+            {
+                return await ArtistImage(id, "failoverFromPrimaryEndpoint", resize, width, contenttype);
+            }
+
+            return await ReturnResizedImageAsync(imageUrl, resize, width, contenttype);
         }
 
         // i.e. http://image.catalog.zune.net/v3.0/en-US/music/track/f32bb0ab-59d6-4620-b239-e86dc68647a4/albumImage?width=240&height=240&resize=true
 
         [HttpGet, Route("music/{imageKind}/{id}/{type}")]
-        public async Task<IActionResult> ArtistImage(Guid id, string type)
+        public async Task<IActionResult> ArtistImage(Guid id, string type, bool resize = true, int width = 480, string contenttype = "image/jpeg")
         {
-            Uri? imageUrl = null;
+            _logger.LogDebug($"Fetching image type: '{type}', starting with DC");
+            // known types - deviceBackgroundImage, primaryImage, albumImage.
+            // primaryImage is mostly what the Zune app asks for
+            // deviceBackgroundImage is what is displayed  on the 'now playing' screen
+            // albumImage is just the album cover.
 
-            if (type == "primaryImage")
+            string imageUrl;
+            try
             {
-                try
-                {
-                    _logger.LogInformation($"Getting image for Artist");
-                    (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(id);
-
-                    imageUrl = new Uri(dc_artist.Value<JArray>("images")?
-                        .FirstOrDefault(i => i.Value<string>("type") == "primary")?
-                        .Value<string>("uri"));
-                } catch 
-                {
-                    _logger.LogInformation($"Failed to get by Artist ID, failing over to albumImage lookup method");
-                    type = "albumImage";
-                }
-
+                imageUrl = await GetImageUrlFromDCAsync(id);
             }
-            if(type == "albumImage")
+            catch
             {
-                try
-                {
-                    _logger.LogInformation($"Getting image from RecordingID");
-                    var albumId = MusicBrainz.GetAlbumByRecordingId(id).Id;
-                    _logger.LogInformation($"Got ID{albumId}");
-                    imageUrl = new Uri($"https://coverartarchive.org/release/{id}/front");
-
-                } catch (Exception e) 
-                {
-                    _logger.LogError(e, "Failed to get AlbumID");
-                }
-
-                if(imageUrl == null)
-                {
-                    _logger.LogInformation($"Getting image failed, falling back");
-                    imageUrl = new Uri($"http://coverartarchive.org/release/{id}/front");
-                }
-
-                _logger.LogInformation($"Getting image from: {imageUrl.AbsoluteUri}");
-
-                using var client = new HttpClient();
-                var result = await client.GetAsync(imageUrl);
-                if(!result.IsSuccessStatusCode)
-                {
-                    result = await client.GetAsync(defaultImage);
-                }
-                return new HttpResponseMessageResult(result);
+                _logger.LogDebug("DC failed for some reason, so we are now going to try Cover Archive");
+                imageUrl = GetImageUrlFromCoverArchive(id);
             }
 
-            return imageUrl != null
-                ? Redirect(imageUrl.AbsoluteUri)
-                : NotFound();
+            return await ReturnResizedImageAsync(imageUrl, resize, width, contenttype);
+        }
+
+        private async Task<IActionResult> ReturnResizedImageAsync(string imageUrl, bool resize, int width, string contenttype)
+        {
+            var imgResponse = await imageUrl.GetAsync();
+
+            if (imgResponse.StatusCode != 200)
+            {
+                NotFound();
+            }
+
+            var image = await SixLabors.ImageSharp.Image.LoadAsync(await imgResponse.GetStreamAsync());
+            if (resize && image.Size.Width > width)
+            {
+                _logger.LogDebug("resizing");
+                image.Mutate(x => x.Resize(width, 0));
+            }
+
+            using var stream = new MemoryStream();
+
+            if (contenttype.Contains("jpeg"))
+            {
+                _logger.LogDebug("sending as jpg");
+                image.Save(stream, new JpegEncoder());
+            }
+            else if (contenttype.Contains("bmp"))
+            {
+                _logger.LogDebug("bmp");
+                image.Save(stream, new BmpEncoder());
+            }
+            else if (contenttype.Contains("png"))
+            {
+                _logger.LogDebug("sending as png");
+                image.Save(stream, new PngEncoder());
+            }
+
+            return File(stream.ToArray(), contenttype);
+        }
+
+        private static async Task<string> GetImageUrlFromDCAsync(Guid id)
+        {
+            (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(id);
+
+            return dc_artist.Value<JArray>("images")?
+                .FirstOrDefault(i => i.Value<string>("type") == "primary")?
+                .Value<string>("uri");
+        }
+
+        private static string GetImageUrlFromCoverArchive(Guid id)
+        {
+            string? albumId = null;
+            try
+            {
+                albumId = MusicBrainz.GetAlbumByRecordingId(id).Id;
+            } catch
+            {
+            }
+            if(string.IsNullOrEmpty(albumId))
+            {
+                albumId = id.ToString();
+            }
+            return $"https://coverartarchive.org/release/{albumId}/front";
         }
     }
 }

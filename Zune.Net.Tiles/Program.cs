@@ -6,11 +6,9 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
-app.UseHttpLogging();
+// app.UseHttpLogging();
 
 // Configure the HTTP request pipeline.
-
-app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

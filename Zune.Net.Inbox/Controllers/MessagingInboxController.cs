@@ -1,15 +1,24 @@
 ﻿using Atom.Xml;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using Zune.Xml.Inbox;
 
 namespace Zune.Net.Inbox.Controllers
 {
+    ///en-US/messaging/xerootg/inbox/unreadcount
     [ApiController]
     [Route("/{locale}/messaging/{zuneTag}/inbox/{action=List}/{id?}")]
+    [Route("/{locale}/messaging/{zuneTag}/inbox/")]
     [Route("/messaging/{zuneTag}/inbox/{action=List}/{id?}")]
     public class MessagingInboxController : ControllerBase
     {
+        private ILogger _logger;
+        public MessagingInboxController(ILogger<MessagingInboxController> logger)
+        {
+            _logger = logger;
+        }
+
         [HttpGet]
         public Feed<MessageRoot> List(string locale, string zuneTag)
         {
@@ -57,17 +66,16 @@ namespace Zune.Net.Inbox.Controllers
         }
 
         [HttpGet("unreadcount")]
-        [HttpGet("UnreadCount")]
-        public IActionResult UnreadCont(string locale, string zuneTag)
+        public IActionResult UnreadCont(string zuneTag)
         {
-            
+            _logger.LogInformation($"{zuneTag} message count requested");
         //     using var ctx = new ZuneNetContext();
         //     Member member = ctx.Members.First(m => m.ZuneTag == zuneTag);
         //     if (member == null)
         //         return StatusCode(StatusCodes.Status400BadRequest, $"User {zuneTag} does not exist.");
 
         //     return Content(member.Messages.Count(msg => !msg.IsRead).ToString());
-        return Ok("1");
+            return Ok("1");
         }
     }
 }

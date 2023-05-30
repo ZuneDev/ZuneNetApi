@@ -95,13 +95,14 @@ namespace Zune.SocialApi.Controllers
 
             var feed = new Feed<Badge>
             {
-                Id = Guid.Empty.ToString(),
+                Id = new Guid().ToString(),
                 Links = { new Link(requestUrl) },
                 Title = member.ZuneTag + "'s Badges",
-                Entries =
-                {
-                    badge1
-                }
+                Updated = DateTime.Now - TimeSpan.FromDays(1),
+                // Entries =
+                // {
+                //     badge1
+                // }
             };
 
             return feed;

@@ -17,7 +17,7 @@ builder.Services.AddTransient(typeof(WMIS));
 
 var app = builder.Build();
 
-app.UseHttpLogging();
+// app.UseHttpLogging();
 
 app.MapControllers();
 app.UseResponseCaching();

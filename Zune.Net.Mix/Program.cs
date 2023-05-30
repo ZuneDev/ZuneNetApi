@@ -12,7 +12,7 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
-app.UseHttpLogging();
+// app.UseHttpLogging();
 
 app.UseAuthorization();
 

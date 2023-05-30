@@ -5,6 +5,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Content Include="Resources\**">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\Atom\Atom.csproj" />
 		<ProjectReference Include="..\Zune.DB\Zune.DB.csproj" />
 		<ProjectReference Include="..\Zune.Net.Shared\Zune.Net.Shared.csproj" />
