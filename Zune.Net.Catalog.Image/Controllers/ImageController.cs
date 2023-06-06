@@ -34,7 +34,7 @@ namespace Zune.Net.Catalog.Image.Controllers
         }
 
         [HttpGet("image/{id}")]
-        public async Task<IActionResult> Image(Guid id, bool resize = true, int width = 480, string contenttype = "image/jpeg")
+        public async Task<IActionResult> Image(Guid id, int width, bool resize = false, string contenttype = "image/jpeg")
         {
             string? imageUrl = null;
 
@@ -82,7 +82,7 @@ namespace Zune.Net.Catalog.Image.Controllers
 
             if (string.IsNullOrEmpty(imageUrl))
             {
-                return await ArtistImage(id, "failoverFromPrimaryEndpoint", resize, width, contenttype);
+                return await ArtistImage(id, "failoverFromPrimaryEndpoint", width, resize, contenttype);
             }
 
             return await ReturnResizedImageAsync(imageUrl, resize, width, contenttype);
@@ -91,7 +91,7 @@ namespace Zune.Net.Catalog.Image.Controllers
         // i.e. http://image.catalog.zune.net/v3.0/en-US/music/track/f32bb0ab-59d6-4620-b239-e86dc68647a4/albumImage?width=240&height=240&resize=true
 
         [HttpGet("music/{imageKind}/{id}/{type}")]
-        public async Task<IActionResult> ArtistImage(Guid id, string type, bool resize = true, int width = 480, string contenttype = "image/jpeg")
+        public async Task<IActionResult> ArtistImage(Guid id, string type, int width, bool resize = false, string contenttype = "image/jpeg")
         {
             _logger.LogDebug($"Fetching image type: '{type}', starting with DC");
             // known types - deviceBackgroundImage, primaryImage, albumImage.
@@ -113,7 +113,7 @@ namespace Zune.Net.Catalog.Image.Controllers
             return await ReturnResizedImageAsync(imageUrl, resize, width, contenttype);
         }
 
-        private async Task<IActionResult> ReturnResizedImageAsync(string imageUrl, bool resize, int width, string contenttype)
+        private async Task<IActionResult> ReturnResizedImageAsync(string imageUrl, bool resize, int? width, string contenttype)
         {
             try
             {
@@ -125,10 +125,10 @@ namespace Zune.Net.Catalog.Image.Controllers
                 }
 
                 var image = await SixLabors.ImageSharp.Image.LoadAsync(await imgResponse.GetStreamAsync());
-                if (resize && image.Size.Width > width)
+                if (width.HasValue && resize && image.Size.Width > width.Value)
                 {
                     _logger.LogDebug("resizing");
-                    image.Mutate(x => x.Resize(width, 0));
+                    image.Mutate(x => x.Resize(width.Value, 0));
                 }
 
                 using var stream = new MemoryStream();
