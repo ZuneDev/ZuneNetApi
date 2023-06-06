@@ -62,7 +62,8 @@ namespace Zune.Net.Catalog.Image.Controllers
                     var thisImage = images[idB];
                     imageUrl = thisImage.Value<string>("uri");
                 }
-            } else
+            }
+            else
             {
                 try
                 {
@@ -75,10 +76,11 @@ namespace Zune.Net.Catalog.Image.Controllers
                             imageUrl = imageEntry.Url;
                         }
                     }
-                } catch {}
+                }
+                catch { }
             }
 
-            if(string.IsNullOrEmpty(imageUrl))
+            if (string.IsNullOrEmpty(imageUrl))
             {
                 return await ArtistImage(id, "failoverFromPrimaryEndpoint", resize, width, contenttype);
             }
@@ -113,39 +115,43 @@ namespace Zune.Net.Catalog.Image.Controllers
 
         private async Task<IActionResult> ReturnResizedImageAsync(string imageUrl, bool resize, int width, string contenttype)
         {
-            var imgResponse = await imageUrl.GetAsync();
-
-            if (imgResponse.StatusCode != 200)
+            try
             {
-                NotFound();
-            }
+                var imgResponse = await imageUrl.GetAsync();
 
-            var image = await SixLabors.ImageSharp.Image.LoadAsync(await imgResponse.GetStreamAsync());
-            if (resize && image.Size.Width > width)
-            {
-                _logger.LogDebug("resizing");
-                image.Mutate(x => x.Resize(width, 0));
-            }
+                if (imgResponse.StatusCode != 200)
+                {
+                    NotFound();
+                }
 
-            using var stream = new MemoryStream();
+                var image = await SixLabors.ImageSharp.Image.LoadAsync(await imgResponse.GetStreamAsync());
+                if (resize && image.Size.Width > width)
+                {
+                    _logger.LogDebug("resizing");
+                    image.Mutate(x => x.Resize(width, 0));
+                }
 
-            if (contenttype.Contains("jpeg"))
-            {
-                _logger.LogDebug("sending as jpg");
-                image.Save(stream, new JpegEncoder());
-            }
-            else if (contenttype.Contains("bmp"))
-            {
-                _logger.LogDebug("bmp");
-                image.Save(stream, new BmpEncoder());
-            }
-            else if (contenttype.Contains("png"))
-            {
-                _logger.LogDebug("sending as png");
-                image.Save(stream, new PngEncoder());
-            }
+                using var stream = new MemoryStream();
 
-            return File(stream.ToArray(), contenttype);
+                if (contenttype.Contains("jpeg"))
+                {
+                    _logger.LogDebug("sending as jpg");
+                    image.Save(stream, new JpegEncoder());
+                }
+                else if (contenttype.Contains("bmp"))
+                {
+                    _logger.LogDebug("bmp");
+                    image.Save(stream, new BmpEncoder());
+                }
+                else if (contenttype.Contains("png"))
+                {
+                    _logger.LogDebug("sending as png");
+                    image.Save(stream, new PngEncoder());
+                }
+
+                return File(stream.ToArray(), contenttype);
+            }
+            catch { return NotFound(); }
         }
 
         private static async Task<string> GetImageUrlFromDCAsync(Guid id)
@@ -163,10 +169,11 @@ namespace Zune.Net.Catalog.Image.Controllers
             try
             {
                 albumId = MusicBrainz.GetAlbumByRecordingId(id).Id;
-            } catch
+            }
+            catch
             {
             }
-            if(string.IsNullOrEmpty(albumId))
+            if (string.IsNullOrEmpty(albumId))
             {
                 albumId = id.ToString();
             }
