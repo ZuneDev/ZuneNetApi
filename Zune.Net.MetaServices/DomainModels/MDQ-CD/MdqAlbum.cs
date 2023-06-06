@@ -5,9 +5,9 @@ namespace Zune.Net.MetaServices.DomainModels.MdqCd
     public class MdqAlbum
     {
         [XmlElement("title")]
-        public MdqDescriptionElement AlbumTitle;
+        public MdqDescriptionElement AlbumTitle = new();
 
         [XmlElement("artist")]
-        public MdqDescriptionElement AlbumArtist;
+        public MdqDescriptionElement AlbumArtist = new();
     }
 }

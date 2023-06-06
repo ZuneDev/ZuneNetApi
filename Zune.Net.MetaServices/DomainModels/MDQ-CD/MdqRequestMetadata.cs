@@ -6,6 +6,6 @@ namespace Zune.Net.MetaServices.DomainModels.MdqCd
     public partial class MdqRequestMetadata
     {
         [XmlElement("MDQ-CD")]
-        public MdqCd MdqCd { get; set; }
+        public MdqCd MdqCd { get; set; } = new();
     }
 }

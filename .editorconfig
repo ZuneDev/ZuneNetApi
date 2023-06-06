@@ -1,0 +1,4 @@
+
+# Format: rule = severity # defintion; justification
+dotnet_diagnostic.ASP0014.severity = none # Don't use UseEndpoints in trivial APIs; we have some simplistic program.cs, and still need to manually register UseEndpoints
+dotnet_diagnostic.CA2254.severity = none # use logging formatter instead of interpolation; formatted strings in logs give me the creeps - also, too many nights oncall sorting impossible to read logs

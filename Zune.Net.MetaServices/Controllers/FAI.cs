@@ -17,27 +17,20 @@ namespace Zune.Net.MetaServices.Controllers
         }
         [HttpGet("Search")]
         [Produces("application/xml")]
-        public async Task<ActionResult> Search(string SearchString, string resultTypeString, int maxNumberOfResults = 10)
-        {
+        public async Task<ActionResult> Search(string SearchString, string resultTypeString, int maxNumberOfResults = 10) =>
             // var results = await MusicBrainz.MDARSearchAlbums(SearchString);
             // //resultTypeString album or artist
             // return results[0];
-            switch (resultTypeString)
+            resultTypeString switch
             {
-                case "album": //{WMISFAIAlbumsQuery}, List<Album> Album
-                    // mdsr-cd
-                    //  UIX Type: AlbumList, of Album
-                    return Ok(await _wmis.SearchAlbumsAsync(SearchString, maxNumberOfResults));
-                case "artist":
-                    // mdsr-cd, but with slightly different elements
-                    //  UIX Type: ArtistList, of Artist
-                    return Ok("<METADATA><MDSR-CD><ReturnCode>SUCCESS</ReturnCode></MDSR-CD></METADATA>");
-                case "track":
-                    // WMISFAITracksQuery->TrackList (see WMISDATA.SCHEMA.XML)
-                    return Ok();
-            }
-            return NotFound();
-        }
+                //{WMISFAIAlbumsQuery}, List<Album> Album
+                "album" => Ok(await _wmis.SearchAlbumsAsync(SearchString, maxNumberOfResults)),// mdsr-cd
+                                                                                               //  UIX Type: AlbumList, of Album
+                "artist" => Ok("<METADATA><MDSR-CD><ReturnCode>SUCCESS</ReturnCode></MDSR-CD></METADATA>"),// mdsr-cd, but with slightly different elements
+                                                                                                           //  UIX Type: ArtistList, of Artist
+                "track" => Ok(),// WMISFAITracksQuery->TrackList (see WMISDATA.SCHEMA.XML)
+                _ => NotFound(),
+            };
 
         // example - http://metaservices.zune.net/ZuneFAI/GetAlbumDetailsFromAlbumId?albumId=8144290952437462496&locale=1033&volume=1
         // Also known as WMISFAIGetAlbumDetailsQuery in the UIX side
@@ -45,12 +38,20 @@ namespace Zune.Net.MetaServices.Controllers
         [HttpPost("GetAlbumDetailsFromAlbumId")]
         [HttpGet("GetAlbumDetailsFromAlbumId")]
         [Produces("application/xml")]
-        public async Task<ActionResult> MDARGetAlbumDetailsFromAlbumId(Int64 albumId, int locale, string volume, [FromBody]MdqRequestMetadata request = null)
+        public async Task<ActionResult> MDARGetAlbumDetailsFromAlbumId(Int64 albumId, int locale, string volume, [FromBody] MdqRequestMetadata? request = null)
         {
-            var response = await _wmis.GetMdarCdRequestFromInt64(albumId, volume, request);
-            if(request?.MdqCd?.MdqRequestId != null)
+            var response = await _wmis.GetMdarCdRequestFromInt64(albumId, volume, request!);
+            if (request?.MdqCd?.MdqRequestId != null)
             {
-                response.mdqRequestID = new Guid(request?.MdqCd?.MdqRequestId);
+                var mdqRequestId = request?.MdqCd?.MdqRequestId;
+                if (string.IsNullOrEmpty(mdqRequestId))
+                {
+                    response.mdqRequestID = new Guid();
+                }
+                else
+                {
+                    response.mdqRequestID = new Guid(mdqRequestId);
+                }
             }
             return Ok(response);
         }

@@ -50,7 +50,7 @@ namespace Zune.Net.Catalog
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpLogging();
+            //app.UseHttpLogging();
 
             app.UseRequestBuffering();
 

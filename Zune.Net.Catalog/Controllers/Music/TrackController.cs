@@ -21,7 +21,7 @@ namespace Zune.Net.Catalog.Controllers.Music
             _env = env;
         }
 
-        [HttpGet, Route("")]
+        [HttpGet("")]
         public ActionResult<Feed<Track>> Search()
         {
             if (!Request.Query.TryGetValue("q", out var queries) || queries.Count != 1)
@@ -30,13 +30,13 @@ namespace Zune.Net.Catalog.Controllers.Music
             return MusicBrainz.SearchTracks(queries[0], Request.Path);
         }
 
-        [HttpGet, Route("{mbid}")]
+        [HttpGet("{mbid}")]
         public ActionResult<Track> Details(Guid mbid)
         {
             return MusicBrainz.GetTrackByMBID(mbid);
         }
 
-        [HttpGet, Route("{mbid}/similarTracks")]
+        [HttpGet("{mbid}/similarTracks")]
         public async Task<ActionResult<Feed<Track>>> SimilarTracks(Guid mbid)
         {
             return await LastFM.GetSimilarTracksByMBID(mbid);

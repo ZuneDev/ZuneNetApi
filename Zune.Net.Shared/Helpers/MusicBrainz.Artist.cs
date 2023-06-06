@@ -2,7 +2,9 @@
 using MetaBrainz.MusicBrainz;
 using MetaBrainz.MusicBrainz.Interfaces.Entities;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Zune.Xml.Catalog;
 
 namespace Zune.Net.Helpers
@@ -145,6 +147,22 @@ namespace Zune.Net.Helpers
                 Id = mb_artist.Id,
                 Title = mb_artist.Name
             };
+        }
+
+        public static async Task<List<int>> GetArtistGenreIdsByArtistIdAsync(Guid artistId)
+        {
+            var artistGenreIds = new HashSet<int>();
+
+            var artistDetails = _query.LookupArtist(artistId, Include.ReleaseGroups);
+            var releaseGroupIds = artistDetails.ReleaseGroups?.Select(x=> x.Id) ?? new List<Guid>();
+
+            foreach(var releaseGroup in releaseGroupIds)
+            {
+                var results = await MusicBrainz.GetGenreIdsByReleaseGroupMbidAsync(releaseGroup);
+                results.ForEach(genreId => artistGenreIds.Add(genreId));
+            }
+
+            return artistGenreIds.ToList();
         }
     }
 }

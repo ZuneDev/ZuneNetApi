@@ -1,13 +1,10 @@
 ﻿using Atom.Xml;
 using Flurl.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Zune.DB;
 using Zune.Net.Helpers;
@@ -16,25 +13,30 @@ using Zune.Xml.Catalog;
 namespace Zune.Net.Catalog.Controllers.Music
 {
     [Route("/v3.2/{culture}/music/artist/")]
+    [Route("/v3.0/{culture}/music/artist/")]
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
     public class ArtistController : Controller
     {
         private readonly ZuneNetContext _database;
-        public ArtistController(ZuneNetContext database)
+        private readonly ILogger _logger;
+
+        public ArtistController(ILogger<ArtistController> logger, ZuneNetContext database)
         {
+            _logger = logger;
             _database = database;
         }
 
-        [HttpGet, Route("")]
-        public ActionResult<Feed<Artist>> Search()
+        [HttpGet("")]
+        public ActionResult<Feed<Artist>> Search(string q)
         {
-            if (!Request.Query.TryGetValue("q", out var queries) || queries.Count != 1)
+            if(string.IsNullOrEmpty(q))
+            {
                 return BadRequest();
-
-            return MusicBrainz.SearchArtists(queries[0], Request.Path);
+            }
+            return MusicBrainz.SearchArtists(q, Request.Path);
         }
 
-        [HttpGet, Route("{mbid}")]
+        [HttpGet("{mbid}")]
         public async Task<ActionResult<Artist>> Details(Guid mbid)
         {
             (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(mbid);
@@ -62,55 +64,44 @@ namespace Zune.Net.Catalog.Controllers.Music
             return artist;
         }
 
-        [HttpGet, Route("{mbid}/tracks")]
-        public ActionResult<Feed<Track>> Tracks(Guid mbid)
+        [HttpGet("{mbid}/tracks")]
+        public ActionResult<Feed<Track>> Tracks(Guid mbid, string orderby = "unset", int chunkSize = 10)
         {
-            if (!Request.Query.TryGetValue("chunkSize", out var chunkSizeStrs) || chunkSizeStrs.Count != 1)
-                return BadRequest();
-
-            return MusicBrainz.GetArtistTracksByMBID(mbid, Request.Path, int.Parse(chunkSizeStrs[0]));
-        }
-
-        [HttpGet, Route("{mbid}/albums")]
-        public ActionResult<Feed<Album>> Albums(Guid mbid)
-        {
-            var feed = MusicBrainz.GetArtistAlbumsByMBID(mbid, Request.Path);
-
-            Comparison<Album> sortComparer = (a, b) => a.ReleaseDate.Year.CompareTo(b.ReleaseDate.Year);
-            if (Request.Query.TryGetValue("orderby", out var orderByValue))
+            var tracks = MusicBrainz.GetArtistTracksByMBID(mbid, Request.Path, 100);
+            var toSort = tracks.Entries;
+            try
             {
-                string orderBy = orderByValue.Single().ToLower();
-                switch (orderBy)
+                switch (orderby.ToLowerInvariant())
                 {
-                    case "title":
-                        sortComparer = (a, b) => (a.SortTitle ?? a.Title.Value).CompareTo(b.SortTitle ?? b.Title.Value);
-                        break;
-
-                    case "mostplayed":
-                        sortComparer = (a, b) => a.Popularity.CompareTo(b.Popularity);
+                    case "playrank":
+                        tracks.Entries.Sort((a, b) => a.Popularity.CompareTo(b));
                         break;
                 }
             }
+            catch { }
+            tracks.Entries = tracks.Entries.Take(chunkSize).ToList();
+            return tracks;
+        }
 
+        [HttpGet("{mbid}/albums")]
+        public ActionResult<Feed<Album>> Albums(Guid mbid, int chunkSize = 10, string orderby = "ReleaseDate")
+        {
+            var feed = MusicBrainz.GetArtistAlbumsByMBID(mbid, Request.Path);
+            Comparison<Album> sortComparer = orderby.ToLowerInvariant() switch
+            {
+                "title" => (a, b) => (a.SortTitle ?? a.Title.Value).CompareTo(b.SortTitle ?? b.Title.Value),
+
+                "mostplayed" or "playrank" => (a, b) => a.Popularity.CompareTo(b.Popularity),
+
+                //default
+                _ or "releasedate" => (a, b) => a.ReleaseDate.Year.CompareTo(b.ReleaseDate.Year),
+            };
             feed.Entries.Sort(sortComparer);
+            feed.Entries = feed.Entries.Take(chunkSize).ToList();
             return feed;
         }
 
-        [HttpGet, Route("{mbid}/primaryImage")]
-        public async Task<ActionResult> PrimaryImage(Guid mbid)
-        {
-            (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(mbid);
-            if (dc_artist == null)
-                return StatusCode(404);
-
-            string imgUrl = dc_artist["images"].First(i => i.Value<string>("type") == "primary").Value<string>("uri");
-            var imgResponse = await imgUrl.GetAsync();
-            if (imgResponse.StatusCode != 200)
-                return StatusCode(imgResponse.StatusCode);
-            return File(await imgResponse.GetStreamAsync(), "image/jpeg");
-        }
-
-        [HttpGet, Route("{mbid}/biography")]
+        [HttpGet("{mbid}/biography")]
         public async Task<ActionResult<Entry>> Biography(Guid mbid)
         {
             (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(mbid);
@@ -127,12 +118,33 @@ namespace Zune.Net.Catalog.Controllers.Music
                 Updated = updated,
             };
         }
+        
+        [HttpGet("{mbid}/primaryImage")]
+        public async Task<ActionResult> PrimaryImage(Guid mbid)
+        {
+            (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(mbid);
+            if (dc_artist == null)
+            {
+                _logger.LogDebug($"No artist found for mbid: {mbid}");
+                return StatusCode(404);
+            }
 
-        [HttpGet, Route("{mbid}/images")]
-        public async Task<ActionResult<Feed<Image>>> Images(Guid mbid)
+            string imgUrl = dc_artist["images"].First(i => i.Value<string>("type") == "primary").Value<string>("uri");
+            var imgResponse = await imgUrl.GetAsync();
+            if (imgResponse.StatusCode != 200)
+                return StatusCode(imgResponse.StatusCode);
+            return File(await imgResponse.GetStreamAsync(), "image/jpeg");
+        }
+
+        [HttpGet("{mbid}/images")]
+        public async Task<ActionResult<Feed<Image>>> Images(Guid mbid, int chunkSize = 40)
         {
             (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(mbid);
             DateTime updated = DateTime.Now;
+            if(dc_artist == null)
+            {
+                return StatusCode(404);
+            }
             int dcid = dc_artist.Value<int>("id");
             byte[] zero = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -167,17 +179,19 @@ namespace Zune.Net.Catalog.Controllers.Music
                             }
                         }
                     };
-                }).ToList();
+                }).Take(chunkSize).ToList();
             }
 
             return feed;
         }
 
-        [HttpGet, Route("{mbid}/similarArtists")]
-        [HttpGet, Route("{mbid}/influencers")]
-        public async Task<ActionResult<Feed<Artist>>> SimilarArtists(Guid mbid)
+        [HttpGet("{mbid}/similarArtists")]
+        [HttpGet("{mbid}/influencers")]
+        public async Task<ActionResult<Feed<Artist>>> SimilarArtists(Guid mbid, int chunkSize = 10)
         {
-            return await LastFM.GetSimilarArtistsByMBID(mbid);
+            var similar = await LastFM.GetSimilarArtistsByMBID(mbid);
+            similar.Entries = similar.Entries.Take(chunkSize).ToList();
+            return similar;
         }
     }
 }

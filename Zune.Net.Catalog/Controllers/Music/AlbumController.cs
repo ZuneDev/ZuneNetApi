@@ -12,7 +12,7 @@ namespace Zune.Net.Catalog.Controllers.Music
     public class AlbumController : Controller
     {
 
-        [HttpGet, Route("")]
+        [HttpGet("")]
         public ActionResult<Feed<Album>> Search()
         {
             if (!Request.Query.TryGetValue("q", out var queries) || queries.Count != 1)

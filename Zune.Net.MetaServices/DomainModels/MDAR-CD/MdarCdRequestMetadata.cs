@@ -6,10 +6,10 @@ namespace Zune.Net.MetaServices.DomainModels.MdarCd
     public class MdarCdRequestMetadata
     {
         [XmlElement("mdqRequestID")]
-        public Guid mdqRequestID{get; set;}
+        public Guid? mdqRequestID{get; set;}
 
         [XmlElement("MDAR-CD")]
-        public MdarCd MdarCd {get; set;}
+        public MdarCd MdarCd {get; set;} = new();
 
         [XmlElement("BackOff")]
         public MdarBackoff Backoff = new();

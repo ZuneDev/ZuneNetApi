@@ -33,7 +33,7 @@ namespace Zune.Net.Catalog.Image.Controllers
             _logger = logger;
         }
 
-        [HttpGet, Route("image/{id}")]
+        [HttpGet("image/{id}")]
         public async Task<IActionResult> Image(Guid id, bool resize = true, int width = 480, string contenttype = "image/jpeg")
         {
             string? imageUrl = null;
@@ -88,7 +88,7 @@ namespace Zune.Net.Catalog.Image.Controllers
 
         // i.e. http://image.catalog.zune.net/v3.0/en-US/music/track/f32bb0ab-59d6-4620-b239-e86dc68647a4/albumImage?width=240&height=240&resize=true
 
-        [HttpGet, Route("music/{imageKind}/{id}/{type}")]
+        [HttpGet("music/{imageKind}/{id}/{type}")]
         public async Task<IActionResult> ArtistImage(Guid id, string type, bool resize = true, int width = 480, string contenttype = "image/jpeg")
         {
             _logger.LogDebug($"Fetching image type: '{type}', starting with DC");
@@ -154,7 +154,7 @@ namespace Zune.Net.Catalog.Image.Controllers
 
             return dc_artist.Value<JArray>("images")?
                 .FirstOrDefault(i => i.Value<string>("type") == "primary")?
-                .Value<string>("uri");
+                .Value<string>("uri") ?? throw new FileNotFoundException();
         }
 
         private static string GetImageUrlFromCoverArchive(Guid id)

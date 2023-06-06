@@ -1,4 +1,6 @@
-﻿using Atom.Xml;
+﻿using System;
+using System.Threading.Tasks;
+using Atom.Xml;
 using Microsoft.AspNetCore.Mvc;
 using Zune.Net.Helpers;
 using Zune.Xml.Catalog;
@@ -10,7 +12,7 @@ namespace Zune.Net.Mix.Controllers
     public class TrackController : Controller
     {
 
-        [HttpGet, Route("{mbid}/similarTracks")]
+        [HttpGet("{mbid}/similarTracks")]
         public async Task<ActionResult<Feed<Track>>> SimilarTracks(Guid mbid)
         {
             return await LastFM.GetSimilarTracksByMBID(mbid);

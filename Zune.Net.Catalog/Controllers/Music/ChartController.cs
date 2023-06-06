@@ -13,15 +13,12 @@ namespace Zune.Net.Catalog.Controllers.Music
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
     public class ChartController : Controller
     {
-        private const bool useDeezer = true;
-
-        [HttpGet, Route("tracks")]
+        [HttpGet("tracks")]
         public async Task<ActionResult<Feed<Track>>> Tracks()
         {
             Feed<Track> feed;
 
-            if (useDeezer)
-            {
+#if UseDeezer
                 var dz_tracks = await Deezer.GetChartDZTracks();
                 DateTime updated = DateTime.Now;
 
@@ -45,30 +42,28 @@ namespace Zune.Net.Catalog.Controllers.Music
 
                     feed.Entries.Add(track);
                 }
-            }
-            else
+#else
+            var fm_tracks = await LastFM.GetTopTracks();
+            feed = LastFM.CreateFeed<Track>("/music/chart/zune/tracks", "Top tracks");
+
+            foreach (var fm_track in fm_tracks.Take(10))
             {
-                var fm_tracks = await LastFM.GetTopTracks();
-                feed = LastFM.CreateFeed<Track>("/music/chart/zune/tracks", "Top tracks");
+                var mb_recording = LastFM.GetMBRecordingByFMTrack(fm_track);
+                if (mb_recording == null)
+                    continue;
 
-                foreach (var fm_track in fm_tracks.Take(10))
-                {
-                    var mb_recording = LastFM.GetMBRecordingByFMTrack(fm_track);
-                    if (mb_recording == null)
-                        continue;
+                var track = MusicBrainz.MBRecordingToTrack(mb_recording, updated: feed.Updated, includeRights: true);
+                track.Popularity = fm_track.Rank ?? 0;
+                track.PlayCount = fm_track.PlayCount ?? 0;
 
-                    var track = MusicBrainz.MBRecordingToTrack(mb_recording, updated: feed.Updated, includeRights: true);
-                    track.Popularity = fm_track.Rank ?? 0;
-                    track.PlayCount = fm_track.PlayCount ?? 0;
-
-                    feed.Entries.Add(track);
-                }
+                feed.Entries.Add(track);
             }
+#endif
 
             return feed;
         }
 
-        [HttpGet, Route("albums")]
+        [HttpGet("albums")]
         public async Task<ActionResult<Feed<Album>>> Albums()
         {
             var dz_albums = await Deezer.GetChartDZAlbums();

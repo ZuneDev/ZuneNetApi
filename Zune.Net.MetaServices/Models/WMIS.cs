@@ -135,7 +135,7 @@ namespace Zune.Net.Helpers
             };
         }
 
-        private async Task<List<MdarTrack>> GetTracksFromIReleaseAsync(IRelease release, MdqRequestMetadata requestMetadata = null)
+        private async Task<List<MdarTrack>> GetTracksFromIReleaseAsync(IRelease release, MdqRequestMetadata? requestMetadata)
         {
             var tracks = new List<MdarTrack>();
             if (release.Media != null && release.Media.Count > 0)
@@ -340,7 +340,7 @@ namespace Zune.Net.Helpers
                     }},
                     Label = label,
                     UniqueFileID = $"AMGa_ID=R {albumId}",
-                    AlbumTitle = release.Title,
+                    AlbumTitle = release.Title!,
                     AlbumArtist = performerName,
                     ReleaseDate = release.Date.NearestDate,
                     Genre = genre,

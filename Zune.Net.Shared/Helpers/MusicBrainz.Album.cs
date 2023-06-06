@@ -5,6 +5,7 @@ using MetaBrainz.MusicBrainz.Interfaces.Searches;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Zune.Xml.Catalog;
 
 namespace Zune.Net.Helpers
@@ -71,7 +72,7 @@ namespace Zune.Net.Helpers
             {
                 album.Tracks = new();
 
-                for(var mediaId = 0; mediaId < mb_rel.Media.Count; mediaId++)
+                for (var mediaId = 0; mediaId < mb_rel.Media.Count; mediaId++)
                 {
                     var mb_media = mb_rel.Media[mediaId];
 
@@ -100,6 +101,63 @@ namespace Zune.Net.Helpers
                 Id = mb_rel.Id,
                 Title = mb_rel.Title
             };
+        }
+
+        public static async Task<List<Guid>> GetTracksByAlbumMbidAsync(Guid albumId)
+        {
+            var trackList = new List<Guid>();
+            try
+            {
+                var album = await _query.LookupReleaseAsync(albumId, Include.Recordings);
+                var medias = album.Media?.ToList() ?? new List<IMedium>();
+                medias.ForEach(media => media.Tracks.ToList().ForEach(track => trackList.Add(track.Id)));
+            }
+            catch { }
+            return trackList;
+        }
+
+        public static async Task<List<int>> GetGenreIdsByReleaseGroupMbidAsync(Guid releaseGroupId)
+        {
+            try
+            {
+                var genreIdList = new List<int>();
+                var releaseGroup = await _query.LookupReleaseGroupAsync(releaseGroupId, Include.Tags | Include.Genres);
+                foreach (var genre in releaseGroup.Genres?.ToList() ?? new List<IGenre>())
+                {
+                    var genreIndexId = Array.IndexOf(MusicBrainzGenreList.Genres, genre.Name);
+                    if (genreIndexId > -1)
+                    {
+                        genreIdList.Add(genreIndexId);
+                    }
+                }
+
+                foreach (var tag in releaseGroup.Tags?.ToList() ?? new List<ITag>())
+                {
+                    var genreIndexId = Array.IndexOf(MusicBrainzGenreList.Genres, tag.Name);
+                    if (genreIndexId > -1)
+                    {
+                        genreIdList.Add(genreIndexId);
+                    }
+                }
+
+                return genreIdList;
+            } catch 
+            {
+                return new List<int>();
+            }
+        }
+
+        public static async Task<List<int>> GetGenreIdsByAlbumMbidAsync(Guid albumId)
+        {
+            try
+            {
+                var album = await _query.LookupReleaseAsync(albumId, Include.ReleaseGroups);
+                return await GetGenreIdsByReleaseGroupMbidAsync(album.ReleaseGroup.Id);
+            }
+            catch
+            {
+                return new List<int>();
+            }
         }
     }
 }

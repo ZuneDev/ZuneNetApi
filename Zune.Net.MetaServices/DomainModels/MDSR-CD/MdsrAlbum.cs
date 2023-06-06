@@ -5,16 +5,16 @@ namespace Zune.Net.MetaServices.DomainModels.MdsrCd
     public class MdsrAlbum
     {
         [XmlElement("albumFullTitle")]
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
         [XmlElement("id_album")]
         public long AlbumId { get; set; }
 
         [XmlElement("albumPerformer")]
-        public string AlbumArtist { get; set; }
+        public string AlbumArtist { get; set; } = string.Empty;
 
         [XmlElement("albumGenre")]
-        public string Genre { get; set; }
+        public string Genre { get; set; } = string.Empty;
 
         [XmlElement("Volume")]
         public int Volume { get; set; }
@@ -32,9 +32,9 @@ namespace Zune.Net.MetaServices.DomainModels.MdsrCd
         public bool IsMultiDisc { get; set; }
 
         [XmlElement("albumCover")]
-        public string CoverParms { get; set; }
+        public string CoverParms { get; set; } = string.Empty;
 
         [XmlElement("buyNowLink")]
-        public string BuyNowParms { get; set; }
+        public string BuyNowParms { get; set; } = string.Empty;
     }
 }

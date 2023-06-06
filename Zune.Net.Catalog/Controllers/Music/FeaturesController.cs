@@ -11,7 +11,7 @@ namespace Zune.Net.Catalog.Controllers.Music
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
     public class FeaturesController : Controller
     {
-        [HttpGet, Route("")]
+        [HttpGet("")]
         public ActionResult<Feed<AlbumCollection>> Features()
         {
             var updated = DateTime.Now;

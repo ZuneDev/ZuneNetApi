@@ -23,7 +23,7 @@ namespace Zune.Net.Catalog.Controllers
             _env = env;
         }
 
-        [HttpGet, Route("music/{mbid}")]
+        [HttpGet("music/{mbid}")]
         public async Task<ActionResult> DefaultStreaming(Guid mbid)
         {
             var track = MusicBrainz.GetTrackByMBID(mbid);

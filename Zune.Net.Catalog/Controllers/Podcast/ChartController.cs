@@ -17,7 +17,7 @@ namespace Zune.Net.Catalog.Controllers.Podcast
             _database = database;
         }
 
-        [HttpGet, Route("podcasts")]
+        [HttpGet("podcasts")]
         public async Task<ActionResult<Feed<PodcastSeries>>> Podcasts(string culture)
         {
             int limit = 26;

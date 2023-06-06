@@ -20,7 +20,7 @@ namespace Zune.Net.Catalog.Controllers.Podcast
             _database = database;
         }
 
-        [HttpGet, Route("podcast")]
+        [HttpGet("podcast")]
         public async Task<ActionResult<Feed<PodcastSeries>>> Search()
         {
             if (!Request.Query.TryGetValue("q", out var queries) || queries.Count != 1)
@@ -33,7 +33,7 @@ namespace Zune.Net.Catalog.Controllers.Podcast
             return feed;
         }
 
-        [HttpGet, Route("podcast/{tdid}")]
+        [HttpGet("podcast/{tdid}")]
         public async Task<PodcastSeries> Details(Guid tdid)
         {
             var podcast = await Taddy.GetPodcastByTDID(tdid);
@@ -41,7 +41,7 @@ namespace Zune.Net.Catalog.Controllers.Podcast
             return podcast;
         }
 
-        [HttpGet, Route("podcastCategories")]
+        [HttpGet("podcastCategories")]
         public Feed<Category> Categories()
         {
             // TODO: Narrow the categories down to a few, not 110

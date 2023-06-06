@@ -13,10 +13,7 @@ namespace Zune.Net.Catalog.Image
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Host.ConfigureLogging(cfg => 
-            {
-                cfg.AddConsole();
-            });
+            builder.Logging.AddConsole();
 
             // Add services to the container.
 

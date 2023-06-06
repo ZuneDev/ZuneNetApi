@@ -12,13 +12,13 @@ namespace Zune.Net.Catalog.Controllers.Music
     public class GenreController : Controller
     {
 
-        [HttpGet, Route("")]
+        [HttpGet("")]
         public ActionResult<Feed<Genre>> Genres()
         {
             return MusicBrainz.GetGenres(Request.Path);
         }
 
-        [HttpGet, Route("{id}")]
+        [HttpGet("{id}")]
         public ActionResult<Genre> Details(string id)
         {
             if (Guid.TryParse(id, out Guid mbid))
@@ -26,7 +26,7 @@ namespace Zune.Net.Catalog.Controllers.Music
             return MusicBrainz.GetGenreByZID(id);
         }
 
-        [HttpGet, Route("{id}/albums")]
+        [HttpGet("{id}/albums")]
         public ActionResult<Feed<Album>> Albums(string id)
         {
             if (Guid.TryParse(id, out Guid mbid))
@@ -35,7 +35,7 @@ namespace Zune.Net.Catalog.Controllers.Music
         }
 
         // Not actually used by Zune, but hey, might as well
-        [HttpGet, Route("{id}/tracks")]
+        [HttpGet("{id}/tracks")]
         public ActionResult<Feed<Track>> Tracks(string id)
         {
             if (Guid.TryParse(id, out Guid mbid))
@@ -43,7 +43,7 @@ namespace Zune.Net.Catalog.Controllers.Music
             return MusicBrainz.GetGenreTracksByZID(id, Request.Path);
         }
 
-        [HttpGet, Route("{id}/artists")]
+        [HttpGet("{id}/artists")]
         public ActionResult<Feed<Artist>> Artists(string id)
         {
             if (Guid.TryParse(id, out Guid mbid))

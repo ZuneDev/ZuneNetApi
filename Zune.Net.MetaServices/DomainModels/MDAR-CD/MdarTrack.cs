@@ -5,16 +5,16 @@ namespace Zune.Net.MetaServices.DomainModels.MdarCd
     public class MdarTrack
     {
         [XmlElement("Title")]
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
         [XmlElement("Performers")]
-        public string Performers { get; set; }
+        public string Performers { get; set; } = string.Empty;
 
         [XmlElement("TrackNum")]
-        public int TrackNumber { get; set; }
+        public int TrackNumber { get; set; } = 0;
 
         [XmlElement("TrackWmid")]
-        public Guid TrackWmid {get; set;}
+        public Guid? TrackWmid {get; set;}
 
         [XmlElement("TrackRequestID")]
         public int TrackRequestID {get; set;} = 0;

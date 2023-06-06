@@ -8,6 +8,6 @@ namespace Zune.Net.MetaServices.DomainModels.MdsrCd
     {
         [XmlArray("SearchResult")]
         [XmlArrayItem("Result")]
-        public List<MdsrAlbum> Results;
+        public List<MdsrAlbum> Results = new();
     }
 }

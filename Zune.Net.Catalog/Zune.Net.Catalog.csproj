@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
         <UserSecretsId>2a7e8fe8-2bbf-4b58-a184-68ae46722b1c</UserSecretsId>
+        <UseDeezer>True</UseDeezer>
     </PropertyGroup>
 
     <ItemGroup>

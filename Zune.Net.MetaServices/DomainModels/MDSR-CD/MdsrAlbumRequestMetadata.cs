@@ -9,6 +9,6 @@ namespace Zune.Net.MetaServices.DomainModels.MdsrCd
     public class MdsrAlbumRequestMetadata
     {
         [XmlElement("MDSR-CD")] // of type (UIX) Album
-        public MdsrAlbumSearchResult mDSRcD {get; set;}
+        public MdsrAlbumSearchResult mDSRcD {get; set;} = new();
     }
 }
