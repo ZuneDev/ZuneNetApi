@@ -3,6 +3,7 @@ using Zune.Net;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddLogging(x=>x.AddConsole());
 
 builder.Services.AddControllers();
 

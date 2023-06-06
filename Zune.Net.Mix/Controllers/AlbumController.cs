@@ -4,6 +4,7 @@ using Zune.Net.Mix.DomainModel;
 
 namespace Zune.Net.Mix.Controllers
 {
+    [Route("/v3.0/model/album/")]
     [Route("/v4.0/{culture}/model/album/")]
     [Produces("application/xml")]
     public class AlbumController : Controller
