@@ -31,10 +31,8 @@ foreach ($projInfo in $projInfos)
 {
     $projName = $projInfo.Item1
     $hostNum = $projInfo.Item2
-    
-    $exePath = ".\" + $projName + "\bin\" + $configuration + "\net6.0\" + $projName + ".exe"
 
-    $command = '$env:ASPNETCORE_URLS=\"http://127.0.0.' + $hostNum + ':80;https://127.0.0.' + $hostNum + ':443\"; echo "Starting ' + $projName + '..."; ' + $exePath
+    $command = "dotnet run --no-build --project " + $projName
     echo $command
     
     Start-Process powershell.exe -ArgumentList "-noexit", ("-command " + $command)
