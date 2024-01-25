@@ -71,6 +71,7 @@ namespace Zune.Net.Catalog.Controllers.Music
             return MusicBrainz.GetArtistTracksByMBID(mbid, Request.Path, int.Parse(chunkSizeStrs[0]));
         }
 
+        [HttpGet, Route("{mbid}/appearsOnAlbums")] //Will be modified to own method in next few commits
         [HttpGet, Route("{mbid}/albums")]
         public ActionResult<Feed<Album>> Albums(Guid mbid)
         {
@@ -147,7 +148,7 @@ namespace Zune.Net.Catalog.Controllers.Music
             var images = dc_artist.Value<JToken>("images");
             if (images != null)
             {
-                feed.Entries = images.Select((j, idx) =>
+                feed.Entries = images.OrderBy(j =>(int)j.Value<int>("width")*(int)j.Value<int>("width")).Select((j, idx) =>
                 {
                     // Encode DCID and image index in ID
                     Guid imgId = new(dcid, (short)idx, 0, zero);

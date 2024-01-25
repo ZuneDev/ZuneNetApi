@@ -69,7 +69,7 @@ namespace Zune.Net.Helpers
 
         public static Feed<Album> GetArtistAlbumsByMBID(Guid mbid, string requestPath)
         {
-            var results = _query.BrowseAllArtistReleases(mbid, inc: Include.ArtistCredits | Include.ReleaseRelationships);
+            MetaBrainz.MusicBrainz.Interfaces.IStreamingQueryResults<IReleaseGroup> results = _query.BrowseAllArtistReleaseGroups(mbid, inc: Include.ArtistCredits | Include.ReleaseRelationships);
             var updated = DateTime.Now;
             Feed<Album> feed = new()
             {
@@ -86,7 +86,7 @@ namespace Zune.Net.Helpers
             {
                 if (feed.Entries.Count == chunkSize) break;
 
-                feed.Entries.Add(MBReleaseToAlbum(mb_release, updated: updated));
+                feed.Entries.Add(MBReleaseGroupToAlbum(mb_release, updated: updated));
             }
 
             return feed;
@@ -95,11 +95,13 @@ namespace Zune.Net.Helpers
 
         public static Artist MBArtistToArtist(IArtist mb_artist, DateTime? updated = null)
         {
+            String name=mb_artist.Name;
+            if (mb_artist.Disambiguation!=null && mb_artist.Disambiguation!="") name +=" (" + mb_artist.Disambiguation + ")";
             updated ??= DateTime.Now;
             Artist artist = new()
             {
                 Id = mb_artist.Id.ToString(),
-                Title = mb_artist.Name,
+                Title = name,
                 SortTitle = mb_artist.SortName,
                 IsVariousArtist = mb_artist.Id == ARTIST_VARIOUSARTISTS,
                 BiographyLink = "https://bing.com",

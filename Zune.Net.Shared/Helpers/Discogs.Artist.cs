@@ -53,7 +53,7 @@ namespace Zune.Net.Helpers
                             var mb_album = MusicBrainz.GetAlbumByMBID(mbid_rel);
                             htmlEquiv = $"<link type=\"Album\" id=\"{mb_album.Id}\">{mb_album.Title}</link>";
                         }
-                        catch (QueryException) { }
+                        catch (Exception e) { Console.WriteLine(e);}
                         break;
 
                     // Artist
@@ -64,7 +64,7 @@ namespace Zune.Net.Helpers
                             var mb_artist = MusicBrainz.GetArtistByMBID(mbid_artist);
                             htmlEquiv = $"<link type=\"Contributor\" id=\"{mb_artist.Id}\">{mb_artist.Title}</link>";
                         }
-                        catch (QueryException) { }
+                        catch (Exception e) { Console.WriteLine(e);}
                         break;
 
                     // Label
@@ -75,7 +75,7 @@ namespace Zune.Net.Helpers
                             // TODO: Label lookup
                             htmlEquiv = $"<link type=\"Label\" id=\"{mbid_label}\">the label</link>";
                         }
-                        catch (QueryException) { }
+                        catch (Exception e) { Console.WriteLine(e);}
                         break;
 
                     // Master

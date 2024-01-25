@@ -1,4 +1,5 @@
 ﻿using Atom.Xml;
+using MetaBrainz.MusicBrainz.Interfaces.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
@@ -27,11 +28,11 @@ namespace Zune.Net.Catalog.Controllers.Music
 
             foreach (var dz_album in dz_albums)
             {
-                var mb_release = Deezer.GetMBReleaseByDZAlbum(dz_album);
+                IReleaseGroup mb_release = Deezer.GetMBReleaseGroupByDZAlbum(dz_album);
                 if (mb_release == null)
                     continue;
 
-                var album = MusicBrainz.MBReleaseToAlbum(mb_release, updated: updated);
+                Album album = MusicBrainz.MBReleaseGroupToAlbum(mb_release, updated: updated);
                 album.Explicit = dz_album.Value<bool>("explicit_lyrics");
 
                 feed.Entries.Add(album);
