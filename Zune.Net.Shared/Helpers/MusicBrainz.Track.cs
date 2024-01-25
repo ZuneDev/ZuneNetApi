@@ -41,7 +41,7 @@ namespace Zune.Net.Helpers
                 var mb_rec = _query.LookupRecording(mbid, Include.Genres | Include.ArtistCredits | Include.Releases | Include.UrlRelationships | Include.Media);
                 return MBRecordingToTrack(mb_rec, includeRights: true);
             }
-            catch (QueryException)
+            catch (Exception)
             {
                 // MusicBrainz Picard likes to put the Track ID instead of the Recording ID
                 var releases = _query.BrowseTrackReleases(mbid, limit: 1, inc: Include.UrlRelationships);
