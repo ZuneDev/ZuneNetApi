@@ -28,13 +28,17 @@ namespace Zune.Net.Catalog.Controllers.Podcast
 
             foreach (var podcast in feed.Entries)
             {
-                await PodcastController.AddImagesToDatabase(_database, podcast);
+                try
+                {
+                    // Search on Taddy for RSS URL
+                    var td_pod = await Taddy.GetMinimalPodcastInfo(podcast.Title.Value);
+                    podcast.Id = td_pod.Id.ToString();
+                    podcast.FeedUrl = td_pod.RssUrl;
+                    podcast.Content = td_pod.Description;
 
-                // Search on Taddy for RSS URL
-                var td_pod = await Taddy.GetMinimalPodcastInfo(podcast.Title.Value);
-                podcast.Id = td_pod.Id.ToString();
-                podcast.FeedUrl = td_pod.RssUrl;
-                podcast.Content = td_pod.Description;
+                    await PodcastController.AddImagesToDatabase(_database, podcast);
+                }
+                catch { }
             }
 
             return feed;
