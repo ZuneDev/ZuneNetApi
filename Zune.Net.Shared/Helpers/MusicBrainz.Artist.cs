@@ -15,7 +15,6 @@ namespace Zune.Net.Helpers
         public static Feed<Artist> SearchArtists(string query, string requestPath)
         {
             var results = _query.FindAllArtists(query, simple: true);
-            
             var updated = DateTime.Now;
             Feed<Artist> feed = new()
             {
@@ -47,7 +46,6 @@ namespace Zune.Net.Helpers
         public static Feed<Track> GetArtistTracksByMBID(Guid mbid, string requestPath, int chunkSize)
         {
             var results = _query.BrowseAllArtistRecordings(mbid, pageSize: chunkSize, inc: Include.ArtistCredits);
-            
             var updated = DateTime.Now;
             Feed<Track> feed = new()
             {
@@ -71,8 +69,7 @@ namespace Zune.Net.Helpers
 
         public static Feed<Album> GetArtistAlbumsByMBID(Guid mbid, string requestPath)
         {
-            var results = _query.BrowseAllArtistReleaseGroups(mbid, inc: Include.ArtistCredits | Include.ReleaseRelationships);
-            
+            MetaBrainz.MusicBrainz.Interfaces.IStreamingQueryResults<IReleaseGroup> results = _query.BrowseAllArtistReleaseGroups(mbid, inc: Include.ArtistCredits | Include.ReleaseRelationships);
             var updated = DateTime.Now;
             Feed<Album> feed = new()
             {
@@ -98,10 +95,8 @@ namespace Zune.Net.Helpers
 
         public static Artist MBArtistToArtist(IArtist mb_artist, DateTime? updated = null)
         {
-            var name = mb_artist.Name;
-            if (!string.IsNullOrEmpty(mb_artist.Disambiguation))
-                name += $" ({mb_artist.Disambiguation})";
-
+            String name=mb_artist.Name;
+            if (mb_artist.Disambiguation!=null && mb_artist.Disambiguation!="") name +=" (" + mb_artist.Disambiguation + ")";
             updated ??= DateTime.Now;
             Artist artist = new()
             {
