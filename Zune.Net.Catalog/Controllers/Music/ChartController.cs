@@ -1,5 +1,4 @@
 ﻿using Atom.Xml;
-using MetaBrainz.MusicBrainz.Interfaces.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
@@ -13,7 +12,7 @@ namespace Zune.Net.Catalog.Controllers.Music
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
     public class ChartController : Controller
     {
-        private const bool useDeezer = false;
+        private const bool useDeezer = true;
 
         [HttpGet, Route("tracks")]
         public async Task<ActionResult<Feed<Track>>> Tracks()
@@ -84,11 +83,11 @@ namespace Zune.Net.Catalog.Controllers.Music
 
             foreach (var dz_album in dz_albums)
             {
-                IReleaseGroup mb_release = Deezer.GetMBReleaseGroupByDZAlbum(dz_album);
+                var mb_release = Deezer.GetMBReleaseByDZAlbum(dz_album);
                 if (mb_release == null)
                     continue;
 
-                var album = MusicBrainz.MBReleaseGroupToAlbum(mb_release, updated: updated);
+                var album = MusicBrainz.MBReleaseToAlbum(mb_release, updated: updated);
                 album.Explicit = dz_album.Value<bool>("explicit_lyrics");
 
                 feed.Entries.Add(album);

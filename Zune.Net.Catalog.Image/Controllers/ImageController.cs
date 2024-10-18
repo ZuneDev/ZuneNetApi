@@ -3,12 +3,8 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Zune.DB;
 using Zune.Net.Helpers;
@@ -31,9 +27,7 @@ namespace Zune.Net.Catalog.Image.Controllers
         [HttpGet, Route("image/{id}")]
         public async Task<IActionResult> Image(Guid id)
         {
-            string imageUrl = "";
-
-            //Console.WriteLine(id.ToString());
+            string? imageUrl = null;
 
             (var idA, var idB, var idC) = id.GetGuidParts();
             var imageEntry = await _database.GetImageEntryAsync(id);
@@ -59,7 +53,7 @@ namespace Zune.Net.Catalog.Image.Controllers
                 if (images != null && images.Count > idB)
                 {
                     var image = images[idB];
-                    imageUrl = image.Value<string>("uri")??"";
+                    imageUrl = image.Value<string>("uri");
                 }
             }
             else
@@ -72,38 +66,11 @@ namespace Zune.Net.Catalog.Image.Controllers
                 int width = caaSupportedSizes.MinBy(x => Math.Abs(x - requestedWidth));
                 imageUrl = $"https://coverartarchive.org/release/{id}/front-{width}";
             }
-            MemoryStream memStream = new MemoryStream();
-            if (imageUrl != "")
-            {
-                memStream = await httpToMemSreamAsync(imageUrl);
-            }
 
             // Request the image from the API and forward it to the Zune software
-            return (memStream.Length > 0)
-                ? File(memStream.ToArray(), "image/jpg")
+            return imageUrl != null
+                ? Redirect(imageUrl)
                 : NotFound();
-        }
-
-        public async Task<MemoryStream> httpToMemSreamAsync(string url)
-        {
-            HttpClient client = new HttpClient();
-            client.DefaultRequestHeaders.Add("User-Agent", "Zune-4.8");
-            MemoryStream imgMemStream = new MemoryStream();
-            Stream imgStream = new MemoryStream();
-            try
-            {
-                HttpResponseMessage response = await client.GetAsync(url);
-                if (response.IsSuccessStatusCode)
-                {
-                    imgStream = response.Content.ReadAsStream();
-                }
-            }
-            catch (HttpRequestException w)
-            {
-                Console.WriteLine(w.ToString());
-            }
-            imgStream.CopyTo(imgMemStream);
-            return imgMemStream;
         }
 
         [HttpGet, Route("music/artist/{id}/{type}")]

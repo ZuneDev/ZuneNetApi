@@ -1,5 +1,4 @@
 ﻿using Atom.Xml;
-using MetaBrainz.MusicBrainz.Interfaces;
 using MetaBrainz.MusicBrainz.Interfaces.Entities;
 using MetaBrainz.MusicBrainz.Interfaces.Searches;
 using System;
@@ -49,13 +48,13 @@ namespace Zune.Net.Helpers
 
             // Get albums from genre
             int maxNumAlbums = 50;
-            IEnumerator<ISearchResult<IReleaseGroup>> results = _query.FindAllReleaseGroups($"tag:\"{mb_genre.Name}\"").GetEnumerator();
+            var results = _query.FindAllReleases($"tag:\"{mb_genre.Name}\"").GetEnumerator();
 
             // Add results to feed
             while (feed.Entries.Count < maxNumAlbums && results.MoveNext())
             {
-                var mb_release_grp = results.Current.Item;
-                feed.Entries.Add(MBReleaseGroupToAlbum(mb_release_grp, updated: updated));
+                var mb_release = results.Current.Item;
+                feed.Entries.Add(MBReleaseToAlbum(mb_release, updated: updated));
             }
 
             return feed;
@@ -79,13 +78,13 @@ namespace Zune.Net.Helpers
             var mb_genres = genre.Value.Values.GetEnumerator();
             while (feed.Entries.Count < maxNumAlbums && mb_genres.MoveNext())
             {
-                IEnumerator<ISearchResult<IReleaseGroup>> results = _query.FindAllReleaseGroups($"tag:\"{mb_genres.Current}\"").GetEnumerator();
+                var results = _query.FindAllReleases($"tag:\"{mb_genres.Current}\"").GetEnumerator();
 
                 // Add results to feed
                 while (feed.Entries.Count < maxNumAlbums && results.MoveNext())
                 {
-                    IReleaseGroup mb_release_grp = results.Current.Item;
-                    feed.Entries.Add(MBReleaseGroupToAlbum(mb_release_grp, updated: updated));
+                    var mb_release = results.Current.Item;
+                    feed.Entries.Add(MBReleaseToAlbum(mb_release, updated: updated));
                 }
             }
 
@@ -132,7 +131,7 @@ namespace Zune.Net.Helpers
                 // Add results to feed
                 while (feed.Entries.Count < maxNumArtists && results.MoveNext())
                 {
-                    IArtist mb_artist = results.Current.Item;
+                    var mb_artist = results.Current.Item;
                     feed.Entries.Add(MBArtistToArtist(mb_artist, updated: updated));
                 }
             }
@@ -175,7 +174,7 @@ namespace Zune.Net.Helpers
             var mb_genres = genre.Value.Values.GetEnumerator();
             while (feed.Entries.Count < maxNumTracks && mb_genres.MoveNext())
             {
-                IEnumerator<ISearchResult<IRecording>> results = _query.FindAllRecordings($"tag:\"{mb_genres.Current}\"").GetEnumerator();
+                var results = _query.FindAllRecordings($"tag:\"{mb_genres.Current}\"").GetEnumerator();
 
                 // Add results to feed
                 while (feed.Entries.Count < maxNumTracks && results.MoveNext())

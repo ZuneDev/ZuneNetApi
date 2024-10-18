@@ -2,22 +2,18 @@
 using MetaBrainz.MusicBrainz;
 using MetaBrainz.MusicBrainz.Interfaces.Entities;
 using MetaBrainz.MusicBrainz.Interfaces.Searches;
-using MetaBrainz.MusicBrainz.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Zune.Xml.Catalog;
-using System.Collections.Concurrent;
 
 namespace Zune.Net.Helpers
 {
     public partial class MusicBrainz
     {
-
-        private static readonly ConcurrentDictionary<String, Album> mbAlbumCache = new();
         public static Feed<Album> SearchAlbums(string query, string requestPath)
         {
-            IReadOnlyList<ISearchResult<IReleaseGroup>> results = _query.FindReleaseGroups(query, 40,0,true).Results;
+            var results = _query.FindAllReleases(query, simple: true);
             var updated = DateTime.Now;
             Feed<Album> feed = new()
             {
@@ -25,7 +21,8 @@ namespace Zune.Net.Helpers
                 Title = "Albums",
                 Links = { new(requestPath) },
                 Updated = updated,
-                Entries = results.Select(mb_rel => MBReleaseGroupToAlbum(mb_rel.Item, updated: updated)).ToList(),
+                Entries = ((IEnumerable<ISearchResult<IRelease>>)results)
+                    .Take(40).Select(mb_rel => MBReleaseToAlbum(mb_rel.Item, updated: updated)).ToList(),
             };
 
             return feed;
@@ -33,27 +30,23 @@ namespace Zune.Net.Helpers
 
         public static Album GetAlbumByMBID(Guid mbid)
         {
-            IReleaseGroup mb_rel = _query.LookupReleaseGroup(mbid, Include.Genres | Include.ArtistCredits);
-            return MBReleaseGroupToAlbum(mb_rel);
+            var mb_rel = _query.LookupRelease(mbid, Include.Genres | Include.ArtistCredits | Include.Recordings | Include.Media);
+            return MBReleaseToAlbum(mb_rel);
         }
 
-        public static Album MBReleaseGroupToAlbum(IReleaseGroup mb_rel_grp, DateTime? updated = null, bool includeRights = true)
+
+        public static Album MBReleaseToAlbum(IRelease mb_rel, DateTime? updated = null, bool includeRights = true)
         {
-            if (mbAlbumCache.ContainsKey(mb_rel_grp.Id.ToString()))
-            {
-                return mbAlbumCache[mb_rel_grp.Id.ToString()];
-            }
-            IRelease mb_rel = _query.BrowseAllReleaseGroupReleases(mb_rel_grp.Id, 1, 0, Include.Recordings | Include.Media).First();
             updated ??= DateTime.Now;
-            var mb_artist = mb_rel_grp.ArtistCredit[0].Artist;
+            var mb_artist = mb_rel.ArtistCredit[0].Artist;
             var artist = MBArtistToMiniArtist(mb_artist);
-            
+
             Album album = new()
             {
-                Id = mb_rel_grp.Id.ToString(),
+                Id = mb_rel.Id.ToString(),
                 Title = mb_rel.Title,
                 PrimaryArtist = artist,
-                Artists = mb_rel_grp.ArtistCredit.Select(mb_credit => MBNameCreditToMiniArtist(mb_credit)).ToList(),
+                Artists = mb_rel.ArtistCredit.Select(mb_credit => MBNameCreditToMiniArtist(mb_credit)).ToList(),
                 ReleaseDate = mb_rel.Date?.NearestDate ?? default,
                 Images = new()
                 {
@@ -82,7 +75,6 @@ namespace Zune.Net.Helpers
             if (includeRights)
                 MusicBrainz.AddDefaultRights(ref album);
 
-            mbAlbumCache.AddOrUpdate(album.Id, _ => album, (_, _) => album);
             return album;
         }
 
