@@ -59,11 +59,6 @@ namespace Zune.Net.Catalog
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-
-                endpoints.MapGet("/", ctx =>
-                {
-                    return Task.FromResult(new OkObjectResult("Welcome to the Social"));
-                });
             });
         }
     }
