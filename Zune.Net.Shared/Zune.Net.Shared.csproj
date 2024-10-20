@@ -17,10 +17,10 @@
 
         <PackageReference Include="Flurl.Http" Version="3.2.4" />
         <PackageReference Include="OwlCore" Version="0.1.0" />
-        <PackageReference Include="MetaBrainz.MusicBrainz" Version="5.0.0" />
-        <PackageReference Include="MetaBrainz.MusicBrainz.CoverArt" Version="5.0.0" />
-        <PackageReference Include="MetaBrainz.MusicBrainz.DiscId" Version="3.0.0" />
-        <PackageReference Include="PodcastAPI" Version="1.1.4" />
+        <PackageReference Include="MetaBrainz.MusicBrainz" Version="6.1.0" />
+        <PackageReference Include="MetaBrainz.MusicBrainz.CoverArt" Version="6.0.0" />
+        <PackageReference Include="MetaBrainz.MusicBrainz.DiscId" Version="4.0.0" />
+        <PackageReference Include="PodcastAPI" Version="1.1.6" />
         <!--<PackageReference Include="Inflatable.Lastfm" Version="1.2.0" />-->
     </ItemGroup>
 

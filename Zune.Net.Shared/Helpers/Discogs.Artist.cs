@@ -1,6 +1,7 @@
 ﻿using Atom.Xml;
 using Flurl;
 using Flurl.Http;
+using MetaBrainz.Common;
 using MetaBrainz.MusicBrainz;
 using MetaBrainz.MusicBrainz.Interfaces.Entities;
 using Newtonsoft.Json.Linq;
@@ -53,7 +54,7 @@ namespace Zune.Net.Helpers
                             var mb_album = MusicBrainz.GetAlbumByMBID(mbid_rel);
                             htmlEquiv = $"<link type=\"Album\" id=\"{mb_album.Id}\">{mb_album.Title}</link>";
                         }
-                        catch (QueryException) { }
+                        catch (HttpError) { }
                         break;
 
                     // Artist
@@ -64,7 +65,7 @@ namespace Zune.Net.Helpers
                             var mb_artist = MusicBrainz.GetArtistByMBID(mbid_artist);
                             htmlEquiv = $"<link type=\"Contributor\" id=\"{mb_artist.Id}\">{mb_artist.Title}</link>";
                         }
-                        catch (QueryException) { }
+                        catch (HttpError) { }
                         break;
 
                     // Label
@@ -75,7 +76,7 @@ namespace Zune.Net.Helpers
                             // TODO: Label lookup
                             htmlEquiv = $"<link type=\"Label\" id=\"{mbid_label}\">the label</link>";
                         }
-                        catch (QueryException) { }
+                        catch (HttpError) { }
                         break;
 
                     // Master
