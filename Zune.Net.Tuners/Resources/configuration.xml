@@ -2384,7 +2384,7 @@
         </endpointThrottling>
         <endpointThrottling>
             <endpoint>mix</endpoint>
-            <backoffTime>0</backoffTime>
+            <backoffTime>100</backoffTime>
         </endpointThrottling>
     </serviceThrottling>
     <smartDJ>
