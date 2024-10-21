@@ -35,8 +35,15 @@ public class HealthController(ZuneNetContext _database) : ControllerBase
         Exception dbException = null;
         try
         {
-            var list = await _database.GetAsync();
-            Guard.IsNotNull(list);
+            var timeoutTask = async () =>
+            {
+                await Task.Delay(TimeSpan.FromSeconds(5));
+                return (DB.Models.Member)null;
+            };
+
+            var task = await Task.WhenAny(timeoutTask(), _database.GetSingleAsync());
+            
+            Guard.IsNotNull(task.Result);
         }
         catch (Exception ex)
         {
