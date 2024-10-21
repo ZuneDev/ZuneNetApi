@@ -11,12 +11,19 @@ namespace Zune.Net.Catalog;
 
 [Route("[controller]")]
 [ApiController]
-public class HealthController(ZuneNetContext _database) : ControllerBase
+public class HealthController : ControllerBase
 {
+    private readonly ZuneNetContext database;
+
+    public HealthController(ZuneNetContext _database)
+    {
+        database = _database;
+    }
+
     [HttpGet]
     public async Task<IActionResult> HealthCheck()
     {
-        List<(string, Exception)> _checks = [];
+        List<(string, Exception)> _checks = new();
 
         // Check MusicBrainz
         Exception mbException = null;
@@ -41,7 +48,7 @@ public class HealthController(ZuneNetContext _database) : ControllerBase
                 return (DB.Models.Member)null;
             };
 
-            var task = await Task.WhenAny(timeoutTask(), _database.GetSingleAsync());
+            var task = await Task.WhenAny(timeoutTask(), database.GetSingleAsync());
             
             Guard.IsNotNull(task.Result);
         }
