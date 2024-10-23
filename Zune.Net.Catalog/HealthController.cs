@@ -42,15 +42,8 @@ public class HealthController : ControllerBase
         Exception dbException = null;
         try
         {
-            var timeoutTask = async () =>
-            {
-                await Task.Delay(TimeSpan.FromSeconds(5));
-                return (DB.Models.Member)null;
-            };
-
-            var task = await Task.WhenAny(timeoutTask(), database.GetSingleAsync());
-            
-            Guard.IsNotNull(task.Result);
+            await database.GetSingleAsync()
+                .WaitAsync(TimeSpan.FromSeconds(5));
         }
         catch (Exception ex)
         {
