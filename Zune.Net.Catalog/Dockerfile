@@ -11,6 +11,6 @@ RUN dotnet publish -c release -o /app --no-restore
 # final stage/image
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /app
-COPY --from=build /app/Zune.Net.Catalog ./
+COPY --from=build /app .
 ENV DOTNET_EnableDiagnostics=0
 ENTRYPOINT ["dotnet", "Zune.Net.Catalog.dll"]
