@@ -2,14 +2,13 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using Zune.Net.Helpers;
 using Zune.Xml.Catalog;
 
 namespace Zune.Net.Catalog.Controllers.Music
 {
-    [Route("/v{version:decimal}/{culture}/music/track/")]
+    [Route("/music/track/")]
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
     public class TrackController : Controller
     {

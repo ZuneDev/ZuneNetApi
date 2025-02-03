@@ -15,6 +15,7 @@
         <ProjectReference Include="..\Zune.Xml\Zune.Xml.csproj" />
         <ProjectReference Include="..\Zune.DB\Zune.DB.csproj" />
 
+        <PackageReference Include="Asp.Versioning.Mvc" Version="8.1.0" />
         <PackageReference Include="Flurl.Http" Version="3.2.4" />
         <PackageReference Include="OwlCore" Version="0.1.0" />
         <PackageReference Include="MetaBrainz.MusicBrainz" Version="6.1.0" />

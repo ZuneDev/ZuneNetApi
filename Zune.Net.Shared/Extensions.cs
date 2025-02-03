@@ -7,7 +7,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using System;
-using Zune.Net;
+using Zune.Net.Middleware;
 
 namespace Zune.Net
 {
@@ -28,6 +28,13 @@ namespace Zune.Net
                 ctx.Request.EnableBuffering(); // this is dumb
                 return next();
             });
+        }
+
+        public static IApplicationBuilder UseCommonRouting(this IApplicationBuilder app)
+        {
+            return app.UseRequestBuffering()
+                .UseVersionStripping()
+                .UseCultureStripping();
         }
 
         public static IHostBuilder ConfigureZuneDB(this IHostBuilder host)

@@ -2,11 +2,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Localization.Routing;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Threading.Tasks;
 using Zune.Net.Helpers;
 
 namespace Zune.Net.Catalog
@@ -35,9 +33,7 @@ namespace Zune.Net.Catalog
             };
             services.AddSingleton(options);
 
-            // allow a client to call you without specifying an api version
-            // since we haven't configured it otherwise, the assumed api version will be 1.0
-            //services.AddApiVersioning(o => o.AssumeDefaultVersionWhenUnspecified = true);
+            services.AddApiVersioning();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -54,6 +50,7 @@ namespace Zune.Net.Catalog
 
             app.UseRequestBuffering();
 
+            app.UseCommonRouting();
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>

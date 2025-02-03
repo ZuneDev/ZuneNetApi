@@ -3,11 +3,7 @@ using Flurl.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Zune.DB;
 using Zune.Net.Helpers;
@@ -15,7 +11,7 @@ using Zune.Xml.Catalog;
 
 namespace Zune.Net.Catalog.Controllers.Music
 {
-    [Route("/v{version:decimal}/{culture}/music/artist/")]
+    [Route("/music/artist/")]
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
     public class ArtistController : Controller
     {

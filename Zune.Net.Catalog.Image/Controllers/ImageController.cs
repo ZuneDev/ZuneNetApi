@@ -2,8 +2,6 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Zune.DB;
@@ -11,7 +9,7 @@ using Zune.Net.Helpers;
 
 namespace Zune.Net.Catalog.Image.Controllers
 {
-    [Route("/v{version:decimal}/{culture}/")]
+    [Route("/")]
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
     public class ImageController : Controller
     {

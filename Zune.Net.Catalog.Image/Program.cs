@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
-using System.Threading.Tasks;
 
 namespace Zune.Net.Catalog.Image
 {
@@ -21,17 +19,7 @@ namespace Zune.Net.Catalog.Image
 
             // Configure the HTTP request pipeline.
 
-            app.UseRouting();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-
-                endpoints.MapGet("/", ctx =>
-                {
-                    return Task.FromResult(new OkObjectResult("Welcome to the Social"));
-                });
-            });
+            app.UseCommonRouting();
 
             app.Run();
         }

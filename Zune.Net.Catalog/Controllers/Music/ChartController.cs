@@ -8,7 +8,7 @@ using Zune.Xml.Catalog;
 
 namespace Zune.Net.Catalog.Controllers.Music
 {
-    [Route("/v{version:decimal}/{culture}/music/chart/zune/")]
+    [Route("/music/chart/zune/")]
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
     public class ChartController : Controller
     {
