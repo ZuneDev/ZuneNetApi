@@ -46,12 +46,14 @@ namespace Zune.Net.Catalog.Controllers.Music
                 if (dc_artist_image != null)
                 {
                     string artistImageUrl = dc_artist_image.Value<string>("uri");
-                    var artistImageEntry = await _database.AddImageAsync(artistImageUrl);
 
-                    artist.BackgroundImage = new()
-                    {
-                        Id = artistImageEntry.Id
-                    };
+                    var artistImageEntry = await _database.AddImageAsync(artistImageUrl);
+                    artist.BackgroundImage = Image.FromSingleInstance(artistImageEntry.Id, artistImageUrl);
+
+                    //artist.BackgroundImage = new()
+                    //{
+                    //    Id = artistImageEntry.Id
+                    //};
                 }
             }
 

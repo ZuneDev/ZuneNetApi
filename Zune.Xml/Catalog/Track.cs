@@ -1,68 +1,67 @@
 ﻿using Atom;
 using System;
-using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace Zune.Xml.Catalog
 {
-    [XmlRoot("entry")]
+    [XmlRoot("entry", Namespace = Constants.ATOM_NAMESPACE)]
     public class Track : Media
     {
-        [XmlElement("length")]
+        [XmlElement("length", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public SerializableTimeSpan Duration { get; set; }
 
-        [XmlElement("trackNumber")]
+        [XmlElement("trackNumber", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public int TrackNumber { get; set; }
 
-        [XmlElement("discNumber")]
+        [XmlElement("discNumber", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public int DiscNumber { get; set; }
 
-        [XmlElement("album")]
+        [XmlElement("album", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public MiniAlbum Album { get; set; }
 
-        [XmlElement("albumArtist")]
+        [XmlElement("albumArtist", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public MiniArtist AlbumArtist { get; set; }
 
-        [XmlElement("playCount")]
+        [XmlElement("playCount", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public int PlayCount { get; set; }
 
-        [XmlElement("referrerContext")]
+        [XmlElement("referrerContext", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public string ReferrerContext { get; set; }
 
-        [XmlElement("musicVideoId")]
+        [XmlElement("musicVideoId", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public Guid MusicVideoId { get; set; }
 
 
         // Are these valid from the API?
 
-        [XmlElement("PointsPrice")]
+        [XmlElement("PointsPrice", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public int PointsPrice { get; set; }
 
-        [XmlElement("CanPlay")]
+        [XmlElement("CanPlay", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public bool CanPlay { get; set; }
 
-        [XmlElement("CanDownload")]
+        [XmlElement("CanDownload", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public bool CanDownload { get; set; }
 
-        [XmlElement("CanPurchase")]
+        [XmlElement("CanPurchase", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public bool CanPurchase { get; set; }
 
-        [XmlElement("CanPurchaseMP3")]
+        [XmlElement("CanPurchaseMP3", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public bool CanPurchaseMP3 { get; set; }
 
-        [XmlElement("CanPurchaseAlbumOnly")]
+        [XmlElement("CanPurchaseAlbumOnly", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public bool CanPurchaseAlbumOnly { get; set; }
 
-        [XmlElement("CanSync")]
+        [XmlElement("CanSync", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public bool CanSync { get; set; }
 
-        [XmlElement("CanBurn")]
+        [XmlElement("CanBurn", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public bool CanBurn { get; set; }
 
-        [XmlElement("InCollection")]
+        [XmlElement("InCollection", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public bool InCollection { get; set; }
 
-        [XmlElement("IsDownloading")]
+        [XmlElement("IsDownloading", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public bool IsDownloading { get; set; }
     }
 }

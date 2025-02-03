@@ -1,4 +1,5 @@
-﻿using Atom.Xml;
+﻿using Atom;
+using Atom.Xml;
 using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
@@ -10,33 +11,33 @@ namespace Zune.Xml.Catalog
     /// </remarks>
     public abstract class Media : Entry
     {
-        [XmlElement("sortTitle")]
+        [XmlElement("sortTitle", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public string SortTitle { get; set; }
 
-        [XmlArray("rights")]
-        [XmlArrayItem("right")]
+        [XmlArray("rights", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
+        [XmlArrayItem("right", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public List<Right> Rights { get; set; }
 
-        [XmlElement("primaryArtist")]
+        [XmlElement("primaryArtist", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public MiniArtist PrimaryArtist { get; set; }
 
-        [XmlArray("artists")]
-        [XmlArrayItem("artist")]
+        [XmlArray("artists", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
+        [XmlArrayItem("artist", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public List<MiniArtist> Artists { get; set; }
 
-        [XmlElement("primaryGenre")]
+        [XmlElement("primaryGenre", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public Genre PrimaryGenre { get; set; }
 
-        [XmlElement("playRank")]
+        [XmlElement("playRank", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public double Popularity { get; set; }
 
-        [XmlElement("isExplicit")]
+        [XmlElement("isExplicit", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public bool Explicit { get; set; }
 
-        [XmlElement("isPremium")]
+        [XmlElement("isPremium", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public bool Premium { get; set; }
 
-        [XmlElement("isActionable")]
+        [XmlElement("isActionable", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public bool Actionable { get; set; } = true;
     }
 }

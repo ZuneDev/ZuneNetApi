@@ -120,10 +120,12 @@ namespace Zune.Net.Helpers
             if (mb_artist.Releases != null && mb_artist.Releases.Count > 0)
             {
                 var mb_release = mb_artist.Releases.MaxBy(rel => rel.Date);
-                artist.AlbumImage = new()
+
+                if (mb_release.CoverArtArchive?.Front ?? true)
                 {
-                    Id = mb_release.Id
-                };
+                    var caaFrontUrl = $"https://coverartarchive.org/release/{mb_release.Id}";
+                    artist.LatestAlbumImage = Image.FromSingleInstance(mb_release.Id, caaFrontUrl);
+                }
             }
 
             return artist;

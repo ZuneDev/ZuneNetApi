@@ -1,5 +1,4 @@
 ﻿using Atom;
-using Atom.Attributes;
 using Atom.Xml;
 using System;
 using System.Collections.Generic;
@@ -7,32 +6,32 @@ using System.Xml.Serialization;
 
 namespace Zune.Xml.Catalog
 {
-    [XmlRoot("entry")]
+    [XmlRoot("entry", Namespace = Constants.ATOM_NAMESPACE)]
     public class PodcastSeries : Media
     {
-        [XmlElement("image")]
+        [XmlElement("image", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public List<Image> Images { get; set; }
 
-        [XmlElement("imageUrl")]
+        [XmlElement("imageUrl", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public string ImageUrl { get; set; }
 
-        [XmlElement("contentType")]
+        [XmlElement("contentType", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public string Type { get; set; }
 
-        [XmlElement("feedUrl")]
+        [XmlElement("feedUrl", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public string FeedUrl { get; set; }
 
-        [XmlElement("websiteUrl")]
+        [XmlElement("websiteUrl", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public string WebsiteUrl { get; set; }
 
-        [XmlElement("dateAdded")]
+        [XmlElement("dateAdded", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public DateTime ReleaseDate { get; set; }
 
-        [XmlElement("author")]
+        [XmlElement("author", Namespace = Constants.ATOM_NAMESPACE)]
         public Author Author { get; set; }
 
-        [XmlArray("categories")]
-        [XmlArrayItem("category")]
+        [XmlArray("categories", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
+        [XmlArrayItem("category", Namespace = Constants.ZUNE_CATALOG_MUSIC_NAMESPACE)]
         public List<Category> Categories { get; set; }
     }
 }

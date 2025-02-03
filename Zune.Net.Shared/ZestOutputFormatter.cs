@@ -31,16 +31,11 @@ namespace Zune.Net
                 return;
             }
 
-            var type = value.GetType();
-            if (!_namespaceCache.TryGetValue(type, out var ns))
-            {
-                ns = new XmlSerializerNamespaces();
-                var attributes = type.GetCustomAttributes<NamespacePrefixAttribute>(true);
-                foreach (var attribute in attributes)
-                    ns.Add(attribute.Prefix, attribute.Namespace);
-
-                _namespaceCache[type] = ns;
-            }
+            var ns = new XmlSerializerNamespaces();
+            ns.Add("a", Atom.Constants.ATOM_NAMESPACE);
+            ns.Add("m", Atom.Constants.ZUNE_CATALOG_MUSIC_NAMESPACE);
+            ns.Add("c", Atom.Constants.ZUNE_COMMERCE_NAMESPACE);
+            ns.Add("p", Atom.Constants.ZUNE_PROFILES_NAMESPACE);
 
             xmlSerializer.Serialize(xmlWriter, value, ns);
         }
