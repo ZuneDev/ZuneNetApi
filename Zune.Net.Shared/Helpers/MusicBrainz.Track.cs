@@ -92,18 +92,16 @@ namespace Zune.Net.Helpers
 
         public static Track MBTrackToTrack(ITrack mb_track, MiniArtist trackArtist, DateTime? updated = null, bool includeRights = true)
         {
-            updated ??= DateTime.Now;
-
             Track track = new()
             {
-                Id = mb_track.Id.ToString(),
+                Id = mb_track.Recording.Id.ToString(),
                 Title = mb_track.Title,
                 PrimaryArtist = trackArtist,
                 AlbumArtist = trackArtist,
-                Artists = mb_track.ArtistCredit?.Select(mb_credit => MBNameCreditToMiniArtist(mb_credit)).ToList(),
+                Artists = mb_track.ArtistCredit?.Select(MBNameCreditToMiniArtist).ToList(),
                 Duration = mb_track.Length ?? TimeSpan.Zero,
                 TrackNumber = mb_track.Position ?? 0,
-                Updated = updated.Value,
+                Updated = updated.HasValue ? updated.Value : DateTime.Now,
             };
 
             if (includeRights)
