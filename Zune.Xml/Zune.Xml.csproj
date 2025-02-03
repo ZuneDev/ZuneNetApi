@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard1.1;netstandard2.0;netstandard2.1;net7.0;net35;net40</TargetFrameworks>
+        <TargetFrameworks>netstandard1.1;netstandard2.0;netstandard2.1;$(ServerTargetFramework);net35;net40</TargetFrameworks>
         <VersionPrefix>0.1.1</VersionPrefix>
         <AssemblyVersion>$(VersionPrefix).0</AssemblyVersion>
 		
@@ -26,7 +26,7 @@
         <IsPublishable>false</IsPublishable>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(TargetFramework)' == 'net7.0'">
+    <PropertyGroup Condition="'$(TargetFramework)' == '$(ServerTargetFramework)'">
         <DefineConstants>$(DefineConstants);NETSTANDARD1_1_OR_GREATER;NETSTANDARD2_0_OR_GREATER;NETSTANDARD2_1_OR_GREATER</DefineConstants>
     </PropertyGroup>
 
@@ -42,8 +42,8 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.17" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.1" />
+    <ItemGroup Condition="'$(TargetFramework)' == '$(ServerTargetFramework)'">
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.1" />
     </ItemGroup>
     
     <ItemGroup Condition="$(DefineConstants.Contains(';NETSTANDARD1_1_OR_GREATER;'))">

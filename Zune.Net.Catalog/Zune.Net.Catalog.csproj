@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>$(ServerTargetFramework)</TargetFramework>
         <UserSecretsId>2a7e8fe8-2bbf-4b58-a184-68ae46722b1c</UserSecretsId>
     </PropertyGroup>
 
@@ -12,8 +12,8 @@
     <ItemGroup>
         <PackageReference Include="Flurl.Http" Version="3.2.4" />
         
-        <PackageReference Include="Microsoft.AspNetCore.Localization.Routing" Version="2.2.0" />
-        <PackageReference Include="Microsoft.NET.Build.Containers" Version="8.0.403" />
+        <PackageReference Include="Microsoft.AspNetCore.Localization.Routing" Version="2.3.0" />
+        <PackageReference Include="Microsoft.NET.Build.Containers" Version="9.0.102" />
         <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
     </ItemGroup>
 

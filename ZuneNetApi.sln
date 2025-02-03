@@ -37,6 +37,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zune.Net.Catalog.Image", "Z
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IF.Lastfm.Core", "Backing\lastfm\src\IF.Lastfm.Core\IF.Lastfm.Core.csproj", "{58C9A790-90E3-438C-97E8-B68E4EB80C87}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1A627439-D620-4C7C-A79D-F7A6AB9D99D3}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
