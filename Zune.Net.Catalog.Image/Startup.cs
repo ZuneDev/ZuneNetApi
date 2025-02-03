@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Zune.Net.Helpers;
 
-namespace Zune.Net.Catalog
+namespace Zune.Net.Catalog.Image
 {
     public class Startup
     {

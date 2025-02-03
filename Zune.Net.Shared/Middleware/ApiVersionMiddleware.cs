@@ -1,12 +1,12 @@
 ﻿// https://gist.github.com/fernando-almeida/2b1f59e5f7f99a2f31d95471b895f625#file-urlsegmentapiversionstripmiddleware
 
-using Asp.Versioning;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Zune.Net.Features;
 
 namespace Zune.Net.Middleware
 {
@@ -14,7 +14,7 @@ namespace Zune.Net.Middleware
     /// <summary>
     /// Rewrite URL API version segment if it exists
     /// </summary>
-    public class UrlSegmentApiVersionStripMiddleware
+    public class ApiVersionMiddleware
     {
         private static readonly string DEFAULT_API_VERSION_PREFIX = "v";
 
@@ -27,12 +27,9 @@ namespace Zune.Net.Middleware
         /// </summary>
         /// <param name="next">Next request delegate</param>
         /// <param name="apiVersionPrefix">API version prefix (optional)</param>
-        public UrlSegmentApiVersionStripMiddleware(RequestDelegate next, string apiVersionPrefix = null)
+        public ApiVersionMiddleware(RequestDelegate next, string apiVersionPrefix = null)
         {
-            if (next == null)
-            {
-                throw new ArgumentNullException(nameof(next));
-            }
+            ArgumentNullException.ThrowIfNull(next);
             _apiVersionVersion = Regex.Escape(apiVersionPrefix ?? DEFAULT_API_VERSION_PREFIX);
             _next = next;
         }
@@ -53,33 +50,29 @@ namespace Zune.Net.Middleware
             var apiVersionSegment = uri.Segments
                 .Where(segment => urlSegmentApiVersionRegexes.Any(regex => regex.Match(segment).Success))
                 .FirstOrDefault();
+
             if (apiVersionSegment != null)
             {
                 var newPath = string.Join("", uri.Segments.Where(segment => segment != apiVersionSegment));
                 httpContext.Request.Path = new PathString(newPath);
+
                 var match = urlSegmentApiVersionRegexes.Select(regex => regex.Match(apiVersionSegment))
                     .Where(regex => regex.Success)
                     .First();
                 var rawApiVersion = match.Groups["apiVersion"].Value;
 
-                var feature = httpContext.Features.Get<IApiVersioningFeature>();
-                if (feature is null)
-                {
-                    feature = new ApiVersioningFeature(httpContext);
-                    httpContext.Features.Set(feature);
-                }
-                    
-                feature.RawRequestedApiVersion = rawApiVersion;
+                ApiVersionFeature apiVersionFeature = new(rawApiVersion);
+                httpContext.Features.Set<IApiVersionFeature>(apiVersionFeature);
             }
             return _next(httpContext);
         }
     }
 
-    public static class UrlSegmentApiVersionStripMiddlewareExtensions
+    public static class ApiVersionMiddlewareExtensions
     {
         public static IApplicationBuilder UseVersionStripping(this IApplicationBuilder builder)
         {
-            return builder.UseMiddleware<UrlSegmentApiVersionStripMiddleware>();
+            return builder.UseMiddleware<ApiVersionMiddleware>();
         }
     }
 }

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 
 namespace Zune.Net.Catalog.Image
 {
@@ -7,21 +8,15 @@ namespace Zune.Net.Catalog.Image
     {
         public static void Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
-
-            // Add services to the container.
-
-            builder.Services.AddControllers();
-
-            builder.Host.ConfigureZuneDB();
-
-            var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-
-            app.UseCommonRouting();
-
-            app.Run();
+            CreateHostBuilder(args).Build().Run();
         }
+
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                })
+                .ConfigureZuneDB();
     }
 }

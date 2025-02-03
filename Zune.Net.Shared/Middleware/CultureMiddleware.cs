@@ -1,12 +1,12 @@
 ﻿// https://gist.github.com/fernando-almeida/2b1f59e5f7f99a2f31d95471b895f625#file-urlsegmentapiversionstripmiddleware
 
-using Asp.Versioning;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Zune.Net.Features;
 
 namespace Zune.Net.Middleware
 {
@@ -14,7 +14,7 @@ namespace Zune.Net.Middleware
     /// <summary>
     /// Rewrite URL cultute segment if it exists
     /// </summary>
-    public class CultureMiddleware
+    public partial class CultureMiddleware
     {
         private readonly RequestDelegate _next;
 
@@ -35,18 +35,23 @@ namespace Zune.Net.Middleware
                 if (cultureSegment[^1] == '/')
                     cultureSegment = cultureSegment[..^1];
 
-                if (RouteCultureProvider.IsCulture(cultureSegment))
+                if (IsCulture(cultureSegment))
                 {
                     var newPath = string.Join("", uri.Segments.Where(s => !s.StartsWith(cultureSegment)));
                     httpContext.Request.Path = new PathString(newPath);
 
-                    // TODO: Add feature
-                    httpContext.Items.Add("Culture", cultureSegment);
+                    CultureFeature feature = new(cultureSegment);
+                    httpContext.Features.Set<ICultureFeature>(feature);
                 }
             }
 
             return _next(httpContext);
         }
+
+        internal static bool IsCulture(string candidate) => CulturePattern().IsMatch(candidate);
+
+        [GeneratedRegex(@"^[a-z]{2}(-[A-Z]{2})*$")]
+        private static partial Regex CulturePattern();
     }
 
     public static class CultureMiddlewareExtensions
