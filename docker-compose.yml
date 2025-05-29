@@ -21,12 +21,14 @@ services:
       - backend
       - zune.net
 
-  nginx:
-    build:
-      context: nginx
+  traefik:
+    image: traefik:v3.3
+    command: --api.insecure=true --providers.docker=true
     ports:
-      - 80:80
-      - 443:443
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - backend
       - zune.net
@@ -37,9 +39,13 @@ services:
       dockerfile: Zune.Net.Catalog/Dockerfile
     depends_on:
       - mongodb
-      - nginx
+      - traefik
     networks:
       - backend
+    ports:
+      - "8070:8080"
+    labels:
+      - "traefik.http.routers.catalog.rule=HostRegexp(`^catalog\\..+`)"
 
   catalog.image:
     build:
@@ -47,9 +53,11 @@ services:
       dockerfile: Zune.Net.Catalog.Image/Dockerfile
     depends_on:
       - mongodb
-      - nginx
+      - traefik
     networks:
       - backend
+    ports:
+      - "8071:8080"
 
   commerce:
     build:
@@ -57,9 +65,11 @@ services:
       dockerfile: Zune.Net.Commerce/Dockerfile
     depends_on:
       - mongodb
-      - nginx
+      - traefik
     networks:
       - backend
+    ports:
+      - "8072:8080"
 
   inbox:
     build:
@@ -67,9 +77,11 @@ services:
       dockerfile: Zune.Net.Inbox/Dockerfile
     depends_on:
       - mongodb
-      - nginx
+      - traefik
     networks:
       - backend
+    ports:
+      - "8073:8080"
 
   login:
     build:
@@ -77,9 +89,11 @@ services:
       dockerfile: Zune.Net.Login/Dockerfile
     depends_on:
       - mongodb
-      - nginx
+      - traefik
     networks:
       - backend
+    ports:
+      - "8074:8080"
 
   metaservices:
     build:
@@ -87,9 +101,11 @@ services:
       dockerfile: Zune.Net.MetaServices/Dockerfile
     depends_on:
       - mongodb
-      - nginx
+      - traefik
     networks:
       - backend
+    ports:
+      - "8075:8080"
 
   mix:
     build:
@@ -97,9 +113,11 @@ services:
       dockerfile: Zune.Net.Mix/Dockerfile
     depends_on:
       - mongodb
-      - nginx
+      - traefik
     networks:
       - backend
+    ports:
+      - "8076:8080"
 
   social:
     build:
@@ -107,9 +125,11 @@ services:
       dockerfile: Zune.Net.SocialApi/Dockerfile
     depends_on:
       - mongodb
-      - nginx
+      - traefik
     networks:
       - backend
+    ports:
+      - "8077:8080"
 
   tiles:
     build:
@@ -117,9 +137,11 @@ services:
       dockerfile: Zune.Net.Tiles/Dockerfile
     depends_on:
       - mongodb
-      - nginx
+      - traefik
     networks:
       - backend
+    ports:
+      - "8078:8080"
 
   tuners:
     build:
@@ -127,9 +149,11 @@ services:
       dockerfile: Zune.Net.Tuners/Dockerfile
     depends_on:
       - mongodb
-      - nginx
+      - traefik
     networks:
       - backend
+    ports:
+      - "8079:8080"
 
 volumes:
   mongodb_data_container:
