@@ -47,7 +47,7 @@ services:
     labels:
       - "traefik.http.routers.catalog.rule=HostRegexp(`^catalog\\..+`)"
 
-  catalog.image:
+  catalog-image:
     build:
       context: ./
       dockerfile: Zune.Net.Catalog.Image/Dockerfile
@@ -58,6 +58,8 @@ services:
       - backend
     ports:
       - "8071:8080"
+    labels:
+      - "traefik.http.routers.catalog-image.rule=HostRegexp(`^image\\.catalog\\..+`)"
 
   commerce:
     build:
@@ -70,6 +72,8 @@ services:
       - backend
     ports:
       - "8072:8080"
+    labels:
+      - "traefik.http.routers.commerce.rule=HostRegexp(`^commerce\\..+`)"
 
   inbox:
     build:
@@ -82,6 +86,8 @@ services:
       - backend
     ports:
       - "8073:8080"
+    labels:
+      - "traefik.http.routers.inbox.rule=HostRegexp(`^inbox\\..+`)"
 
   login:
     build:
@@ -94,6 +100,8 @@ services:
       - backend
     ports:
       - "8074:8080"
+    labels:
+      - "traefik.http.routers.login.rule=HostRegexp(`^login\\..+`)"
 
   metaservices:
     build:
@@ -106,6 +114,8 @@ services:
       - backend
     ports:
       - "8075:8080"
+    labels:
+      - "traefik.http.routers.metaservices.rule=HostRegexp(`^metaservices\\..+`)"
 
   mix:
     build:
@@ -118,6 +128,8 @@ services:
       - backend
     ports:
       - "8076:8080"
+    labels:
+      - "traefik.http.routers.mix.rule=HostRegexp(`^mix\\..+`)"
 
   social:
     build:
@@ -130,6 +142,8 @@ services:
       - backend
     ports:
       - "8077:8080"
+    labels:
+      - "traefik.http.routers.socialapi.rule=HostRegexp(`^socialapi\\..+`)"
 
   tiles:
     build:
@@ -142,6 +156,8 @@ services:
       - backend
     ports:
       - "8078:8080"
+    labels:
+      - "traefik.http.routers.tiles.rule=HostRegexp(`^tiles\\..+`)"
 
   tuners:
     build:
@@ -154,6 +170,8 @@ services:
       - backend
     ports:
       - "8079:8080"
+    labels:
+      - "traefik.http.routers.tuners.rule=HostRegexp(`^tuners\\..+`)"
 
 volumes:
   mongodb_data_container:
