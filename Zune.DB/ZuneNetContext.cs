@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -21,8 +20,13 @@ namespace Zune.DB
 
         public ZuneNetContext(ZuneNetContextSettings dbSettings)
         {
-            MongoClient mongoClient = new(dbSettings.ConnectionString);
+            if (dbSettings?.ConnectionString is null)
+                throw new ZuneNetConfigurationException("MongoDB connection string was not provided.");
 
+            if (dbSettings.DatabaseName is null)
+                throw new ZuneNetConfigurationException("MongoDB database name was not provided.");
+                
+            var mongoClient = new MongoClient(dbSettings.ConnectionString);
             var mongoDatabase = mongoClient.GetDatabase(dbSettings.DatabaseName);
 
             _memberCollection = mongoDatabase.GetCollection<Member>(dbSettings.MemberCollectionName);
@@ -41,9 +45,9 @@ namespace Zune.DB
 
         public Task<Member?> GetByIdOrZuneTag(string value)
         {
-            if (Guid.TryParse(value, out var id))
-                return GetAsync(id);
-            return GetSingleAsync(m => m.ZuneTag == value);
+            return Guid.TryParse(value, out var id)
+                ? GetAsync(id)
+                : GetSingleAsync(m => m.ZuneTag == value);
         }
 
         public async Task CreateAsync(Member newMember) =>

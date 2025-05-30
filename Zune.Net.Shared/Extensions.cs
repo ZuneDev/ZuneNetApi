@@ -7,6 +7,8 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using System;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
 using Zune.Net.Middleware;
 
 namespace Zune.Net
@@ -45,6 +47,52 @@ namespace Zune.Net
                 s.Configure<DB.ZuneNetContextSettings>(ctx.Configuration.GetSection("ZuneNetContext"));
                 s.AddSingleton<DB.ZuneNetContext>();
             });
+        }
+
+        public static JToken SerializeToJson(this IConfiguration config)
+        {
+            var obj = new JObject();
+            foreach (var child in config.GetChildren())
+            {
+                if (child.Path.EndsWith(":0"))
+                {
+                    var arr = new JArray();
+
+                    foreach (var arrayChild in config.GetChildren())
+                    {
+                        arr.Add(arrayChild.SerializeToJson());
+                    }
+
+                    return arr;
+                }
+
+                obj.Add(child.Key, child.SerializeToJson());
+            }
+
+            if (obj.HasValues || config is not IConfigurationSection section) return obj;
+    
+            // Allow for json that has been embeded as a string in a single key
+            if (section.Value.StartsWith('{') && section.Value.EndsWith('}'))
+            {
+                obj = JObject.Parse(section.Value);
+                return obj;
+            }
+
+            return ParseJValue(section.Value);
+            
+            JValue ParseJValue(string value)
+            {
+                if (bool.TryParse(value, out var boolean))
+                    return new JValue(boolean);
+
+                if (long.TryParse(value, out var integer))
+                    return new JValue(integer);
+    
+                if (decimal.TryParse(value, out var real))
+                    return new JValue(real);
+    
+                return new JValue(value);
+            }
         }
 
         public static (uint A, ushort B, ulong C) GetGuidParts(this Guid guid)
