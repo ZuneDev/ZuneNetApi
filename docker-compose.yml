@@ -11,8 +11,8 @@ services:
   mongodb:
     image: mongo:latest
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     ports:
       - 27017:27017
     volumes:
@@ -46,6 +46,9 @@ services:
       - "8070:8080"
     labels:
       - "traefik.http.routers.catalog.rule=HostRegexp(`^catalog\\..+`)"
+    environment:
+      - "ZuneNetContext__ConnectionString=${ZuneNetContext__ConnectionString}"
+      - "ZuneNetContext__DatabaseName=${ZuneNetContext__DatabaseName}"
 
   catalog-image:
     build:
