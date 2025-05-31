@@ -61,6 +61,7 @@ namespace CommerceZuneNet
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHomeRoute();
             });
         }
     }

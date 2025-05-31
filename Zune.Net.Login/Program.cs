@@ -23,6 +23,7 @@ public class Program
         app.UseWlidAuthorization();
 
         app.MapControllers();
+        app.MapHomeRoute();
 
         app.Run();
     }

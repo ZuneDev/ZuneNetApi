@@ -10,4 +10,8 @@
 		<Folder Include="Resources\" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\Zune.Net.Shared\Zune.Net.Shared.csproj" />
+	</ItemGroup>
+
 </Project>

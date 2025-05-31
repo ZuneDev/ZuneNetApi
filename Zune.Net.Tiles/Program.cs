@@ -1,3 +1,5 @@
+using Zune.Net;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -13,5 +15,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHomeRoute();
 
 app.Run();

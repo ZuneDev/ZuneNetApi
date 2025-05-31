@@ -42,6 +42,7 @@ namespace Zune.Net.Catalog
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHomeRoute();
             });
         }
     }

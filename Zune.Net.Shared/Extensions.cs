@@ -10,11 +10,17 @@ using System;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using Zune.Net.Middleware;
+using Microsoft.AspNetCore.Routing;
+using System.Reflection;
+using System.Linq;
+using System.IO;
 
 namespace Zune.Net
 {
     public static class Extensions
     {
+        private static string _homeRouteHtml;
+
         public static MvcOptions UseZestFormatters(this MvcOptions options)
         {
             options.OutputFormatters.Insert(0, new ZestOutputFormatter());
@@ -49,6 +55,23 @@ namespace Zune.Net
             });
         }
 
+        public static RouteHandlerBuilder MapHomeRoute(this IEndpointRouteBuilder endpoints)
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceName = assembly.GetManifestResourceNames()
+                .Single(n => n.EndsWith(".api-landing.html"));
+            using (var sourceStream = assembly.GetManifestResourceStream(resourceName))
+            {
+                using StreamReader reader = new(sourceStream);
+                _homeRouteHtml = reader.ReadToEnd();
+            }
+
+            return endpoints.MapGet("/", () =>
+            {
+                return Results.Content(_homeRouteHtml, "text/html");
+            });
+        }
+
         public static JToken SerializeToJson(this IConfiguration config)
         {
             var obj = new JObject();
@@ -70,7 +93,7 @@ namespace Zune.Net
             }
 
             if (obj.HasValues || config is not IConfigurationSection section) return obj;
-    
+
             // Allow for json that has been embeded as a string in a single key
             if (section.Value.StartsWith('{') && section.Value.EndsWith('}'))
             {
@@ -79,7 +102,7 @@ namespace Zune.Net
             }
 
             return ParseJValue(section.Value);
-            
+
             JValue ParseJValue(string value)
             {
                 if (bool.TryParse(value, out var boolean))
@@ -87,10 +110,10 @@ namespace Zune.Net
 
                 if (long.TryParse(value, out var integer))
                     return new JValue(integer);
-    
+
                 if (decimal.TryParse(value, out var real))
                     return new JValue(real);
-    
+
                 return new JValue(value);
             }
         }

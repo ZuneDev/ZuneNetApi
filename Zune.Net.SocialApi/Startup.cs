@@ -50,6 +50,7 @@ namespace Zune.SocialApi
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHomeRoute();
             });
         }
     }

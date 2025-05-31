@@ -1,3 +1,5 @@
+using Zune.Net;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -16,5 +18,6 @@ app.MapGet("/{locale}/ZunePCClient/{version}/{file}.xml", (string locale, string
 
     return zuneConfig;
 });
+app.MapHomeRoute();
 
 app.Run();
