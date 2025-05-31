@@ -1,11 +1,10 @@
-version: '3.4'
-
 networks:
   backend:
     name: backend
-  zune.net:
-    name: zune.net
-    driver: bridge
+
+x-env-aspnet: &env-aspnet
+  ZuneNetContext__ConnectionString: ${ZuneNetContext__ConnectionString}
+  ZuneNetContext__DatabaseName: ${ZuneNetContext__DatabaseName}
 
 services:
   mongodb:
@@ -19,7 +18,6 @@ services:
       - mongodb_data_container:/data/db
     networks:
       - backend
-      - zune.net
 
   traefik:
     image: traefik:v3.3
@@ -31,7 +29,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - backend
-      - zune.net
 
   catalog:
     build:
@@ -47,8 +44,7 @@ services:
     labels:
       - "traefik.http.routers.catalog.rule=HostRegexp(`^catalog\\..+`)"
     environment:
-      - "ZuneNetContext__ConnectionString=${ZuneNetContext__ConnectionString}"
-      - "ZuneNetContext__DatabaseName=${ZuneNetContext__DatabaseName}"
+      << : [*env-aspnet]
 
   catalog-image:
     build:
@@ -63,6 +59,8 @@ services:
       - "8071:8080"
     labels:
       - "traefik.http.routers.catalog-image.rule=HostRegexp(`^image\\.catalog\\..+`)"
+    environment:
+      << : [*env-aspnet]
 
   commerce:
     build:
@@ -77,6 +75,8 @@ services:
       - "8072:8080"
     labels:
       - "traefik.http.routers.commerce.rule=HostRegexp(`^commerce\\..+`)"
+    environment:
+      << : [*env-aspnet]
 
   inbox:
     build:
@@ -91,6 +91,8 @@ services:
       - "8073:8080"
     labels:
       - "traefik.http.routers.inbox.rule=HostRegexp(`^inbox\\..+`)"
+    environment:
+      << : [*env-aspnet]
 
   login:
     build:
@@ -105,6 +107,8 @@ services:
       - "8074:8080"
     labels:
       - "traefik.http.routers.login.rule=HostRegexp(`^login\\..+`)"
+    environment:
+      << : [*env-aspnet]
 
   metaservices:
     build:
@@ -119,6 +123,8 @@ services:
       - "8075:8080"
     labels:
       - "traefik.http.routers.metaservices.rule=HostRegexp(`^metaservices\\..+`)"
+    environment:
+      << : [*env-aspnet]
 
   mix:
     build:
@@ -133,6 +139,8 @@ services:
       - "8076:8080"
     labels:
       - "traefik.http.routers.mix.rule=HostRegexp(`^mix\\..+`)"
+    environment:
+      << : [*env-aspnet]
 
   social:
     build:
@@ -147,6 +155,8 @@ services:
       - "8077:8080"
     labels:
       - "traefik.http.routers.socialapi.rule=HostRegexp(`^socialapi\\..+`)"
+    environment:
+      << : [*env-aspnet]
 
   tiles:
     build:
@@ -161,6 +171,8 @@ services:
       - "8078:8080"
     labels:
       - "traefik.http.routers.tiles.rule=HostRegexp(`^tiles\\..+`)"
+    environment:
+      << : [*env-aspnet]
 
   tuners:
     build:
@@ -175,6 +187,8 @@ services:
       - "8079:8080"
     labels:
       - "traefik.http.routers.tuners.rule=HostRegexp(`^tuners\\..+`)"
+    environment:
+      << : [*env-aspnet]
 
 volumes:
   mongodb_data_container:
