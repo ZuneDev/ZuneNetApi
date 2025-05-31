@@ -1,3 +1,5 @@
+using System.Reflection;
+using Microsoft.AspNetCore.StaticFiles;
 using Zune.Net;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,13 +12,28 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 
-app.MapGet("/{locale}/ZunePCClient/{version}/{file}.xml", (string locale, string version, string file) =>
+app.MapGet("/{locale}/ZunePCClient/{version}/{fileName}", (string locale, string version, string fileName) =>
 {
-    // TODO: Don't load from file paths. It's unsafe, and the files aren't copied into the Docker container.
-    string filePath = Path.Combine(app.Environment.ContentRootPath, "Resources", file + ".xml");
-    string zuneConfig = File.ReadAllText(filePath);
+    var assembly = Assembly.GetExecutingAssembly();
+    var resourceName = assembly.GetManifestResourceNames()
+        .SingleOrDefault(str => str.EndsWith($".{fileName}"));
+    if (resourceName is null)
+        return Results.NotFound();
 
-    return zuneConfig;
+    byte[] content;
+
+    using (var stream = assembly.GetManifestResourceStream(resourceName))
+    {
+        if (stream is null)
+            return Results.NotFound();
+        
+        using MemoryStream memoryStream = new();
+        stream.CopyTo(memoryStream);
+        content = memoryStream.ToArray();
+    }
+    
+    new FileExtensionContentTypeProvider().TryGetContentType(resourceName, out var contentType);
+    return Results.File(content, contentType, fileName);
 });
 app.MapHomeRoute();
 
