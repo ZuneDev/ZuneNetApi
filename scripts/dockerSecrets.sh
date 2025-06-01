@@ -1,5 +1,7 @@
 #!/bin/sh
 
+export SSL_ACME_EMAIL=postmaster@example.com
+
 export MONGO_INITDB_ROOT_USERNAME=root
 export MONGO_INITDB_ROOT_PASSWORD=ChangeMe
 
