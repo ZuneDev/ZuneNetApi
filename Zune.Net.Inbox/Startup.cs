@@ -46,6 +46,7 @@ namespace Zune.Net.Inbox
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHomeRoute();
             });
         }
     }

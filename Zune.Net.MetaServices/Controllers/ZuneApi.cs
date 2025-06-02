@@ -1,4 +1,3 @@
-using Atom;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Zune.Net.MetaServices.Controllers
@@ -21,7 +20,7 @@ namespace Zune.Net.MetaServices.Controllers
     <ENDPOINTS>
         <ENDPOINT/>
     </ENDPOINTS>
-</METADATA>", Constants.XML_MIMETYPE);
+</METADATA>", Atom.Constants.XML_MIMETYPE);
         }
     }
 }

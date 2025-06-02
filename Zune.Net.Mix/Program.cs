@@ -21,5 +21,6 @@ MusicBrainz.Initialize(app.Environment);
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHomeRoute();
 
 app.Run();

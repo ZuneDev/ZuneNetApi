@@ -2,9 +2,15 @@
 using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Zune.Net.Helpers;
 using CommunityToolkit.Diagnostics;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Zune.DB;
 
 namespace Zune.Net.Catalog;
@@ -13,11 +19,15 @@ namespace Zune.Net.Catalog;
 [ApiController]
 public class HealthController : ControllerBase
 {
-    private readonly ZuneNetContext database;
+    private readonly IServiceProvider _services;
+    private readonly ILogger<HealthController> _logger;
+    // private readonly ZuneNetContext database;
 
-    public HealthController(ZuneNetContext _database)
+    public HealthController(IServiceProvider serviceProvider, ILogger<HealthController> logger)
     {
-        database = _database;
+        _services = serviceProvider;
+        _logger = logger;
+        // database = _database;
     }
 
     [HttpGet]
@@ -35,6 +45,7 @@ public class HealthController : ControllerBase
         catch (Exception ex)
         {
             mbException = ex;
+            _logger.LogError(ex, "Failed to use MusicBrainz API");
         }
         _checks.Add(("MusicBrainz", mbException));
 
@@ -42,12 +53,34 @@ public class HealthController : ControllerBase
         Exception dbException = null;
         try
         {
+            var database = _services.GetRequiredService<ZuneNetContext>();
             await database.GetSingleAsync()
                 .WaitAsync(TimeSpan.FromSeconds(5));
+        }
+        catch (ZuneNetConfigurationException ex)
+        {
+            dbException = ex;
+            
+            var ctx = _services.GetRequiredService<HostBuilderContext>();
+            var configJson = ctx.Configuration.SerializeToJson();
+            
+            var writer = new StringWriter();
+            var jsonWriter = new JsonTextWriter(writer);
+            await configJson.WriteToAsync(jsonWriter);
+            
+            _logger.LogError("Failed to configure ZuneDB");
+            _logger.LogError("{Config}", writer.ToString());
         }
         catch (Exception ex)
         {
             dbException = ex;
+            _logger.LogError(ex, "Failed to use ZuneDB");
+            
+            var ctx = _services.GetRequiredService<HostBuilderContext>();
+            _logger.LogError("{ConnectionString}", ctx.Configuration
+                .GetSection("ZuneNetContext")
+                .Get<ZuneNetContextSettings>()
+                .ConnectionString);
         }
         _checks.Add(("Database", dbException));
 
