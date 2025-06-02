@@ -21,22 +21,14 @@ services:
 
   traefik:
     image: traefik:v3.3
-    command:
-      - "--tracing=true"
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--entryPoints.web.address=:80"
-      - "--entryPoints.websecure.address=:443"
-      - "--certificatesresolvers.leresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.leresolver.acme.email=${SSL_ACME_EMAIL}"
-      - "--certificatesresolvers.leresolver.acme.storage=/letsencrypt/acme.json"
     ports:
       - "80:80"
       - "443:443"
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - "./letsencrypt:/letsencrypt"
+      - "./traefik/traefik.yml:/traefik.yml:ro"
+      - "traefik-certs:/certs"
     networks:
       - backend
 
@@ -52,10 +44,10 @@ services:
     ports:
       - "8070:8080"
     labels:
-      - "traefik.http.routers.catalog.rule=HostRegexp(`^catalog\\..+`)"
-      - "traefik.http.routers.catalog-ssl.rule=HostRegexp(`^catalog(-ssl)?\\..+`)"
+      - "traefik.http.routers.catalog.rule=Host(`catalog.${DOMAIN_ROOT}`)"
+      - "traefik.http.routers.catalog-ssl.rule=Host(`catalog-ssl.${DOMAIN_ROOT}`)"
       - "traefik.http.routers.catalog-ssl.entrypoints=websecure"
-      - "traefik.http.routers.catalog-ssl.tls.certresolver=leresolver"
+      - "traefik.http.routers.catalog-ssl.tls.certresolver=letsencrypt"
     environment:
       << : [*env-aspnet]
 
@@ -71,10 +63,10 @@ services:
     ports:
       - "8071:8080"
     labels:
-      - "traefik.http.routers.catalog-image.rule=HostRegexp(`^image\\.catalog\\..+`)"
-      - "traefik.http.routers.catalog-image-ssl.rule=HostRegexp(`^image\\.catalog\\..+`)"
+      - "traefik.http.routers.catalog-image.rule=Host(`image.catalog.${DOMAIN_ROOT}`)"
+      - "traefik.http.routers.catalog-image-ssl.rule=Host(`image.catalog.${DOMAIN_ROOT}`)"
       - "traefik.http.routers.catalog-image-ssl.entrypoints=websecure"
-      - "traefik.http.routers.catalog-image-ssl.tls.certresolver=leresolver"
+      - "traefik.http.routers.catalog-image-ssl.tls.certresolver=letsencrypt"
     environment:
       << : [*env-aspnet]
 
@@ -90,10 +82,10 @@ services:
     ports:
       - "8072:8080"
     labels:
-      - "traefik.http.routers.commerce.rule=HostRegexp(`^commerce\\..+`)"
-      - "traefik.http.routers.commerce-ssl.rule=HostRegexp(`^commerce(-ssl)?\\..+`)"
+      - "traefik.http.routers.commerce.rule=Host(`commerce.${DOMAIN_ROOT}`)"
+      - "traefik.http.routers.commerce-ssl.rule=Host(`commerce-ssl.${DOMAIN_ROOT}`)"
       - "traefik.http.routers.commerce-ssl.entrypoints=websecure"
-      - "traefik.http.routers.commerce-ssl.tls.certresolver=leresolver"
+      - "traefik.http.routers.commerce-ssl.tls.certresolver=letsencrypt"
     environment:
       << : [*env-aspnet]
 
@@ -109,10 +101,10 @@ services:
     ports:
       - "8073:8080"
     labels:
-      - "traefik.http.routers.inbox.rule=HostRegexp(`^inbox\\..+`)"
-      - "traefik.http.routers.inbox-ssl.rule=HostRegexp(`^inbox(-ssl)?\\..+`)"
+      - "traefik.http.routers.inbox.rule=Host(`inbox.${DOMAIN_ROOT}`)"
+      - "traefik.http.routers.inbox-ssl.rule=Host(`inbox-ssl.${DOMAIN_ROOT}`)"
       - "traefik.http.routers.inbox-ssl.entrypoints=websecure"
-      - "traefik.http.routers.inbox-ssl.tls.certresolver=leresolver"
+      - "traefik.http.routers.inbox-ssl.tls.certresolver=letsencrypt"
     environment:
       << : [*env-aspnet]
 
@@ -128,10 +120,10 @@ services:
     ports:
       - "8074:8080"
     labels:
-      - "traefik.http.routers.login.rule=HostRegexp(`^login\\..+`)"
-      - "traefik.http.routers.login-ssl.rule=HostRegexp(`^login(-ssl)?\\..+`)"
+      - "traefik.http.routers.login.rule=Host(`login.${DOMAIN_ROOT}`)"
+      - "traefik.http.routers.login-ssl.rule=Host(`login-ssl.${DOMAIN_ROOT}`)"
       - "traefik.http.routers.login-ssl.entrypoints=websecure"
-      - "traefik.http.routers.login-ssl.tls.certresolver=leresolver"
+      - "traefik.http.routers.login-ssl.tls.certresolver=letsencrypt"
     environment:
       << : [*env-aspnet]
 
@@ -147,9 +139,9 @@ services:
     ports:
       - "8075:8080"
     labels:
-      - "traefik.http.routers.metaservices.rule=HostRegexp(`^metaservices\\..+`)"
-      - "traefik.http.routers.metaservices-ssl.rule=HostRegexp(`^metaservices(-ssl)?\\..+`)"
-      - "traefik.http.routers.metaservices-ssl.tls.certresolver=leresolver"
+      - "traefik.http.routers.metaservices.rule=Host(`metaservices.${DOMAIN_ROOT}`)"
+      - "traefik.http.routers.metaservices-ssl.rule=Host(`metaservices-ssl.${DOMAIN_ROOT}`)"
+      - "traefik.http.routers.metaservices-ssl.tls.certresolver=letsencrypt"
       - "traefik.http.routers.metaservices-ssl.entrypoints=websecure"
     environment:
       << : [*env-aspnet]
@@ -166,9 +158,9 @@ services:
     ports:
       - "8076:8080"
     labels:
-      - "traefik.http.routers.mix.rule=HostRegexp(`^mix\\..+`)"
-      - "traefik.http.routers.mix-ssl.rule=HostRegexp(`^mix(-ssl)?\\..+`)"
-      - "traefik.http.routers.mix-ssl.tls.certresolver=leresolver"
+      - "traefik.http.routers.mix.rule=Host(`mix.${DOMAIN_ROOT}`)"
+      - "traefik.http.routers.mix-ssl.rule=Host(`mix-ssl.${DOMAIN_ROOT}`)"
+      - "traefik.http.routers.mix-ssl.tls.certresolver=letsencrypt"
       - "traefik.http.routers.mix-ssl.entrypoints=websecure"
     environment:
       << : [*env-aspnet]
@@ -185,9 +177,9 @@ services:
     ports:
       - "8077:8080"
     labels:
-      - "traefik.http.routers.socialapi.rule=HostRegexp(`^socialapi\\..+`)"
-      - "traefik.http.routers.socialapi-ssl.rule=HostRegexp(`^socialapi(-ssl)?\\..+`)"
-      - "traefik.http.routers.socialapi-ssl.tls.certresolver=leresolver"
+      - "traefik.http.routers.socialapi.rule=Host(`socialapi.${DOMAIN_ROOT}`)"
+      - "traefik.http.routers.socialapi-ssl.rule=Host(`socialapi-ssl.${DOMAIN_ROOT}`)"
+      - "traefik.http.routers.socialapi-ssl.tls.certresolver=letsencrypt"
       - "traefik.http.routers.socialapi-ssl.entrypoints=websecure"
     environment:
       << : [*env-aspnet]
@@ -204,9 +196,9 @@ services:
     ports:
       - "8078:8080"
     labels:
-      - "traefik.http.routers.tiles.rule=HostRegexp(`^tiles\\..+`)"
-      - "traefik.http.routers.tiles-ssl.rule=HostRegexp(`^tiles(-ssl)?\\..+`)"
-      - "traefik.http.routers.tiles-ssl.tls.certresolver=leresolver"
+      - "traefik.http.routers.tiles.rule=Host(`tiles.${DOMAIN_ROOT}`)"
+      - "traefik.http.routers.tiles-ssl.rule=Host(`tiles-ssl.${DOMAIN_ROOT}`)"
+      - "traefik.http.routers.tiles-ssl.tls.certresolver=letsencrypt"
       - "traefik.http.routers.tiles-ssl.entrypoints=websecure"
     environment:
       << : [*env-aspnet]
@@ -223,12 +215,13 @@ services:
     ports:
       - "8079:8080"
     labels:
-      - "traefik.http.routers.tuners.rule=HostRegexp(`^tuners\\..+`)"
-      - "traefik.http.routers.tuners-ssl.rule=HostRegexp(`^tuners(-ssl)?\\..+`)"
-      - "traefik.http.routers.tuners-ssl.tls.certresolver=leresolver"
+      - "traefik.http.routers.tuners.rule=Host(`tuners.${DOMAIN_ROOT}`)"
+      - "traefik.http.routers.tuners-ssl.rule=Host(`tuners-ssl.${DOMAIN_ROOT}`)"
+      - "traefik.http.routers.tuners-ssl.tls.certresolver=letsencrypt"
       - "traefik.http.routers.tuners-ssl.entrypoints=websecure"
     environment:
       << : [*env-aspnet]
 
 volumes:
+  traefik-certs:
   mongodb_data_container:
