@@ -14,7 +14,7 @@ namespace Zune.Net.Helpers
 
         public static Feed<Artist> SearchArtists(string query, string requestPath)
         {
-            var results = _query.FindAllArtists(query, simple: true);
+            var results = Query.FindAllArtists(query, simple: true);
             var updated = DateTime.Now;
             Feed<Artist> feed = new()
             {
@@ -39,13 +39,13 @@ namespace Zune.Net.Helpers
 
         public static Artist GetArtistByMBID(Guid mbid)
         {
-            var mb_artist = _query.LookupArtist(mbid, Include.Releases | Include.Recordings);
+            var mb_artist = Query.LookupArtist(mbid, Include.Releases | Include.Recordings);
             return MBArtistToArtist(mb_artist);
         }
 
         public static Feed<Track> GetArtistTracksByMBID(Guid mbid, string requestPath, int chunkSize)
         {
-            var results = _query.BrowseAllArtistRecordings(mbid, pageSize: chunkSize, inc: Include.ArtistCredits);
+            var results = Query.BrowseAllArtistRecordings(mbid, pageSize: chunkSize, inc: Include.ArtistCredits);
             var updated = DateTime.Now;
             Feed<Track> feed = new()
             {
@@ -69,7 +69,7 @@ namespace Zune.Net.Helpers
 
         public static Feed<Album> GetArtistAlbumsByMBID(Guid mbid, string requestPath)
         {
-            var results = _query.BrowseAllArtistReleases(mbid, inc: Include.ArtistCredits | Include.ReleaseRelationships);
+            var results = Query.BrowseAllArtistReleases(mbid, inc: Include.ArtistCredits | Include.ReleaseRelationships);
             var updated = DateTime.Now;
             Feed<Album> feed = new()
             {

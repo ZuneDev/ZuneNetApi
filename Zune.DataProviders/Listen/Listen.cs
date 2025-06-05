@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Zune.Xml.Catalog;
 
-namespace Zune.Net.Helpers
+namespace Zune.DataProviders.Listen
 {
     public static partial class Listen
     {

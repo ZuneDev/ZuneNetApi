@@ -1,19 +1,20 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
-using System;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
-using Zune.Net.Middleware;
-using Microsoft.AspNetCore.Routing;
-using System.Reflection;
-using System.Linq;
+using System;
 using System.IO;
+using System.Linq;
+using System.Reflection;
+using Zune.Net.Middleware;
 
 namespace Zune.Net
 {
@@ -69,6 +70,22 @@ namespace Zune.Net
             return endpoints.MapGet("/", () =>
             {
                 return Results.Content(_homeRouteHtml, "text/html");
+            });
+        }
+
+        public static void UseMusicBrainzCache(this IWebHostEnvironment env)
+        {
+            // assume worst-case scenario, mix is getting hit at the same time as catalog. The
+            // frontend cache, nginx, will serve up cached results, but this interleave of 1.5s
+            // might be enough to avoid a race.
+            MetaBrainz.MusicBrainz.Query.DelayBetweenRequests = 1.5;
+
+            Helpers.MusicBrainz.Query.ConfigureClientCreation(delegate
+            {
+                // might be useful to put this as a shared resource between mix and cog
+                var cachePath = Path.Combine(env.ContentRootPath, "bin", "cache");
+                var cacheTime = TimeSpan.FromHours(1);
+                return new System.Net.Http.HttpClient(new OwlCore.Net.Http.CachedHttpClientHandler(cachePath, cacheTime));
             });
         }
 

@@ -6,9 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Zune.Net.Helpers;
 using Zune.Xml.Catalog;
 
-namespace Zune.Net.Helpers
+namespace Zune.DataProviders.LastFM
 {
     public static partial class LastFM
     {
@@ -62,7 +63,7 @@ namespace Zune.Net.Helpers
             if (fm_track.AlbumName != null)
                 query += $" AND release:{fm_track.AlbumName}";
 
-            var results = MusicBrainz._query.FindAllRecordings(query, simple: false);
+            var results = Net.Helpers.MusicBrainz.Query.FindAllRecordings(query, simple: false);
 
             return results.FirstOrDefault()?.Item;
         }
@@ -95,7 +96,7 @@ namespace Zune.Net.Helpers
             };
 
             if (includeRights)
-                MusicBrainz.AddDefaultRights(ref track);
+                Net.Helpers.MusicBrainz.AddDefaultRights(ref track);
 
             return track;
         }
@@ -147,7 +148,7 @@ namespace Zune.Net.Helpers
                 album.ReleaseDate = fm_album.ReleaseDateUtc.Value.DateTime;
 
             if (includeRights)
-                MusicBrainz.AddDefaultRights(ref album);
+                Net.Helpers.MusicBrainz.AddDefaultRights(ref album);
 
             return album;
         }

@@ -21,7 +21,7 @@ namespace Zune.Net.Helpers
 
         public static async Task<(JObject dc_artist, IArtist mb_artist)> GetDCArtistByMBID(Guid mbid)
         {
-            var mb_artist = MusicBrainz._query.LookupArtist(mbid, Include.UrlRelationships | Include.Tags | Include.Releases);
+            var mb_artist = MusicBrainz.Query.LookupArtist(mbid, Include.UrlRelationships | Include.Tags | Include.Releases);
             return (await GetDCArtistByMBArtist(mb_artist), mb_artist);
         }
 
@@ -43,7 +43,7 @@ namespace Zune.Net.Helpers
             {
                 var entityType = match.Groups[1].Value[0];
                 int dcid = int.Parse(match.Groups[2].Value);
-                string htmlEquiv = match.Value;
+                string? htmlEquiv = null;
                 switch (entityType)
                 {
                     // Release
@@ -73,7 +73,6 @@ namespace Zune.Net.Helpers
                         try
                         {
                             var mbid_label = MusicBrainz.GetLabelMBIDByDCID(dcid);
-                            // TODO: Label lookup
                             htmlEquiv = $"<link type=\"Label\" id=\"{mbid_label}\">the label</link>";
                         }
                         catch (HttpError) { }
@@ -85,7 +84,7 @@ namespace Zune.Net.Helpers
                         break;
                 }
 
-                return htmlEquiv;
+                return htmlEquiv ?? match.Value;
             });
 
             // Convert formatting

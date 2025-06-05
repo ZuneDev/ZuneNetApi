@@ -13,7 +13,7 @@ namespace Zune.Net.Helpers
     {
         public static Feed<Album> SearchAlbums(string query, string requestPath)
         {
-            var results = _query.FindAllReleases(query, simple: true);
+            var results = Query.FindAllReleases(query, simple: true);
             var updated = DateTime.Now;
             Feed<Album> feed = new()
             {
@@ -30,7 +30,7 @@ namespace Zune.Net.Helpers
 
         public static Album GetAlbumByMBID(Guid mbid)
         {
-            var mb_rel = _query.LookupRelease(mbid, Include.Genres | Include.ArtistCredits | Include.Recordings | Include.Media);
+            var mb_rel = Query.LookupRelease(mbid, Include.Genres | Include.ArtistCredits | Include.Recordings | Include.Media);
             return MBReleaseToAlbum(mb_rel);
         }
 

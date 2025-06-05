@@ -1,31 +1,12 @@
 ﻿using MetaBrainz.MusicBrainz;
-using Microsoft.AspNetCore.Hosting;
-using OwlCore.Net.Http;
 using System;
-using System.Net.Http;
 using Zune.Xml.Catalog;
 
 namespace Zune.Net.Helpers
 {
     public static partial class MusicBrainz
     {
-        public static readonly Query _query = new("Zune", "4.8", "https://github.com/ZuneDev/ZuneNetApi");
-
-        public static void Initialize(IWebHostEnvironment env)
-        {
-            // assume worst-case scenario, mix is getting hit at the same time as catalog. The
-            // frontent cache, nginx, will serve up cached results, but this interleave of 1.5s
-            // might be enought to avoid a race.
-            Query.DelayBetweenRequests = 1.5;
-
-            _query.ConfigureClientCreation(delegate
-            {
-                // might be useful to put this as a shared resource between mix and cog
-                var cachePath = System.IO.Path.Combine(env.ContentRootPath, "bin", "cache");
-                var cacheTime = TimeSpan.FromHours(1);
-                return new HttpClient(new CachedHttpClientHandler(cachePath, cacheTime));
-            });
-        }
+        public static Query Query { get; } = new("Zune", "4.8", "https://github.com/ZuneDev/ZuneNetApi");
 
         public static void AddDefaultRights<T>(ref T media) where T : Media
         {

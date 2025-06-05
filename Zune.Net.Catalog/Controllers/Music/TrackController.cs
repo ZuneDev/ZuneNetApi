@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
+using Zune.DataProviders.LastFM;
 using Zune.Net.Helpers;
 using Zune.Xml.Catalog;
 

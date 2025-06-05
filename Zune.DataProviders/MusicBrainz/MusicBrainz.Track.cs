@@ -12,7 +12,7 @@ namespace Zune.Net.Helpers
     {
         public static Feed<Track> SearchTracks(string query, string requestPath)
         {
-            var results = _query.FindAllRecordings(query, simple: true);
+            var results = Query.FindAllRecordings(query, simple: true);
             var updated = DateTime.Now;
             Feed<Track> feed = new()
             {
@@ -39,13 +39,13 @@ namespace Zune.Net.Helpers
         {
             try
             {
-                var mb_rec = _query.LookupRecording(mbid, Include.Genres | Include.ArtistCredits | Include.Releases | Include.UrlRelationships | Include.Media);
+                var mb_rec = Query.LookupRecording(mbid, Include.Genres | Include.ArtistCredits | Include.Releases | Include.UrlRelationships | Include.Media);
                 return MBRecordingToTrack(mb_rec, includeRights: true);
             }
             catch (HttpError)
             {
                 // MusicBrainz Picard likes to put the Track ID instead of the Recording ID
-                var releases = _query.BrowseTrackReleases(mbid, limit: 1, inc: Include.UrlRelationships);
+                var releases = Query.BrowseTrackReleases(mbid, limit: 1, inc: Include.UrlRelationships);
                 var mb_rel = releases.Results[0];
                     
                 var mb_media = mb_rel.Media[0];

@@ -5,6 +5,7 @@ using OwlCore.Extensions;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Zune.DataProviders;
 using Zune.Xml.Catalog;
 
 namespace Zune.Net.Helpers

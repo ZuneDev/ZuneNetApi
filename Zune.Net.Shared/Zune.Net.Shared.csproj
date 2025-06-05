@@ -12,15 +12,12 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Backing\lastfm\src\IF.Lastfm.Core\IF.Lastfm.Core.csproj" />
+        <ProjectReference Include="..\Zune.DataProviders\Zune.DataProviders.csproj" />
         <ProjectReference Include="..\Zune.Xml\Zune.Xml.csproj" />
         <ProjectReference Include="..\Zune.DB\Zune.DB.csproj" />
 
         <PackageReference Include="Flurl.Http" Version="3.2.4" />
         <PackageReference Include="OwlCore" Version="0.1.0" />
-        <PackageReference Include="MetaBrainz.MusicBrainz" Version="6.1.0" />
-        <PackageReference Include="MetaBrainz.MusicBrainz.CoverArt" Version="6.0.0" />
-        <PackageReference Include="MetaBrainz.MusicBrainz.DiscId" Version="4.0.0" />
-        <PackageReference Include="PodcastAPI" Version="1.1.6" />
         <!--<PackageReference Include="Inflatable.Lastfm" Version="1.2.0" />-->
     </ItemGroup>
 

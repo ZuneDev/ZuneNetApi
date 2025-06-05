@@ -1,4 +1,5 @@
 ﻿using Flurl.Http;
+using Zune.DataProviders;
 
 namespace Zune.Net.Helpers
 {

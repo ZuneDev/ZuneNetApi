@@ -12,7 +12,7 @@ namespace Zune.Net.Helpers
         {
             JToken dz_artist = dz_track["artist"];
             JToken dz_album = dz_track["album"];
-            var results = MusicBrainz._query.FindAllRecordings(
+            var results = MusicBrainz.Query.FindAllRecordings(
                 $"artistname:{dz_artist.Value<string>("name")} AND release:{dz_album.Value<string>("title")} " +
                 $"AND recording:{dz_track.Value<string>("title")}", simple: false);
 

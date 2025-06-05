@@ -5,6 +5,9 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Zune.DataProviders;
+using Zune.DataProviders.Discogs;
+using Zune.DataProviders.MusicBrainz;
 using Zune.DB;
 using Zune.Net.Helpers;
 using Zune.Xml.Catalog;
@@ -16,9 +19,23 @@ namespace Zune.Net.Catalog.Controllers.Music
     public class ArtistController : Controller
     {
         private readonly ZuneNetContext _database;
+        private readonly IMediaIdMapper _mediaIdMapper;
+        private readonly IArtistBiographyProvider _biographyProvider;
+        private readonly MusicBrainzProvider _mbProvider;
+
         public ArtistController(ZuneNetContext database)
         {
             _database = database;
+
+            var cascadingMapper = new CascadedMediaIdMapper();
+            _mediaIdMapper = new MemoryCachedMediaIdMapper(cascadingMapper);
+
+            _mbProvider = new MusicBrainzProvider(_mediaIdMapper);
+            _biographyProvider = new DiscogsProvider(_mediaIdMapper);
+
+            cascadingMapper.Mappers.AddRange([
+                _mbProvider
+            ]);
         }
 
         [HttpGet, Route("")]
@@ -109,17 +126,21 @@ namespace Zune.Net.Catalog.Controllers.Music
         [HttpGet, Route("{mbid}/biography")]
         public async Task<ActionResult<Entry>> Biography(Guid mbid)
         {
-            (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(mbid);
-            if (dc_artist == null)
-                return StatusCode(404);
+            var mediaId = new MediaId(mbid, KnownMediaSources.MusicBrainz);
+            var bioContent = await _biographyProvider.GetArtistBiography(mediaId);
             DateTime updated = DateTime.Now;
+
+            if (bioContent is null)
+                return StatusCode(404);
+
+            var mbArtist = MusicBrainz.GetArtistByMBID(mbid);
 
             return new Entry
             {
                 Id = $"tag:catalog.zune.net,1900-01-01:/music/artist/{mbid}/biography",
-                Title = mb_artist.Name,
+                Title = mbArtist.Title,
                 Links = { new(Request.Path) },
-                Content = Discogs.DCProfileToBiographyContent(dc_artist.Value<string>("profile")),
+                Content = bioContent,
                 Updated = updated,
             };
         }
@@ -172,7 +193,7 @@ namespace Zune.Net.Catalog.Controllers.Music
         [HttpGet, Route("{mbid}/similarArtists")]
         public async Task<ActionResult<Feed<Artist>>> SimilarArtists(Guid mbid)
         {
-            return await LastFM.GetSimilarArtistsByMBID(mbid);
+            return await DataProviders.LastFM.LastFM.GetSimilarArtistsByMBID(mbid);
         }
     }
 }

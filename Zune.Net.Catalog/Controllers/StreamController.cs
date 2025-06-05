@@ -25,8 +25,8 @@ namespace Zune.Net.Catalog.Controllers
         public async Task<ActionResult> DefaultStreaming(Guid mbid)
         {
             var track = MusicBrainz.GetTrackByMBID(mbid);
-            var mb_rel = MusicBrainz._query.LookupRelease(track.Album.Id, Include.UrlRelationships);
-            var mb_relgrps = MusicBrainz._query.BrowseReleaseGroups(mb_rel, 1, inc: Include.UrlRelationships);
+            var mb_rel = MusicBrainz.Query.LookupRelease(track.Album.Id, Include.UrlRelationships);
+            var mb_relgrps = MusicBrainz.Query.BrowseReleaseGroups(mb_rel, 1, inc: Include.UrlRelationships);
 
             if (mb_relgrps.TotalResults == 0)
                 return NotFound();
@@ -40,7 +40,9 @@ namespace Zune.Net.Catalog.Controllers
             var samples = await $"https://www.allmusic.com/album/{alid}/samples.json".GetJsonAsync<List<Newtonsoft.Json.Linq.JToken>>();
             string sampleUrl = samples[track.TrackNumber - 1]["sample"].ToString();
 
-            return Redirect(sampleUrl);
+            var sampleStream = await sampleUrl.GetStreamAsync();
+
+            return File(sampleStream, "application/octet-stream");
         }
     }
 }

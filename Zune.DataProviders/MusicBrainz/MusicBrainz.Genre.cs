@@ -24,7 +24,7 @@ namespace Zune.Net.Helpers
 
         public static Genre GetGenreByMBID(Guid mbid)
         {
-            var mb_genre = _query.LookupGenre(mbid);
+            var mb_genre = Query.LookupGenre(mbid);
             return MBGenreToGenre(mb_genre);
         }
 
@@ -35,7 +35,7 @@ namespace Zune.Net.Helpers
 
         public static Feed<Album> GetGenreAlbumsByMBID(Guid mbid, string requestPath)
         {
-            var mb_genre = _query.LookupGenre(mbid);
+            var mb_genre = Query.LookupGenre(mbid);
             var updated = DateTime.Now;
             Feed<Album> feed = new()
             {
@@ -48,7 +48,7 @@ namespace Zune.Net.Helpers
 
             // Get albums from genre
             int maxNumAlbums = 50;
-            var results = _query.FindAllReleases($"tag:\"{mb_genre.Name}\"").GetEnumerator();
+            var results = Query.FindAllReleases($"tag:\"{mb_genre.Name}\"").GetEnumerator();
 
             // Add results to feed
             while (feed.Entries.Count < maxNumAlbums && results.MoveNext())
@@ -78,7 +78,7 @@ namespace Zune.Net.Helpers
             var mb_genres = genre.Value.Values.GetEnumerator();
             while (feed.Entries.Count < maxNumAlbums && mb_genres.MoveNext())
             {
-                var results = _query.FindAllReleases($"tag:\"{mb_genres.Current}\"").GetEnumerator();
+                var results = Query.FindAllReleases($"tag:\"{mb_genres.Current}\"").GetEnumerator();
 
                 // Add results to feed
                 while (feed.Entries.Count < maxNumAlbums && results.MoveNext())
@@ -93,7 +93,7 @@ namespace Zune.Net.Helpers
 
         public static Feed<Artist> GetGenreArtistsByMBID(Guid mbid, string requestPath)
         {
-            var mb_genre = _query.LookupGenre(mbid);
+            var mb_genre = Query.LookupGenre(mbid);
             var updated = DateTime.Now;
             Feed<Artist> feed = new()
             {
@@ -101,7 +101,7 @@ namespace Zune.Net.Helpers
                 Title = mb_genre.Name,
                 Links = { new(requestPath) },
                 Updated = updated,
-                Entries = ((IEnumerable<ISearchResult<IArtist>>)_query.FindAllArtists($"tag:\"{mb_genre.Name}\""))
+                Entries = ((IEnumerable<ISearchResult<IArtist>>)Query.FindAllArtists($"tag:\"{mb_genre.Name}\""))
                                 .Select(mb_artist => MBArtistToArtist(mb_artist.Item, updated: updated)).ToList()
             };
 
@@ -126,7 +126,7 @@ namespace Zune.Net.Helpers
             var mb_genres = genre.Value.Values.GetEnumerator();
             while (feed.Entries.Count < maxNumArtists && mb_genres.MoveNext())
             {
-                var results = _query.FindAllArtists($"tag:\"{mb_genres.Current}\"").GetEnumerator();
+                var results = Query.FindAllArtists($"tag:\"{mb_genres.Current}\"").GetEnumerator();
 
                 // Add results to feed
                 while (feed.Entries.Count < maxNumArtists && results.MoveNext())
@@ -141,7 +141,7 @@ namespace Zune.Net.Helpers
 
         public static Feed<Track> GetGenreTracksByMBID(Guid mbid, string requestPath)
         {
-            var mb_genre = _query.LookupGenre(mbid);
+            var mb_genre = Query.LookupGenre(mbid);
             var updated = DateTime.Now;
             Feed<Track> feed = new()
             {
@@ -149,7 +149,7 @@ namespace Zune.Net.Helpers
                 Title = mb_genre.Name,
                 Links = { new(requestPath) },
                 Updated = updated,
-                Entries = ((IEnumerable<ISearchResult<IRecording>>)_query.FindAllRecordings($"tag:\"{mb_genre.Name}\""))
+                Entries = ((IEnumerable<ISearchResult<IRecording>>)Query.FindAllRecordings($"tag:\"{mb_genre.Name}\""))
                                 .Select(mb_track => MBRecordingToTrack(mb_track.Item, updated: updated)).ToList()
             };
 
@@ -174,7 +174,7 @@ namespace Zune.Net.Helpers
             var mb_genres = genre.Value.Values.GetEnumerator();
             while (feed.Entries.Count < maxNumTracks && mb_genres.MoveNext())
             {
-                var results = _query.FindAllRecordings($"tag:\"{mb_genres.Current}\"").GetEnumerator();
+                var results = Query.FindAllRecordings($"tag:\"{mb_genres.Current}\"").GetEnumerator();
 
                 // Add results to feed
                 while (feed.Entries.Count < maxNumTracks && results.MoveNext())
