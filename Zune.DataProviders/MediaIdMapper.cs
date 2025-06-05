@@ -4,6 +4,34 @@ using System.Threading.Tasks;
 
 namespace Zune.DataProviders;
 
+public interface IMediaIdMapper
+{
+    /// <summary>
+    /// Finds an ID that represents the same media as the given ID but from the specified source.
+    /// </summary>
+    /// <param name="id">The known ID.</param>
+    /// <param name="targetSource">The source to find an equivalent ID from.</param>
+    /// <returns></returns>
+    Task<MediaId> MapTo(MediaId id, string targetSource);
+}
+
+public interface IModifiableMediaIdMapper : IMediaIdMapper
+{
+    /// <summary>
+    /// Registers and association between the two provided IDs.
+    /// </summary>
+    Task RegisterMapping(MediaId id1, MediaId id2);
+}
+
+public interface ICompleteMediaIdMapper : IMediaIdMapper
+{
+    /// <summary>
+    /// Fetches all <see cref="MediaId"/>s associated with the given ID.
+    /// </summary>
+    /// <param name="id">The ID to list associations for.</param>
+    IAsyncEnumerable<MediaId> EnumerateMappings(MediaId id);
+}
+
 public class CascadedMediaIdMapper : IMediaIdMapper
 {
     public List<IMediaIdMapper> Mappers { get; } = [];
