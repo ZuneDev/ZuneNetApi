@@ -24,6 +24,7 @@ public class DiscogsProvider(IMediaIdMapper idMapper) : IArtistBiographyProvider
 
         var dcArtist = await Net.Helpers.Discogs.GetDCArtistByDCID(dcid.Value);
         var dcProfile = dcArtist.Value<string>("profile");
-        return await Net.Helpers.Discogs.DCProfileToBiographyContent(dcProfile);
+
+        return await Net.Helpers.Discogs.DCProfileToBiographyContent(dcProfile, idMapper);
     }
 }

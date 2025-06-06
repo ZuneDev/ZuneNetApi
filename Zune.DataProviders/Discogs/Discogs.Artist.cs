@@ -49,36 +49,39 @@ namespace Zune.Net.Helpers
             return await WithAuth(searchUrl).GetJsonAsync<JObject>();
         }
 
-        public static async Task<Content> DCProfileToBiographyContent(string dc_profile)
+        public static async Task<Content> DCProfileToBiographyContent(string dcProfile, IMediaIdMapper idMapper)
         {
-            // Convert hyperlinks
+            // Convert entity links
             Regex rx = new(@"\[([rmal])=?([^\]]+)\]");
 
-            ICollection<Match> matches = rx.Matches(dc_profile);
+            ICollection<Match> matches = rx.Matches(dcProfile);
             StringBuilder htmlBuilder = new();
             int currentIndex = 0;
 
             foreach (var match in matches)
             {
                 var segmentLength = match.Index - currentIndex;
-                htmlBuilder.Append(dc_profile, currentIndex, segmentLength);
-
-                currentIndex = match.Index;
+                htmlBuilder.Append(dcProfile, currentIndex, segmentLength);
 
                 var entityType = match.Groups[1].Value[0];
                 var entityName = match.Groups[2].Value;
-                var convertedLink = await ConvertDCProfileLinkMarkup(entityType, entityName);
+                var convertedLink = await ConvertDCProfileLinkMarkup(entityType, entityName, idMapper);
                 htmlBuilder.Append(convertedLink);
+
+                currentIndex = match.Index + match.Length;
             }
+
+            // Include text that appears after the last link
+            htmlBuilder.Append(dcProfile, currentIndex, dcProfile.Length - currentIndex);
 
             string htmlBio = htmlBuilder.ToString();
 
             // Convert formatting
-            rx = new(@"\[([bi])\](.*)\[\/\1\]", RegexOptions.IgnoreCase);
+            rx = new(@"\[([bi])\](.*)\[\/\1\]");
             htmlBio = rx.Replace(htmlBio, @"<$1>$2</$1>");
 
-            // Convert links
-            rx = new(@"\[url=([^\]]*)\]([^\[]*)?\[\/url\]", RegexOptions.IgnoreCase);
+            // Convert URL-based links
+            rx = new(@"\[url=([^\]]*)\]([^\[]*)?\[\/url\]");
             htmlBio = rx.Replace(htmlBio, "<link href=\"$1\">$2</link>");
 
             return new()
@@ -88,24 +91,24 @@ namespace Zune.Net.Helpers
             };
         }
 
-        private static async Task<string> ConvertDCProfileLinkMarkup(char entityType, string arg)
+        private static async Task<string> ConvertDCProfileLinkMarkup(char entityType, string arg, IMediaIdMapper idMapper)
         {
             var linkType = "Unknown";
             var mbid = Guid.Empty;
             string entityName = null;
 
-            if (int.TryParse(arg, out var dcid))
-            {
-                dcid = -1;
+            if (!int.TryParse(arg, out var dcid))
                 entityName = arg;
-            }
 
             switch (entityType)
             {
                 // Release
                 case 'r':
                     linkType = "Album";
-                    mbid = MusicBrainz.GetReleaseMBIDByDCID(dcid);
+
+                    var dcAlbumId = new MediaId(dcid, KnownMediaSources.Discogs, MediaType.Album);
+                    var mbAlbumId = await idMapper.MapTo(dcAlbumId, KnownMediaSources.MusicBrainz);
+                    mbid = mbAlbumId.AsGuid();
 
                     if (entityName is null)
                     {
@@ -118,10 +121,10 @@ namespace Zune.Net.Helpers
                 case 'a':
                     linkType = "Contributor";
 
-                    if (dcid < 0)
+                    if (dcid <= 0)
                     {
                         var searchResponse = await SearchArtist(arg);
-                        var searchResults = searchResponse.Value<List<JObject>>("results");
+                        var searchResults = searchResponse.Value<JArray>("results");
                         var dcArtistResult = searchResults.FirstOrDefault(result =>
                         {
                             var currentName = result.Value<string>("title");
@@ -131,7 +134,9 @@ namespace Zune.Net.Helpers
                         dcid = dcArtistResult.Value<int>("id");
                     }
 
-                    mbid = MusicBrainz.GetAristMBIDByDCID(dcid);
+                    var dcArtistId = new MediaId(dcid, KnownMediaSources.Discogs, MediaType.Artist);
+                    var mbArtistId = await idMapper.MapTo(dcArtistId, KnownMediaSources.MusicBrainz);
+                    mbid = mbArtistId.AsGuid();
 
                     if (entityName is null)
                     {
