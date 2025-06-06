@@ -1,15 +1,13 @@
 ﻿using IF.Lastfm.Core;
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Zune.DataProviders;
 
-public record MediaId(string Id, string Source)
+public record MediaId(string Id, string Source, MediaType Type = default)
 {
-    public MediaId(Guid id, string source) : this(id.ToString(), source) { }
+    public MediaId(Guid id, string source, MediaType type = default) : this(id.ToString(), source, type) { }
 
-    public MediaId(int id, string source) : this(id.ToString(), source) { }
+    public MediaId(int id, string source, MediaType type = default) : this(id.ToString(), source, type) { }
 
     /// <summary>
     /// Creates a canonical representation of this identifier from this source.
@@ -29,6 +27,26 @@ public record MediaId(string Id, string Source)
     /// Parses <see cref="Id"/> as a signed 32-bit integer.
     /// </summary>
     public int AsInt32() => int.Parse(Id);
+}
+
+[Flags]
+public enum MediaType : uint
+{
+    Unknown     = 0x00000000,
+    Any         = 0xFFFFFFFF,
+
+    Album       = 1 << 1,
+    App         = 1 << 2,
+    Artist      = 1 << 3,
+    Channel     = 1 << 4,
+    Feature     = 1 << 5,
+    Genre       = 1 << 6,
+    Image       = 1 << 7,
+    Playlist    = 1 << 8,
+    Podcast     = 1 << 9,
+    Right       = 1 << 10,
+    Track       = 1 << 11,
+    Video       = 1 << 12,
 }
 
 public static class KnownMediaSources
