@@ -26,7 +26,7 @@ namespace Zune.Net.Helpers
 
         public static async Task<IEnumerable<JToken>> GetChartDZArtists(int genreId = 0)
         {
-            var response = await API_BASE.AppendPathSegments("chart", genreId, "albums")
+            var response = await API_BASE.AppendPathSegments("chart", genreId, "artists")
                 .GetJsonAsync<JObject>();
             return response["data"];
         }

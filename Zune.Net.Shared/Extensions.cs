@@ -15,6 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Zune.DataProviders;
+using Zune.DataProviders.Deezer;
 using Zune.DataProviders.Discogs;
 using Zune.DataProviders.MusicBrainz;
 using Zune.Net.Middleware;
@@ -96,19 +97,20 @@ namespace Zune.Net
         {
             return host.ConfigureServices(s =>
             {
+                AggregatedMediaProvider mediaProvider = new();
                 var cascadingMapper = new CascadedMediaIdMapper();
                 var mediaIdMapper = new MemoryCachedMediaIdMapper(cascadingMapper);
 
                 var mbProvider = new MusicBrainzProvider(mediaIdMapper);
                 var dcProvider = new DiscogsProvider(mediaIdMapper);
+                var dzProvider = new DeezerProvider(mediaProvider, mediaProvider, mediaProvider, mediaIdMapper);
 
                 cascadingMapper.Mappers.AddRange([
                     mbProvider
                 ]);
 
-                AggregatedMediaProvider mediaProvider = new();
                 mediaProvider.Providers.AddRange([
-                    mbProvider, dcProvider,
+                    mbProvider, dcProvider, dzProvider
                 ]);
 
                 s.AddSingleton<IMediaIdMapper>(mediaIdMapper);

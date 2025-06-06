@@ -1,13 +1,22 @@
-﻿using MetaBrainz.MusicBrainz.Interfaces.Entities;
+﻿using Flurl;
+using Flurl.Http;
+using MetaBrainz.MusicBrainz.Interfaces.Entities;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Zune.Xml.Catalog;
 
 namespace Zune.Net.Helpers
 {
     public partial class Deezer
     {
+        public static async Task<JObject> GetDZTrack(string dzid)
+        {
+            return await API_BASE.AppendPathSegments("track", dzid)
+                .GetJsonAsync<JObject>();
+        }
+
         public static IRecording GetMBRecordingByDZTrack(JToken dz_track)
         {
             JToken dz_artist = dz_track["artist"];

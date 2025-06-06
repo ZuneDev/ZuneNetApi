@@ -3,96 +3,51 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Zune.DataProviders.LastFM;
-using Zune.Net.Helpers;
+using Zune.DataProviders;
 using Zune.Xml.Catalog;
 
 namespace Zune.Net.Catalog.Controllers.Music
 {
     [Route("/music/chart/zune/")]
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
-    public class ChartController : Controller
+    public class ChartController(AggregatedMediaProvider mediaProvider) : Controller
     {
-        private const bool useDeezer = true;
+        [HttpGet, Route("albums")]
+        public async Task<ActionResult<Feed<Album>>> Albums()
+        {
+            return new Feed<Album>()
+            {
+                Id = "albums",
+                Title = "Albums",
+                Updated = DateTime.Now,
+                Entries = await mediaProvider.GetAlbumChart().ToListAsync()
+            };
+        }
+
+        [HttpGet, Route("artists")]
+        public async Task<ActionResult<Feed<Artist>>> Artists()
+        {
+            return new Feed<Artist>()
+            {
+                Id = "artists",
+                Title = "Artists",
+                Updated = DateTime.Now,
+                Entries = await mediaProvider.GetArtistChart().ToListAsync()
+            };
+        }
 
         [HttpGet, Route("tracks")]
         public async Task<ActionResult<Feed<Track>>> Tracks()
         {
-            Feed<Track> feed;
+            var tracks = mediaProvider.GetTrackChart();
 
-            if (useDeezer)
+            Feed<Track> feed = new()
             {
-                var dz_tracks = await Deezer.GetChartDZTracks();
-                DateTime updated = DateTime.Now;
-
-                feed = new()
-                {
-                    Id = "tracks",
-                    Title = "Tracks",
-                    Author = Deezer.DZ_AUTHOR,
-                    Updated = updated
-                };
-
-                foreach (var dz_track in dz_tracks)
-                {
-                    var mb_recording = Deezer.GetMBRecordingByDZTrack(dz_track);
-                    if (mb_recording == null)
-                        continue;
-
-                    var track = MusicBrainz.MBRecordingToTrack(mb_recording, updated: updated, includeRights: true);
-                    track.Popularity = dz_track.Value<long>("rank");
-                    track.Explicit = dz_track.Value<bool>("explicit_lyrics");
-
-                    feed.Entries.Add(track);
-                }
-            }
-            else
-            {
-                var fm_tracks = await LastFM.GetTopTracks();
-                feed = LastFM.CreateFeed<Track>("/music/chart/zune/tracks", "Top tracks");
-
-                foreach (var fm_track in fm_tracks.Take(10))
-                {
-                    var mb_recording = LastFM.GetMBRecordingByFMTrack(fm_track);
-                    if (mb_recording == null)
-                        continue;
-
-                    var track = MusicBrainz.MBRecordingToTrack(mb_recording, updated: feed.Updated, includeRights: true);
-                    track.Popularity = fm_track.Rank ?? 0;
-                    track.PlayCount = fm_track.PlayCount ?? 0;
-
-                    feed.Entries.Add(track);
-                }
-            }
-
-            return feed;
-        }
-
-        [HttpGet, Route("albums")]
-        public async Task<ActionResult<Feed<Album>>> Albums()
-        {
-            var dz_albums = await Deezer.GetChartDZAlbums();
-            DateTime updated = DateTime.Now;
-
-            Feed<Album> feed = new()
-            {
-                Id = "albums",
-                Title = "Albums",
-                Author = Deezer.DZ_AUTHOR,
-                Updated = updated
+                Id = "tracks",
+                Title = "Tracks",
+                Updated = DateTime.Now,
+                Entries = await tracks.ToListAsync()
             };
-
-            foreach (var dz_album in dz_albums)
-            {
-                var mb_release = Deezer.GetMBReleaseByDZAlbum(dz_album);
-                if (mb_release == null)
-                    continue;
-
-                var album = MusicBrainz.MBReleaseToAlbum(mb_release, updated: updated);
-                album.Explicit = dz_album.Value<bool>("explicit_lyrics");
-
-                feed.Entries.Add(album);
-            }
 
             return feed;
         }

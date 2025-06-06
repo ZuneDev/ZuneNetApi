@@ -52,8 +52,9 @@ public class CascadedMediaIdMapper : IMediaIdMapper
     }
 }
 
-public class MemoryCachedMediaIdMapper(IMediaIdMapper innerMapper) : IMediaIdMapper, IDelegatable<IMediaIdMapper>
+public class MemoryCachedMediaIdMapper(IMediaIdMapper innerMapper) : IModifiableMediaIdMapper, IDelegatable<IMediaIdMapper>
 {
+    private readonly object _cacheLock = new();
     private readonly Dictionary<MediaId, MediaId> _cache = [];
 
     public IMediaIdMapper Inner { get; } = innerMapper;
@@ -68,9 +69,25 @@ public class MemoryCachedMediaIdMapper(IMediaIdMapper innerMapper) : IMediaIdMap
 
         mappedId = await Inner.MapTo(id, targetSource);
 
-        _cache[id] = mappedId;
-        _cache[mappedId] = id;
+        CacheMapping(id, mappedId);
 
         return mappedId;
+    }
+
+    public Task RegisterMapping(MediaId id1, MediaId id2)
+    {
+        return Task.Run(() => CacheMapping(id1, id2));
+    }
+
+    protected void CacheMapping(MediaId id1, MediaId id2)
+    {
+        if (id1 is null || id2 is null)
+            return;
+        
+        lock (_cacheLock)
+        {
+            _cache[id1] = id2;
+            _cache[id2] = id1;
+        }
     }
 }

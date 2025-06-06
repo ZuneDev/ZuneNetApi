@@ -10,7 +10,12 @@ public interface IMediaProvider;
 
 public interface IAlbumProvider : IMediaProvider
 {
-    Task<Artist> GetAlbum(MediaId id);
+    Task<Album> GetAlbum(MediaId id);
+}
+
+public interface IAlbumChartProvider : IMediaProvider
+{
+    IAsyncEnumerable<Album> GetAlbumChart();
 }
 
 public interface IAlbumImageProvider : IMediaProvider
@@ -23,6 +28,11 @@ public interface IArtistProvider : IMediaProvider
     Task<Artist> GetArtist(MediaId id);
 }
 
+public interface IArtistChartProvider : IMediaProvider
+{
+    IAsyncEnumerable<Artist> GetArtistChart();
+}
+
 public interface IArtistImageProvider : IMediaProvider
 {
     IAsyncEnumerable<Url> GetArtistImages(MediaId id);
@@ -33,4 +43,14 @@ public interface IArtistImageProvider : IMediaProvider
 public interface IArtistBiographyProvider : IMediaProvider
 {
     Task<Content> GetArtistBiography(MediaId id);
+}
+
+public interface ITrackProvider : IMediaProvider
+{
+    Task<Track> GetTrack(MediaId id);
+}
+
+public interface ITrackChartProvider : IMediaProvider
+{
+    IAsyncEnumerable<Track> GetTrackChart();
 }

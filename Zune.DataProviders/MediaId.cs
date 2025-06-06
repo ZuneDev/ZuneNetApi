@@ -56,6 +56,8 @@ public static class KnownMediaSources
     public const string AppleMusic = "applemusic";
     public const string Deezer = "deezer";
     public const string Discogs = "discogs";
+    public const string ISRC = "isrc";
+    public const string ISWC = "iswc";
     public const string LastFM = "lastfm";
     public const string Listen = "listen";
     public const string MusicBrainz = "musicbrainz";

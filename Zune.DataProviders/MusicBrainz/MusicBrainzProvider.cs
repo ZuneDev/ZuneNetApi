@@ -10,7 +10,7 @@ using Zune.Xml.Catalog;
 
 namespace Zune.DataProviders.MusicBrainz;
 
-public class MusicBrainzProvider(IMediaIdMapper idMapper) : IArtistProvider, IAlbumImageProvider, IMediaIdMapper
+public class MusicBrainzProvider(IMediaIdMapper idMapper) : IArtistProvider, IAlbumProvider, IAlbumImageProvider, ITrackProvider, IMediaIdMapper
 {
     public async IAsyncEnumerable<Url> GetAlbumImages(MediaId id)
     {
@@ -110,6 +110,12 @@ public class MusicBrainzProvider(IMediaIdMapper idMapper) : IArtistProvider, IAl
                         _ => throw new ArgumentOutOfRangeException(nameof(searchType))
                     });
 
+                case KnownMediaSources.ISRC:
+                    var isrcEntity = await Net.Helpers.MusicBrainz.Query.LookupIsrcAsync(id.Id);
+                    if (isrcEntity is not null)
+                        return new(isrcEntity.Recordings[0].Id, KnownMediaSources.MusicBrainz, MediaType.Track);
+                    break;
+
                 case KnownMediaSources.Tidal:
                     return await TryGetMbidByUrlAsync(id.Type, searchType => searchType switch
                     {
@@ -128,22 +134,30 @@ public class MusicBrainzProvider(IMediaIdMapper idMapper) : IArtistProvider, IAl
     {
         if (type.HasFlag(MediaType.Artist))
         {
-            var url = formatUrl(MediaType.Artist);
-            var mbUrl = await Net.Helpers.MusicBrainz.Query.LookupUrlAsync(new Uri(url), inc: Include.ArtistRelationships);
+            try
+            {
+                var url = formatUrl(MediaType.Artist);
+                var mbUrl = await Net.Helpers.MusicBrainz.Query.LookupUrlAsync(new Uri(url), inc: Include.ArtistRelationships);
 
-            var mbid = mbUrl?.Relationships[0].Artist.Id;
-            if (mbid.HasValue)
-                return new(mbid.Value, KnownMediaSources.MusicBrainz, MediaType.Artist);
+                var mbid = mbUrl?.Relationships[0].Artist.Id;
+                if (mbid.HasValue)
+                    return new(mbid.Value, KnownMediaSources.MusicBrainz, MediaType.Artist);
+            }
+            catch { }
         }
 
         if (type.HasFlag(MediaType.Album))
         {
-            var url = formatUrl(MediaType.Album);
-            var mbUrl = await Net.Helpers.MusicBrainz.Query.LookupUrlAsync(new Uri(url), inc: Include.ReleaseRelationships);
+            try
+            {
+                var url = formatUrl(MediaType.Album);
+                var mbUrl = await Net.Helpers.MusicBrainz.Query.LookupUrlAsync(new Uri(url), inc: Include.ReleaseRelationships);
 
-            var mbid = mbUrl?.Relationships[0].Release.Id;
-            if (mbid.HasValue)
-                return new(mbid.Value, KnownMediaSources.MusicBrainz, MediaType.Album);
+                var mbid = mbUrl?.Relationships[0].Release.Id;
+                if (mbid.HasValue)
+                    return new(mbid.Value, KnownMediaSources.MusicBrainz, MediaType.Album);
+            }
+            catch { }
         }
 
         return null;
@@ -151,9 +165,28 @@ public class MusicBrainzProvider(IMediaIdMapper idMapper) : IArtistProvider, IAl
 
     public async Task<Artist> GetArtist(MediaId id)
     {
-        if (!id.Source.OrdinalEquals(KnownMediaSources.MusicBrainz))
+        id = await idMapper.MapTo(id, KnownMediaSources.MusicBrainz);
+        if (id is null)
             return null;
 
         return Net.Helpers.MusicBrainz.GetArtistByMBID(id.AsGuid());
+    }
+
+    public async Task<Album> GetAlbum(MediaId id)
+    {
+        id = await idMapper.MapTo(id, KnownMediaSources.MusicBrainz);
+        if (id is null)
+            return null;
+
+        return Net.Helpers.MusicBrainz.GetAlbumByMBID(id.AsGuid());
+    }
+
+    public async Task<Track> GetTrack(MediaId id)
+    {
+        id = await idMapper.MapTo(id, KnownMediaSources.MusicBrainz);
+        if (id is null)
+            return null;
+
+        return Net.Helpers.MusicBrainz.GetTrackByMBID(id.AsGuid());
     }
 }

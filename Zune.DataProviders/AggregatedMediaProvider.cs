@@ -8,7 +8,10 @@ using Zune.Xml.Catalog;
 
 namespace Zune.DataProviders;
 
-public class AggregatedMediaProvider : IArtistProvider, IArtistBiographyProvider, IArtistImageProvider, IAlbumImageProvider
+public class AggregatedMediaProvider : IMediaProvider,
+    IArtistProvider, IArtistChartProvider, IArtistBiographyProvider, IArtistImageProvider,
+    IAlbumProvider, IAlbumChartProvider, IAlbumImageProvider,
+    ITrackProvider, ITrackChartProvider
 {
     public List<IMediaProvider> Providers { get; } = [];
 
@@ -16,7 +19,13 @@ public class AggregatedMediaProvider : IArtistProvider, IArtistBiographyProvider
     {
         return await AggregateAsync<IArtistProvider, Artist>(
             provider => provider.GetArtist(id));
-    } 
+    }
+
+    public IAsyncEnumerable<Artist> GetArtistChart()
+    {
+        return AggregateAsync<IArtistChartProvider, Artist>(
+            provider => provider.GetArtistChart());
+    }
 
     public async Task<Content> GetArtistBiography(MediaId id)
     {
@@ -36,10 +45,34 @@ public class AggregatedMediaProvider : IArtistProvider, IArtistBiographyProvider
             provider => provider.GetArtistPrimaryImage(id));
     }
 
+    public async Task<Album> GetAlbum(MediaId id)
+    {
+        return await AggregateAsync<IAlbumProvider, Album>(
+            provider => provider.GetAlbum(id));
+    }
+
     public IAsyncEnumerable<Url> GetAlbumImages(MediaId id)
     {
         return AggregateAsync<IAlbumImageProvider, Url>(
             provider => provider.GetAlbumImages(id));
+    }
+
+    public IAsyncEnumerable<Album> GetAlbumChart()
+    {
+        return AggregateAsync<IAlbumChartProvider, Album>(
+            provider => provider.GetAlbumChart());
+    }
+
+    public async Task<Track> GetTrack(MediaId id)
+    {
+        return await AggregateAsync<ITrackProvider, Track>(
+            provider => provider.GetTrack(id));
+    }
+
+    public IAsyncEnumerable<Track> GetTrackChart()
+    {
+        return AggregateAsync<ITrackChartProvider, Track>(
+            provider => provider.GetTrackChart());
     }
 
     private async Task<TResult> AggregateAsync<TProvider, TResult>(Func<TProvider, Task<TResult>> func)
