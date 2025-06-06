@@ -1,13 +1,10 @@
 ﻿using Atom.Xml;
 using Flurl.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Zune.DataProviders;
-using Zune.DataProviders.Discogs;
-using Zune.DataProviders.MusicBrainz;
 using Zune.DB;
 using Zune.Net.Helpers;
 using Zune.Xml.Catalog;
@@ -16,28 +13,8 @@ namespace Zune.Net.Catalog.Controllers.Music
 {
     [Route("/music/artist/")]
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
-    public class ArtistController : Controller
+    public class ArtistController(ZuneNetContext database, AggregatedMediaProvider mediaProvider) : Controller
     {
-        private readonly ZuneNetContext _database;
-        private readonly IMediaIdMapper _mediaIdMapper;
-        private readonly IArtistBiographyProvider _biographyProvider;
-        private readonly MusicBrainzProvider _mbProvider;
-
-        public ArtistController(ZuneNetContext database)
-        {
-            _database = database;
-
-            var cascadingMapper = new CascadedMediaIdMapper();
-            _mediaIdMapper = new MemoryCachedMediaIdMapper(cascadingMapper);
-
-            _mbProvider = new MusicBrainzProvider(_mediaIdMapper);
-            _biographyProvider = new DiscogsProvider(_mediaIdMapper);
-
-            cascadingMapper.Mappers.AddRange([
-                _mbProvider
-            ]);
-        }
-
         [HttpGet, Route("")]
         public ActionResult<Feed<Artist>> Search()
         {
@@ -50,26 +27,20 @@ namespace Zune.Net.Catalog.Controllers.Music
         [HttpGet, Route("{mbid}")]
         public async Task<ActionResult<Artist>> Details(Guid mbid)
         {
-            (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(mbid);
-            Artist artist = MusicBrainz.MBArtistToArtist(mb_artist);
-            artist.Images = new() { new() { Id = mbid } };
+            var id = new MediaId(mbid, KnownMediaSources.MusicBrainz, MediaType.Artist);
+            var artist = await mediaProvider.GetArtist(id);
 
-            if (dc_artist != null)
+            var biography = await mediaProvider.GetArtistBiography(id);
+            artist.Biography = biography.Value;
+
+            var artistImageUrl = await mediaProvider.GetArtistPrimaryImage(id);
+            if (artistImageUrl is not null)
             {
-                artist.Biography = dc_artist.Value<string>("profile");
-                artist.Links.Add(new(Request.Path.Value + "biography", relation: "zune://artist/biography"));
-
-                var dc_artist_image = dc_artist.Value<JArray>("images")?.FirstOrDefault(i => i.Value<string>("type") == "primary");
-                if (dc_artist_image != null)
+                var artistImageEntry = await database.AddImageAsync(artistImageUrl);
+                artist.BackgroundImage = new()
                 {
-                    string artistImageUrl = dc_artist_image.Value<string>("uri");
-                    var artistImageEntry = await _database.AddImageAsync(artistImageUrl);
-
-                    artist.BackgroundImage = new()
-                    {
-                        Id = artistImageEntry.Id
-                    };
-                }
+                    Id = artistImageEntry.Id
+                };
             }
 
             return artist;
@@ -112,14 +83,13 @@ namespace Zune.Net.Catalog.Controllers.Music
         [HttpGet, Route("{mbid}/primaryImage")]
         public async Task<ActionResult> PrimaryImage(Guid mbid)
         {
-            (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(mbid);
-            if (dc_artist == null)
-                return StatusCode(404);
+            var id = new MediaId(mbid, KnownMediaSources.MusicBrainz, MediaType.Artist);
+            var imgUrl = await mediaProvider.GetArtistPrimaryImage(id);
 
-            string imgUrl = dc_artist["images"].First(i => i.Value<string>("type") == "primary").Value<string>("uri");
             var imgResponse = await imgUrl.GetAsync();
             if (imgResponse.StatusCode != 200)
                 return StatusCode(imgResponse.StatusCode);
+
             return File(await imgResponse.GetStreamAsync(), "image/jpeg");
         }
 
@@ -127,7 +97,7 @@ namespace Zune.Net.Catalog.Controllers.Music
         public async Task<ActionResult<Entry>> Biography(Guid mbid)
         {
             var mediaId = new MediaId(mbid, KnownMediaSources.MusicBrainz);
-            var bioContent = await _biographyProvider.GetArtistBiography(mediaId);
+            var bioContent = await mediaProvider.GetArtistBiography(mediaId);
             DateTime updated = DateTime.Now;
 
             if (bioContent is null)
@@ -148,43 +118,39 @@ namespace Zune.Net.Catalog.Controllers.Music
         [HttpGet, Route("{mbid}/images")]
         public async Task<ActionResult<Feed<Image>>> Images(Guid mbid)
         {
-            (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(mbid);
-            DateTime updated = DateTime.Now;
-            int dcid = dc_artist.Value<int>("id");
-            byte[] zero = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 };
-
             Feed<Image> feed = new()
             {
                 Id = $"tag:catalog.zune.net,1900-01-01:/music/artist/{mbid}/images",
-                Title = mb_artist.Name,
                 Links = { new(Request.Path) },
-                Updated = updated,
+                Updated = DateTime.Now,
+                Entries = [],
             };
 
-            var images = dc_artist.Value<JToken>("images");
-            if (images != null)
-            {
-                feed.Entries = images.Select((j, idx) =>
-                {
-                    // Encode DCID and image index in ID
-                    Guid imgId = new(dcid, (short)idx, 0, zero);
+            var id = new MediaId(mbid, KnownMediaSources.MusicBrainz, MediaType.Artist);
+            var artist = await mediaProvider.GetArtist(id);
+            feed.Title = artist.Title;
 
-                    return new Image
-                    {
-                        Id = imgId,
-                        Instances = new()
+            var images = mediaProvider.GetArtistImages(id);
+            await foreach (var imageUrl in images)
+            {
+                // Register image URL
+                var imageDbEntry = await database.AddImageAsync(imageUrl);
+
+                var image = new Image
+                {
+                    Id = imageDbEntry.Id,
+                    Instances =
+                    [
+                        new()
                         {
-                            new()
-                            {
-                                Id = imgId,
-                                Url = j.Value<string>("uri"),
-                                Format = "jpg",
-                                Width = j.Value<int>("width"),
-                                Height = j.Value<int>("height"),
-                            }
+                            Id = imageDbEntry.Id,
+                            Url = imageUrl,
+                            Format = "jpg",
                         }
-                    };
-                }).ToList();
+                    ]
+                };
+
+                feed.Entries.Add(image);
             }
 
             return feed;

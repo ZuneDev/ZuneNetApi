@@ -17,6 +17,7 @@ namespace Zune.Net.Catalog.Image
                 {
                     webBuilder.UseStartup<Startup>();
                 })
-                .ConfigureZuneDB();
+                .ConfigureZuneDB()
+                .ConfigureMediaProviders();
     }
 }

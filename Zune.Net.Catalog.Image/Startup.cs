@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Zune.Net.Helpers;
 
 namespace Zune.Net.Catalog.Image
 {
@@ -25,7 +24,7 @@ namespace Zune.Net.Catalog.Image
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            MusicBrainz.Initialize(env);
+            env.UseMusicBrainzCache();
 
             if (env.IsDevelopment())
             {

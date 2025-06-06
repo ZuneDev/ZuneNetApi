@@ -14,6 +14,9 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Zune.DataProviders;
+using Zune.DataProviders.Discogs;
+using Zune.DataProviders.MusicBrainz;
 using Zune.Net.Middleware;
 
 namespace Zune.Net
@@ -86,6 +89,30 @@ namespace Zune.Net
                 var cachePath = Path.Combine(env.ContentRootPath, "bin", "cache");
                 var cacheTime = TimeSpan.FromHours(1);
                 return new System.Net.Http.HttpClient(new OwlCore.Net.Http.CachedHttpClientHandler(cachePath, cacheTime));
+            });
+        }
+
+        public static IHostBuilder ConfigureMediaProviders(this IHostBuilder host)
+        {
+            return host.ConfigureServices(s =>
+            {
+                var cascadingMapper = new CascadedMediaIdMapper();
+                var mediaIdMapper = new MemoryCachedMediaIdMapper(cascadingMapper);
+
+                var mbProvider = new MusicBrainzProvider(mediaIdMapper);
+                var dcProvider = new DiscogsProvider(mediaIdMapper);
+
+                cascadingMapper.Mappers.AddRange([
+                    mbProvider
+                ]);
+
+                AggregatedMediaProvider mediaProvider = new();
+                mediaProvider.Providers.AddRange([
+                    mbProvider, dcProvider,
+                ]);
+
+                s.AddSingleton<IMediaIdMapper>(mediaIdMapper);
+                s.AddSingleton(mediaProvider);
             });
         }
 
