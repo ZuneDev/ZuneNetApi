@@ -6,10 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Zune.Xml.Catalog;
 
 namespace Zune.DataProviders.MusicBrainz;
 
-public class MusicBrainzProvider(IMediaIdMapper idMapper) : IAlbumImageProvider, IMediaIdMapper
+public class MusicBrainzProvider(IMediaIdMapper idMapper) : IArtistProvider, IAlbumImageProvider, IMediaIdMapper
 {
     public async IAsyncEnumerable<Url> GetAlbumImages(MediaId id)
     {
@@ -146,5 +147,13 @@ public class MusicBrainzProvider(IMediaIdMapper idMapper) : IAlbumImageProvider,
         }
 
         return null;
+    }
+
+    public async Task<Artist> GetArtist(MediaId id)
+    {
+        if (!id.Source.OrdinalEquals(KnownMediaSources.MusicBrainz))
+            return null;
+
+        return Net.Helpers.MusicBrainz.GetArtistByMBID(id.AsGuid());
     }
 }

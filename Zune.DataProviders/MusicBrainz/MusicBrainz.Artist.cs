@@ -122,7 +122,15 @@ namespace Zune.Net.Helpers
                 var mb_release = mb_artist.Releases.MaxBy(rel => rel.Date);
                 artist.AlbumImage = new()
                 {
-                    Id = mb_release.Id
+                    Id = mb_release.Id,
+                    Instances = new()
+                    {
+                        new()
+                        {
+                            Id = mb_release.Id,
+                            Url = $"https://coverartarchive.org/release/{mb_release.Id}/front"
+                        }
+                    }
                 };
             }
 
