@@ -147,8 +147,17 @@ namespace Zune.Net.Helpers
 
                 // Label
                 case 'l':
-                    linkType = "Label";
-                    mbid = MusicBrainz.GetLabelMBIDByDCID(dcid);
+                    linkType = "Genre";
+
+                    var dcGenreId = new MediaId(dcid, KnownMediaSources.Discogs, MediaType.Genre);
+                    var mbGenreId = await idMapper.MapTo(dcGenreId, KnownMediaSources.MusicBrainz);
+                    mbid = mbGenreId.AsGuid();
+
+                    if (entityName is null)
+                    {
+                        var mbGenre = await MusicBrainz.Query.LookupGenreAsync(mbid);
+                        entityName = mbGenre.Name;
+                    }
                     break;
 
                 // Master
