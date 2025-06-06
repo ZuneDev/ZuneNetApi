@@ -17,7 +17,7 @@ namespace Zune.Xml.Catalog
         [XmlElement("popularity")]
         public double Popularity { get; set; }
 
-        [XmlElement("isVariousArtist")]
+        [XmlElement("isDisabled")]
         public bool IsVariousArtist { get; set; }
 
         [XmlElement("biographyLink")]
