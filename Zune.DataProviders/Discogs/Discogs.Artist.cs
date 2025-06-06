@@ -1,14 +1,16 @@
 ﻿using Atom.Xml;
 using Flurl;
 using Flurl.Http;
-using MetaBrainz.Common;
 using MetaBrainz.MusicBrainz;
 using MetaBrainz.MusicBrainz.Interfaces.Entities;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Zune.DataProviders;
 
 namespace Zune.Net.Helpers
 {
@@ -35,57 +37,41 @@ namespace Zune.Net.Helpers
             return await WithAuth(discogs_link).GetJsonAsync<JObject>();
         }
 
-        public static Content DCProfileToBiographyContent(string dc_profile)
+        public static async Task<JObject> SearchArtist(string artistName, int? page = null, int? pageSize = null)
         {
-            // Convert relationships
-            Regex rx = new(@"\[([rmal])=?(\d+)\]", RegexOptions.IgnoreCase);
-            string htmlBio = rx.Replace(dc_profile, match =>
+            var searchUrl = API_BASE
+                .AppendPathSegments("database", "search")
+                .SetQueryParam("q", artistName)
+                .SetQueryParam("type", "artist")
+                .SetQueryParam("page", page)
+                .SetQueryParam("per_page", pageSize);
+
+            return await WithAuth(searchUrl).GetJsonAsync<JObject>();
+        }
+
+        public static async Task<Content> DCProfileToBiographyContent(string dc_profile)
+        {
+            // Convert hyperlinks
+            Regex rx = new(@"\[([rmal])=?([^\]]+)\]");
+
+            ICollection<Match> matches = rx.Matches(dc_profile);
+            StringBuilder htmlBuilder = new();
+            int currentIndex = 0;
+
+            foreach (var match in matches)
             {
+                var segmentLength = match.Index - currentIndex;
+                htmlBuilder.Append(dc_profile, currentIndex, segmentLength);
+
+                currentIndex = match.Index;
+
                 var entityType = match.Groups[1].Value[0];
-                int dcid = int.Parse(match.Groups[2].Value);
-                string? htmlEquiv = null;
-                switch (entityType)
-                {
-                    // Release
-                    case 'r':
-                        try
-                        {
-                            var mbid_rel = MusicBrainz.GetReleaseMBIDByDCID(dcid);
-                            var mb_album = MusicBrainz.GetAlbumByMBID(mbid_rel);
-                            htmlEquiv = $"<link type=\"Album\" id=\"{mb_album.Id}\">{mb_album.Title}</link>";
-                        }
-                        catch (HttpError) { }
-                        break;
+                var entityName = match.Groups[2].Value;
+                var convertedLink = await ConvertDCProfileLinkMarkup(entityType, entityName);
+                htmlBuilder.Append(convertedLink);
+            }
 
-                    // Artist
-                    case 'a':
-                        try
-                        {
-                            var mbid_artist = MusicBrainz.GetAristMBIDByDCID(dcid);
-                            var mb_artist = MusicBrainz.GetArtistByMBID(mbid_artist);
-                            htmlEquiv = $"<link type=\"Contributor\" id=\"{mb_artist.Id}\">{mb_artist.Title}</link>";
-                        }
-                        catch (HttpError) { }
-                        break;
-
-                    // Label
-                    case 'l':
-                        try
-                        {
-                            var mbid_label = MusicBrainz.GetLabelMBIDByDCID(dcid);
-                            htmlEquiv = $"<link type=\"Label\" id=\"{mbid_label}\">the label</link>";
-                        }
-                        catch (HttpError) { }
-                        break;
-
-                    // Master
-                    case 'm':
-                        // TODO: Which MusicBrainz entity is this equivalent to? Release groups?
-                        break;
-                }
-
-                return htmlEquiv ?? match.Value;
-            });
+            string htmlBio = htmlBuilder.ToString();
 
             // Convert formatting
             rx = new(@"\[([bi])\](.*)\[\/\1\]", RegexOptions.IgnoreCase);
@@ -100,6 +86,73 @@ namespace Zune.Net.Helpers
                 Type = ContentType.HTML,
                 Value = htmlBio
             };
+        }
+
+        private static async Task<string> ConvertDCProfileLinkMarkup(char entityType, string arg)
+        {
+            var linkType = "Unknown";
+            var mbid = Guid.Empty;
+            string entityName = null;
+
+            if (int.TryParse(arg, out var dcid))
+            {
+                dcid = -1;
+                entityName = arg;
+            }
+
+            switch (entityType)
+            {
+                // Release
+                case 'r':
+                    linkType = "Album";
+                    mbid = MusicBrainz.GetReleaseMBIDByDCID(dcid);
+
+                    if (entityName is null)
+                    {
+                        var mbRelease = await MusicBrainz.Query.LookupReleaseAsync(mbid);
+                        entityName = mbRelease.Title;
+                    }
+                    break;
+
+                // Artist
+                case 'a':
+                    linkType = "Contributor";
+
+                    if (dcid < 0)
+                    {
+                        var searchResponse = await SearchArtist(arg);
+                        var searchResults = searchResponse.Value<List<JObject>>("results");
+                        var dcArtistResult = searchResults.FirstOrDefault(result =>
+                        {
+                            var currentName = result.Value<string>("title");
+                            return currentName.OrdinalEquals(arg);
+                        });
+
+                        dcid = dcArtistResult.Value<int>("id");
+                    }
+
+                    mbid = MusicBrainz.GetAristMBIDByDCID(dcid);
+
+                    if (entityName is null)
+                    {
+                        var mbArtist = await MusicBrainz.Query.LookupArtistAsync(mbid);
+                        entityName = mbArtist.Name;
+                    }
+                    break;
+
+                // Label
+                case 'l':
+                    linkType = "Label";
+                    mbid = MusicBrainz.GetLabelMBIDByDCID(dcid);
+                    break;
+
+                // Master
+                case 'm':
+                    // TODO: Which MusicBrainz entity is this equivalent to? Release groups?
+                    break;
+            }
+
+            return $"<link type=\"{linkType}\" id=\"{mbid}\">{entityName}</link>";
         }
     }
 }
