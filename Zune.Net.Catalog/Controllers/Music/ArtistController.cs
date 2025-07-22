@@ -1,4 +1,4 @@
-﻿using Atom.Xml;
+using Atom.Xml;
 using Flurl.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
@@ -15,8 +15,10 @@ namespace Zune.Net.Catalog.Controllers.Music
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
     public class ArtistController : Controller
     {
-        public ArtistController()
+        private readonly ZuneNetContext _database;
+        public ArtistController(ZuneNetContext database)
         {
+            _database = database;
         }
 
         [HttpGet, Route("")]
@@ -44,8 +46,12 @@ namespace Zune.Net.Catalog.Controllers.Music
                 if (dc_artist_image != null)
                 {
                     string artistImageUrl = dc_artist_image.Value<string>("uri");
-                    //var artistImageEntry = await _database.AddImageAsync(artistImageUrl);
+                    var artistImageEntry = await _database.AddImageAsync(artistImageUrl);
 
+                    artist.BackgroundImage = new()
+                    {
+                        Id = artistImageEntry.Id
+                    };
                 }
             }
 
@@ -86,8 +92,8 @@ namespace Zune.Net.Catalog.Controllers.Music
             return feed;
         }
 
-		[HttpGet, Route("{mbid}/deviceBackgroundImage")]
-		[HttpGet, Route("{mbid}/primaryImage")]
+ 	[HttpGet, Route("{mbid}/deviceBackgroundImage")]
+        [HttpGet, Route("{mbid}/primaryImage")]
         public async Task<ActionResult> PrimaryImage(Guid mbid)
         {
             (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(mbid);
@@ -101,7 +107,7 @@ namespace Zune.Net.Catalog.Controllers.Music
             return File(await imgResponse.GetStreamAsync(), "image/jpeg");
         }
 
-		[HttpGet, Route("{mbid}/biography")]
+        [HttpGet, Route("{mbid}/biography")]
         public async Task<ActionResult<Entry>> Biography(Guid mbid)
         {
             (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(mbid);
