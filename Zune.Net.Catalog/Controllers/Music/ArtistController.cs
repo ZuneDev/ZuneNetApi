@@ -1,4 +1,4 @@
-﻿using Atom.Xml;
+using Atom.Xml;
 using Flurl.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
@@ -92,6 +92,7 @@ namespace Zune.Net.Catalog.Controllers.Music
             return feed;
         }
 
+ 	[HttpGet, Route("{mbid}/deviceBackgroundImage")]
         [HttpGet, Route("{mbid}/primaryImage")]
         public async Task<ActionResult> PrimaryImage(Guid mbid)
         {
