@@ -65,7 +65,7 @@ public class MusicBrainzProvider(IMediaIdMapper idMapper) : IArtistProvider, IAl
                     var dcRelationship = urls.FirstOrDefault(url => url.Item.Relationships.Any(rel => rel.Type == "discogs"));
 
                     var dcWebUrl = dcRelationship?.Item?.Resource;
-                    if (int.TryParse(dcWebUrl.Segments[^1], out int dcid))
+                    if (int.TryParse(dcWebUrl?.Segments[^1], out int dcid))
                         return new(dcid, targetSource);
 
                     return null;

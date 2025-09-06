@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using Flurl;
+using System.Collections.Generic;
 using Zune.Xml.Catalog;
 
 namespace Zune.DataProviders.Deezer;
 
 public class DeezerProvider(IAlbumProvider albumProvider, IArtistProvider artistProvider, ITrackProvider trackProvider, IModifiableMediaIdMapper idMapper = null)
-    : IAlbumChartProvider, IArtistChartProvider, ITrackChartProvider
+    : IAlbumChartProvider, IArtistChartProvider, ITrackChartProvider, ITrackPreviewProvider
 {
     public async IAsyncEnumerable<Album> GetAlbumChart()
     {
@@ -88,5 +88,16 @@ public class DeezerProvider(IAlbumProvider albumProvider, IArtistProvider artist
 
             yield return track;
         }
+    }
+
+    public async IAsyncEnumerable<Url> GetTrackPreviews(MediaId id)
+    {
+        id = await idMapper.MapTo(id, KnownMediaSources.Deezer);
+        if (id is null)
+            yield break;
+
+        var dzTrack = await Net.Helpers.Deezer.GetDZTrack(id.Id);
+        var previewUrl = dzTrack.Value<string>("preview");
+        yield return previewUrl;
     }
 }

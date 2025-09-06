@@ -54,3 +54,8 @@ public interface ITrackChartProvider : IMediaProvider
 {
     IAsyncEnumerable<Track> GetTrackChart();
 }
+
+public interface ITrackPreviewProvider : IMediaProvider
+{
+    IAsyncEnumerable<Url> GetTrackPreviews(MediaId id);
+}

@@ -31,7 +31,7 @@ namespace Zune.Net.Catalog.Controllers.Music
             var artist = await mediaProvider.GetArtist(id);
 
             var biography = await mediaProvider.GetArtistBiography(id);
-            artist.Biography = biography.Value;
+            artist.Biography = biography?.Value;
 
             var artistImageUrl = await mediaProvider.GetArtistPrimaryImage(id);
             if (artistImageUrl is not null)
@@ -86,8 +86,11 @@ namespace Zune.Net.Catalog.Controllers.Music
             var id = new MediaId(mbid, KnownMediaSources.MusicBrainz, MediaType.Artist);
             var imgUrl = await mediaProvider.GetArtistPrimaryImage(id);
 
+            if (imgUrl is null)
+                return NotFound();
+
             var imgResponse = await imgUrl.GetAsync();
-            if (imgResponse.StatusCode != 200)
+            if (imgResponse.StatusCode is not 200)
                 return StatusCode(imgResponse.StatusCode);
 
             return File(await imgResponse.GetStreamAsync(), "image/jpeg");

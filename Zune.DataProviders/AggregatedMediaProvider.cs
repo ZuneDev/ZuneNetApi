@@ -11,7 +11,7 @@ namespace Zune.DataProviders;
 public class AggregatedMediaProvider : IMediaProvider,
     IArtistProvider, IArtistChartProvider, IArtistBiographyProvider, IArtistImageProvider,
     IAlbumProvider, IAlbumChartProvider, IAlbumImageProvider,
-    ITrackProvider, ITrackChartProvider
+    ITrackProvider, ITrackChartProvider, ITrackPreviewProvider
 {
     public List<IMediaProvider> Providers { get; } = [];
 
@@ -73,6 +73,12 @@ public class AggregatedMediaProvider : IMediaProvider,
     {
         return AggregateAsync<ITrackChartProvider, Track>(
             provider => provider.GetTrackChart());
+    }
+
+    public IAsyncEnumerable<Url> GetTrackPreviews(MediaId id)
+    {
+        return AggregateAsync<ITrackPreviewProvider, Url>(
+            provider => provider.GetTrackPreviews(id));
     }
 
     private async Task<TResult> AggregateAsync<TProvider, TResult>(Func<TProvider, Task<TResult>> func)

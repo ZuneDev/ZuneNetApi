@@ -1,29 +1,37 @@
 ﻿using Flurl.Http;
 using MetaBrainz.MusicBrainz;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Zune.DataProviders;
 using Zune.Net.Helpers;
 
 namespace Zune.Net.Catalog.Controllers
 {
     [Route("/stream")]
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
-    public class StreamController : Controller
+    public class StreamController(AggregatedMediaProvider mediaProvider) : Controller
     {
-        private readonly IWebHostEnvironment _env;
-
-        public StreamController(IWebHostEnvironment env)
-        {
-            _env = env;
-        }
-
         [HttpGet, Route("music/{mbid}")]
         public async Task<ActionResult> DefaultStreaming(Guid mbid)
         {
+            var mbMediaId = new MediaId(mbid, KnownMediaSources.MusicBrainz, MediaType.Track);
+            var previewUrls = mediaProvider.GetTrackPreviews(mbMediaId);
+
+            await foreach (var previewUrl in previewUrls)
+            {
+                try
+                {
+                    var previewStream = await previewUrl.GetStreamAsync();
+                    return File(previewStream, "application/octet-stream");
+                }
+                catch { }
+            }
+
+            return NotFound();
+
             var track = MusicBrainz.GetTrackByMBID(mbid);
             var mb_rel = MusicBrainz.Query.LookupRelease(track.Album.Id, Include.UrlRelationships);
             var mb_relgrps = MusicBrainz.Query.BrowseReleaseGroups(mb_rel, 1, inc: Include.UrlRelationships);
