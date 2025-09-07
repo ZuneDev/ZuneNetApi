@@ -1,6 +1,7 @@
 ﻿using Atom.Xml;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using Zune.Net.Helpers;
@@ -22,28 +23,30 @@ namespace Zune.Net.Catalog.Controllers.Music
             if (useDeezer)
             {
                 var dz_tracks = await Deezer.GetChartDZTracks();
-                DateTime updated = DateTime.Now;
+
+                ConcurrentBag<Track> tracks = [];
+
+                Parallel.ForEach(dz_tracks, dz_track =>
+                {
+                    var mb_recording = Deezer.GetMBRecordingByDZTrack(dz_track);
+                    if (mb_recording == null)
+                        return;
+
+                    var track = MusicBrainz.MBRecordingToTrack(mb_recording, updated: DateTime.Now, includeRights: true);
+                    track.Popularity = dz_track.Value<long>("rank");
+                    track.Explicit = dz_track.Value<bool>("explicit_lyrics");
+
+                    tracks.Add(track);
+                });
 
                 feed = new()
                 {
                     Id = "tracks",
                     Title = "Tracks",
                     Author = Deezer.DZ_AUTHOR,
-                    Updated = updated
+                    Updated = DateTime.Now,
+                    Entries = tracks.OrderByDescending(t => t.Popularity).ToList()
                 };
-
-                foreach (var dz_track in dz_tracks)
-                {
-                    var mb_recording = Deezer.GetMBRecordingByDZTrack(dz_track);
-                    if (mb_recording == null)
-                        continue;
-
-                    var track = MusicBrainz.MBRecordingToTrack(mb_recording, updated: updated, includeRights: true);
-                    track.Popularity = dz_track.Value<long>("rank");
-                    track.Explicit = dz_track.Value<bool>("explicit_lyrics");
-
-                    feed.Entries.Add(track);
-                }
             }
             else
             {
@@ -70,28 +73,31 @@ namespace Zune.Net.Catalog.Controllers.Music
         [HttpGet, Route("albums")]
         public async Task<ActionResult<Feed<Album>>> Albums()
         {
-            var dz_albums = await Deezer.GetChartDZAlbums();
-            DateTime updated = DateTime.Now;
+            var dz_albums = (await Deezer.GetChartDZAlbums()).ToList();
+
+            ConcurrentBag<Album> albums = [];
+
+            await Parallel.ForEachAsync(dz_albums, async (dz_album, token) =>
+            {
+                var mb_release = await Deezer.GetMBReleaseByDZAlbumAsync(dz_album);
+                if (mb_release == null)
+                    return;
+
+                var album = MusicBrainz.MBReleaseToAlbum(mb_release, updated: DateTime.Now);
+                album.Explicit = dz_album.Value<bool>("explicit_lyrics");
+                album.Popularity = dz_albums.Count - dz_album.Value<int>("position");
+
+                albums.Add(album);
+            });
 
             Feed<Album> feed = new()
             {
                 Id = "albums",
                 Title = "Albums",
                 Author = Deezer.DZ_AUTHOR,
-                Updated = updated
+                Updated = DateTime.Now,
+                Entries = albums.OrderByDescending(t => t.Popularity).ToList()
             };
-
-            foreach (var dz_album in dz_albums)
-            {
-                var mb_release = Deezer.GetMBReleaseByDZAlbum(dz_album);
-                if (mb_release == null)
-                    continue;
-
-                var album = MusicBrainz.MBReleaseToAlbum(mb_release, updated: updated);
-                album.Explicit = dz_album.Value<bool>("explicit_lyrics");
-
-                feed.Entries.Add(album);
-            }
 
             return feed;
         }
