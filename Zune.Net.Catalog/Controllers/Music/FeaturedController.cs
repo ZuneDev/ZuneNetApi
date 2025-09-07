@@ -7,6 +7,7 @@ using Flurl;
 using Flurl.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
+using Zune.Net.Features;
 using Zune.Xml.Catalog;
 
 namespace Zune.Net.Catalog.Controllers.Music;
@@ -18,6 +19,12 @@ public class FeaturedController : Controller
     [HttpGet, Route("albums")]
     public async Task<ActionResult<Feed<Album>>> Albums()
     {
+        var cultureFeature = HttpContext.Features.Get<ICultureFeature>();
+        var culture = cultureFeature?.CultureString ?? "en-US";
+        
+        var apiVersionFeature = HttpContext.Features.Get<IApiVersionFeature>();
+        var apiVersion = apiVersionFeature?.Version ?? "3.2";
+        
         var response = await "https://api.listenbrainz.org/1/explore/fresh-releases"
             .SetQueryParam("days", 7)
             .SetQueryParam("sort", "release_date")
@@ -34,6 +41,7 @@ public class FeaturedController : Controller
             var artistMbids = lb_release["artist_mbids"]!.ToObject<List<Guid>>();
             var releaseMbid = lb_release.Value<string>("release_mbid");
             var releaseName = lb_release.Value<string>("release_name");
+            var caaReleaseMbid = lb_release.Value<string>("caa_release_mbid");
             var releaseDate = lb_release.Value<DateTime>("release_date");
             var listenCount = lb_release.Value<int>("listen_count");
             
@@ -51,20 +59,27 @@ public class FeaturedController : Controller
                     Title = artistName,
                 },
                 Popularity = listenCount,
-                Images = [
+            };
+
+            if (caaReleaseMbid is not null)
+            {
+                album.Images =
+                [
                     new Image
                     {
-                        Id = new Guid(releaseMbid),
-                        Instances = [
+                        Id = new Guid(caaReleaseMbid),
+                        Instances =
+                        [
                             new ImageInstance
                             {
-                                Id = new Guid(releaseMbid),
-                                Url = $"http://image.catalog.zunes.me/v3.2/en-US/image/{releaseMbid}"
+                                Id = new Guid(caaReleaseMbid),
+                                Url = $"http://image.catalog.zunes.me/v{apiVersion}/{culture}/image/{caaReleaseMbid}"
                             }
                         ]
                     }
-                ]
-            };
+                ];
+            }
+            
             albums.Add(album);
         }
         
