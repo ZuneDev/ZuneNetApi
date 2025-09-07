@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AppleMusicSharp;
 using Atom.Xml;
+using Flurl;
+using Flurl.Http;
 using Microsoft.AspNetCore.Mvc;
-using Zune.Net.Helpers;
+using Newtonsoft.Json.Linq;
 using Zune.Xml.Catalog;
 
 namespace Zune.Net.Catalog.Controllers.Music;
@@ -15,51 +16,73 @@ namespace Zune.Net.Catalog.Controllers.Music;
 public class FeaturedController : Controller
 {
     [HttpGet, Route("albums")]
-    public async Task<ActionResult<Feed<Album>>> Albums([FromServices] AppleMusicClient amClient)
+    public async Task<ActionResult<Feed<Album>>> Albums()
     {
-        var room = await amClient.GetRoomAsync("6751999710");
-        var am_albums = room.Data.First().Relationships.Contents.Data;
-        
+        var response = await "https://api.listenbrainz.org/1/explore/fresh-releases"
+            .SetQueryParam("days", 7)
+            .SetQueryParam("sort", "release_date")
+            .SetQueryParam("future", false)
+            .WithHeader("User-Agent", "Zune/4.8")
+            .GetJsonAsync<JObject>();
+
+        var lb_releases = response["payload"]!["releases"]!;
         List<Album> albums = new(20);
 
-        foreach (var am_album in am_albums)
+        foreach (var lb_release in lb_releases.Take(20))
         {
-            if (albums.Count >= 5)
-                break;
+            var artistName = lb_release.Value<string>("artist_credit_name");
+            var artistMbids = lb_release["artist_mbids"]!.ToObject<List<Guid>>();
+            var releaseMbid = lb_release.Value<string>("release_mbid");
+            var releaseName = lb_release.Value<string>("release_name");
+            var releaseDate = lb_release.Value<DateTime>("release_date");
+            var listenCount = lb_release.Value<int>("listen_count");
             
-            var album = await MusicBrainz.GetAlbumByBarcodeAsync(am_album.Attributes.Upc);
-            
-            // MusicBrainz failed to lookup by barcode
-            if (album is null)
-            {
-                Console.WriteLine($"Failed to lookup album '{am_album.Attributes.Name}' {am_album.Id} by barcode");
-                continue;
-                
-                var results = await MusicBrainz._query.FindReleasesAsync(
-                    $"artistname:{am_album.Attributes.ArtistName} AND release:{am_album.Attributes.Name}",
-                    limit: 1, simple: false);
+            // ListenBrainz combines all credited artists into the name field in alphabetical order,
+            // which doesn't necessarily match the order of the artist MBIDs
 
-                var release = results.Results.FirstOrDefault()?.Item;
-                if (release is null)
-                    continue;
-                
-                album = MusicBrainz.MBReleaseToAlbum(release);
-            }
-            else
+            Album album = new()
             {
-                Console.WriteLine($"Found album '{am_album.Attributes.Name}' {am_album.Id} as {album.Id}");
-            }
-            
+                Title = releaseName,
+                Id = releaseMbid,
+                ReleaseDate = releaseDate,
+                PrimaryArtist = new MiniArtist
+                {
+                    Id = artistMbids[0],
+                    Title = artistName,
+                },
+                Popularity = listenCount,
+                Images = [
+                    new Image
+                    {
+                        Id = new Guid(releaseMbid),
+                        Instances = [
+                            new ImageInstance
+                            {
+                                Id = new Guid(releaseMbid),
+                                Url = $"http://image.catalog.zunes.me/v3.2/en-US/image/{releaseMbid}"
+                            }
+                        ]
+                    }
+                ]
+            };
             albums.Add(album);
         }
         
         return new Feed<Album>
         {
+            Title = "Fresh Releases",
             Author = new Author
             {
-                Name = "Apple Music",
-                Url = "https://music.apple.com"
+                Name = "ListenBrainz",
+                Url = "https://listenbrainz.org/"
             },
+            Links = [
+                new Link
+                {
+                    Href = "https://listenbrainz.org/explore/fresh-releases/",
+                    Relation = "self",
+                }
+            ],
             Entries = albums.OrderByDescending(a => a.ReleaseDate).ToList()
         };
     }
