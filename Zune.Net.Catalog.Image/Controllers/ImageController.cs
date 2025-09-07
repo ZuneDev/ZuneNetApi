@@ -66,19 +66,15 @@ namespace Zune.Net.Catalog.Image.Controllers
                 imageUrl = $"https://coverartarchive.org/release/{id}/front-{width}";
             }
 
+			if (imageUrl == null)
+				return StatusCode(404);
+
 			// Request the image from the API and forward it to the Zune software
-			if (imageUrl != null)
-			{
-				var imgResponse = await imageUrl.GetAsync();
-				if (imgResponse.StatusCode != 200)
-					return StatusCode(imgResponse.StatusCode);
-				return File(await imgResponse.GetStreamAsync(), "image/jpeg");
-			}
-			else
-			{
-				return StatusCode(500);
-			}
-		}
+			var imgResponse = await imageUrl.GetAsync();
+			if (imgResponse.StatusCode != 200)
+				return StatusCode(imgResponse.StatusCode);
+			return File(await imgResponse.GetStreamAsync(), "image/jpeg");
+        }
 
         [HttpGet, Route("music/artist/{id}/{type}")]
         public async Task<IActionResult> ArtistImage(string id, string type)
@@ -95,18 +91,14 @@ namespace Zune.Net.Catalog.Image.Controllers
                     .Value<string>("uri");
             }
 
+            if (imageUrl == null)
+                return StatusCode(404);
+
 			// Request the image from the API and forward it to the Zune software
-			if (imageUrl != null)
-			{
-				var imgResponse = await imageUrl.GetAsync();
-				if (imgResponse.StatusCode != 200)
-					return StatusCode(imgResponse.StatusCode);
-				return File(await imgResponse.GetStreamAsync(), "image/jpeg");
-			}
-			else
-			{
-				return StatusCode(500);
-			}
-		}
+            var imgResponse = await imageUrl.GetAsync();
+            if (imgResponse.StatusCode != 200)
+                return StatusCode(imgResponse.StatusCode);
+            return File(await imgResponse.GetStreamAsync(), "image/jpeg");
+        }
     }
 }
