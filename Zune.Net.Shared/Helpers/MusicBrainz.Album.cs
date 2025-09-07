@@ -5,6 +5,7 @@ using MetaBrainz.MusicBrainz.Interfaces.Searches;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Zune.Xml.Catalog;
 
 namespace Zune.Net.Helpers
@@ -34,11 +35,19 @@ namespace Zune.Net.Helpers
             return MBReleaseToAlbum(mb_rel);
         }
 
-
+        public static async Task<Album> GetAlbumByBarcodeAsync(string barcode)
+        {
+            var results = await _query.FindReleasesAsync($"barcode:{barcode}", limit: 1, simple: false);
+            var release = results.Results.FirstOrDefault()?.Item;
+            return release is not null
+                ? MBReleaseToAlbum(release)
+                : null;
+        }
+        
         public static Album MBReleaseToAlbum(IRelease mb_rel, DateTime? updated = null, bool includeRights = true)
         {
             updated ??= DateTime.Now;
-            var mb_artist = mb_rel.ArtistCredit[0].Artist;
+            var mb_artist = mb_rel.ArtistCredit?[0].Artist;
             var artist = MBArtistToMiniArtist(mb_artist);
 
             Album album = new()
@@ -46,7 +55,7 @@ namespace Zune.Net.Helpers
                 Id = mb_rel.Id.ToString(),
                 Title = mb_rel.Title,
                 PrimaryArtist = artist,
-                Artists = mb_rel.ArtistCredit.Select(mb_credit => MBNameCreditToMiniArtist(mb_credit)).ToList(),
+                Artists = mb_rel.ArtistCredit?.Select(MBNameCreditToMiniArtist).ToList(),
                 ReleaseDate = mb_rel.Date?.NearestDate ?? default,
                 Images = new()
                 {
@@ -55,16 +64,16 @@ namespace Zune.Net.Helpers
                 Updated = updated.Value,
             };
 
-            if (mb_rel.Genres != null && mb_rel.Genres.Count > 0)
+            if (mb_rel.Genres is { Count: > 0 })
                 album.PrimaryGenre = MBGenreToGenre(mb_rel.Genres[0]);
 
-            if (mb_rel.Date != null)
+            if (mb_rel.Date is not null)
                 album.ReleaseDate = mb_rel.Date.NearestDate;
 
-            if (mb_rel.Media != null && mb_rel.Media.Count > 0)
+            if (mb_rel.Media is { Count: > 0 })
             {
                 var mb_media = mb_rel.Media[0];
-                if (mb_media.Tracks != null && mb_media.Tracks.Count > 0)
+                if (mb_media.Tracks is { Count: > 0 })
                 {
                     album.Tracks = new();
                     foreach (var mb_track in mb_media.Tracks)
@@ -77,7 +86,6 @@ namespace Zune.Net.Helpers
 
             return album;
         }
-
 
         public static MiniAlbum MBReleaseToMiniAlbum(IRelease mb_rel)
         {

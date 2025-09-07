@@ -20,6 +20,7 @@ namespace Zune.Net.Catalog
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews(o => o.UseZestFormatters());
+            services.AddScoped<AppleMusicSharp.AppleMusicClient>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

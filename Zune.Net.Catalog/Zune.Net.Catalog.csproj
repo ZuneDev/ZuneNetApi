@@ -6,6 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Backing\AppleMusicSharp\AppleMusicSharp.csproj" />
         <ProjectReference Include="..\Zune.Net.Shared\Zune.Net.Shared.csproj" />
     </ItemGroup>
 

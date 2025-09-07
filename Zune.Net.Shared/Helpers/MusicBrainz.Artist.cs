@@ -11,6 +11,8 @@ namespace Zune.Net.Helpers
     {
         private static readonly Guid ARTIST_VARIOUSARTISTS = new("89ad4ac3-39f7-470e-963a-56509c546377");
         private static readonly Guid ARTIST_NOARTIST = new("eec63d3c-3b81-4ad4-b1e4-7c147d4d2b61");
+        private static readonly Guid ARTIST_UNKNOWN = new("125ec42a-7229-4250-afc5-e057484327fe");
+        private static readonly Guid LABEL_NOLABEL = new("157afde4-4bf5-4039-8ad2-5a15acc85176");
 
         public static Feed<Artist> SearchArtists(string query, string requestPath)
         {
@@ -102,7 +104,7 @@ namespace Zune.Net.Helpers
                 Title = mb_artist.Name,
                 SortTitle = mb_artist.SortName,
                 IsVariousArtist = mb_artist.Id == ARTIST_VARIOUSARTISTS,
-                BiographyLink = "https://bing.com",
+                BiographyLink = $"https://catalog.zunes.me/v3.2/en-US/music/artist/{mb_artist.Id}/biography",
                 Updated = updated.Value,
             };
 
