@@ -53,10 +53,10 @@ public class RoomAttributes
 public class RoomRelationships
 {
     [JsonProperty("contents")]
-    public Contents Contents { get; set; }
+    public Contents<Album> Contents { get; set; }
 }
 
-public class Contents
+public class Contents<T>
 {
     [JsonProperty("href")]
     public string Href { get; set; }
@@ -65,7 +65,19 @@ public class Contents
     public string Next { get; set; }
 
     [JsonProperty("data")]
-    public List<Album> Data { get; set; }
+    public List<T> Data { get; set; }
+}
+
+public class DataReference
+{
+    [JsonProperty("id")]
+    public string Id { get; set; }
+    
+    [JsonProperty("type")]
+    public string Type { get; set; }
+    
+    [JsonProperty("href")]
+    public string Href { get; set; }
 }
 
 public class Album
@@ -90,6 +102,15 @@ public class AlbumAttributes
 {
     [JsonProperty("artistName")]
     public string ArtistName { get; set; }
+    
+    [JsonProperty("artistUrl")]
+    public string ArtistUrl { get; set; }
+
+    [JsonProperty("editorialArtwork")]
+    public EditorialArtwork EditorialArtwork { get; set; }
+
+    [JsonProperty("plainEditorialNotes")]
+    public EditorialNotes PlainEditorialNotes { get; set; }
 
     [JsonProperty("artwork")]
     public Artwork Artwork { get; set; }
@@ -195,6 +216,18 @@ public class PlayParams
 
     [JsonProperty("kind")]
     public string Kind { get; set; }
+}
+
+public class Preview
+{
+    [JsonProperty("artwork")]
+    public Artwork Artwork { get; set; }
+    
+    [JsonProperty("hlsUrl")]
+    public string HlsUrl { get; set; }
+    
+    [JsonProperty("url")]
+    public string Url { get; set; }
 }
 
 public class AlbumMeta
