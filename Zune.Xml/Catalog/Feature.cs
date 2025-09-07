@@ -1,5 +1,6 @@
 ﻿using Atom;
 using System.Xml.Serialization;
+using Atom.Xml;
 
 namespace Zune.Xml.Catalog
 {
@@ -14,8 +15,8 @@ namespace Zune.Xml.Catalog
         [XmlElement("title")]
         public string Title { get; set; }
 
-        [XmlElement("text")]
-        public string Text { get; set; }
+        [XmlElement("content")]
+        public Content Content { get; set; }
 
         [XmlElement("sequenceNumber")]
         public int SequenceNumber { get; set; }
