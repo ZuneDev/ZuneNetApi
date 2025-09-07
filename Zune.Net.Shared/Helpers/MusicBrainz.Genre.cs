@@ -33,6 +33,14 @@ namespace Zune.Net.Helpers
             return Genres.Select(g => g.Key).First(g => g.Id == zid);
         }
 
+        public static IEnumerable<MBGenre> GetMBGenresByZID(string zid)
+        {
+            return Genres
+                .Where(g => g.Key.Id.Equals(zid, StringComparison.InvariantCultureIgnoreCase))
+                .SelectMany(g => g.Value)
+                .Select(g => new MBGenre(g.Key, g.Value));
+        }
+
         public static Feed<Album> GetGenreAlbumsByMBID(Guid mbid, string requestPath)
         {
             var mb_genre = _query.LookupGenre(mbid);
@@ -195,6 +203,8 @@ namespace Zune.Net.Helpers
 
 
         public static readonly DateTime GenresLastUpdated = new(2021, 2, 21);
+        
+        public record MBGenre(Guid Id, string Name);
 
         public static readonly Dictionary<Genre, Dictionary<Guid, string>> Genres = new()
         {

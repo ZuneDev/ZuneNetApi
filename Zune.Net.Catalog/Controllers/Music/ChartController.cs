@@ -1,4 +1,5 @@
-﻿using Atom.Xml;
+﻿using System.Collections.Generic;
+using Atom.Xml;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using CommunityToolkit.Diagnostics;
 using MetaBrainz.ListenBrainz;
 using MetaBrainz.ListenBrainz.Interfaces;
 using Zune.Net.Features;
+using Zune.Net.Helpers;
 using Zune.Xml.Catalog;
 
 namespace Zune.Net.Catalog.Controllers.Music
@@ -38,41 +40,17 @@ namespace Zune.Net.Catalog.Controllers.Music
             if (chunkSize is not null)
                 lb_recordings = lb_recordings.Take(chunkSize.Value);
             
-            foreach (var lb_recording in lb_recordings)
-            {
-                Track track = new()
-                {
-                    Id = lb_recording.Id.ToString(),
-                    Title = lb_recording.Name,
-                    Album = new MiniAlbum
-                    {
-                        Id = lb_recording.ReleaseId!.Value,
-                        Title = lb_recording.ReleaseName,
-                    },
-                    PrimaryArtist = new MiniArtist
-                    {
-                        Title = lb_recording.ArtistName
-                    }
-                };
-
-                if (lb_recording.ArtistIds is { Count: > 0 })
-                {
-                    track.PrimaryArtist.Id = lb_recording.ArtistIds[0];
-                    track.Artists ??= [];
-                    
-                    foreach (var artistMbid in lb_recording.ArtistIds)
-                    {
-                        track.Artists.Add(new MiniArtist
-                        {
-                            Id = artistMbid,
-                        });
-                    }
-                }
-                
-                feed.Entries.Add(track);
-            }
+            feed.Entries = LBRecordingsToTracks(lb_recordings).ToList();
 
             return feed;
+        }
+
+        [HttpGet, Route("genre/{genreZid}/tracks")]
+        public async Task<ActionResult<Feed<Track>>> GenreTracks(string genreZid)
+        {
+            var mbGenres = MusicBrainz.GetMBGenresByZID(genreZid).ToHashSet();
+            
+            throw new System.NotImplementedException();
         }
 
         [HttpGet, Route("albums")]
@@ -150,6 +128,51 @@ namespace Zune.Net.Catalog.Controllers.Music
             }
 
             return feed;
+        }
+
+        [HttpGet, Route("genre/{genreZid}/albums")]
+        public async Task<ActionResult<Feed<Album>>> GenreAlbums(string genreZid)
+        {
+            var mbGenres = MusicBrainz.GetMBGenresByZID(genreZid).ToHashSet();
+            
+            throw new System.NotImplementedException();
+        }
+
+        private IEnumerable<Track> LBRecordingsToTracks(IEnumerable<IRecordingInfo> lb_recordings)
+        {
+            foreach (var lb_recording in lb_recordings)
+            {
+                Track track = new()
+                {
+                    Id = lb_recording.Id.ToString(),
+                    Title = lb_recording.Name,
+                    Album = new MiniAlbum
+                    {
+                        Id = lb_recording.ReleaseId!.Value,
+                        Title = lb_recording.ReleaseName,
+                    },
+                    PrimaryArtist = new MiniArtist
+                    {
+                        Title = lb_recording.ArtistName
+                    }
+                };
+
+                if (lb_recording.ArtistIds is { Count: > 0 })
+                {
+                    track.PrimaryArtist.Id = lb_recording.ArtistIds[0];
+                    track.Artists ??= [];
+                    
+                    foreach (var artistMbid in lb_recording.ArtistIds)
+                    {
+                        track.Artists.Add(new MiniArtist
+                        {
+                            Id = artistMbid,
+                        });
+                    }
+                }
+                
+                yield return track;
+            }
         }
     }
 }
