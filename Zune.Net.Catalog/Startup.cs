@@ -1,3 +1,4 @@
+using MetaBrainz.ListenBrainz;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -21,6 +22,7 @@ namespace Zune.Net.Catalog
         {
             services.AddControllersWithViews(o => o.UseZestFormatters());
             services.AddScoped<AppleMusicSharp.AppleMusicClient>();
+            services.AddSingleton<ListenBrainz>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
