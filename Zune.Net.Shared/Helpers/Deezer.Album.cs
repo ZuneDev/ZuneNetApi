@@ -1,18 +1,21 @@
 ﻿using MetaBrainz.MusicBrainz.Interfaces.Entities;
 using Newtonsoft.Json.Linq;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Zune.Net.Helpers
 {
     public partial class Deezer
     {
-        public static IRelease GetMBReleaseByDZAlbum(JToken dz_album)
+        public static async Task<IRelease> GetMBReleaseByDZAlbumAsync(JToken dz_album)
         {
             JToken dz_artist = dz_album["artist"];
-            var results = MusicBrainz._query.FindAllReleases(
-                $"artistname:{dz_artist.Value<string>("name")} AND release:{dz_album.Value<string>("title")}", simple: false);
+            var results = await MusicBrainz._query.FindReleasesAsync(
+                $"artistname:{dz_artist.Value<string>("name")} AND release:{dz_album.Value<string>("title")}",
+                limit: 1,
+                simple: false);
 
-            return results.FirstOrDefault()?.Item;
+            return results.Results.FirstOrDefault()?.Item;
         }
     }
 }
