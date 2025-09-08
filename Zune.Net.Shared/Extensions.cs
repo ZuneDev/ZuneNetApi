@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Routing;
 using System.Reflection;
 using System.Linq;
 using System.IO;
+using Zune.Net.Features;
 
 namespace Zune.Net
 {
@@ -126,6 +127,17 @@ namespace Zune.Net
                 BitConverter.ToUInt16(bytes, sizeof(uint)),
                 BitConverter.ToUInt64(bytes, sizeof(uint) + sizeof(ushort))
             );
+        }
+
+        public static (string ApiVersion, string Culture) GetCurrentVersionAndCulture(this Controller controller)
+        {
+            var apiVersionFeature = controller.HttpContext.Features.Get<IApiVersionFeature>();
+            var apiVersion = apiVersionFeature?.Version ?? "3.2";
+        
+            var cultureFeature = controller.HttpContext.Features.Get<ICultureFeature>();
+            var culture = cultureFeature?.CultureString ?? "en-US";
+            
+            return (apiVersion, culture);
         }
     }
 }

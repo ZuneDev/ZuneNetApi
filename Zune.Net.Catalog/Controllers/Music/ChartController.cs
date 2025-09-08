@@ -4,17 +4,16 @@ using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Diagnostics;
-using MetaBrainz.ListenBrainz;
 using MetaBrainz.ListenBrainz.Interfaces;
-using Zune.Net.Features;
 using Zune.Net.Helpers;
 using Zune.Xml.Catalog;
+using ListenBrainzClient = MetaBrainz.ListenBrainz.ListenBrainz;
 
 namespace Zune.Net.Catalog.Controllers.Music
 {
     [Route("/music/chart/zune/")]
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
-    public class ChartController(ListenBrainz listenBrainz) : Controller
+    public class ChartController(ListenBrainzClient listenBrainz) : Controller
     {
         private static readonly Author LB_AUTHOR = new()
         {
@@ -56,11 +55,7 @@ namespace Zune.Net.Catalog.Controllers.Music
         [HttpGet, Route("albums")]
         public async Task<ActionResult<Feed<Album>>> Albums([FromQuery] int? chunkSize = null)
         {
-            var cultureFeature = HttpContext.Features.Get<ICultureFeature>();
-            var culture = cultureFeature?.CultureString ?? "en-US";
-        
-            var apiVersionFeature = HttpContext.Features.Get<IApiVersionFeature>();
-            var apiVersion = apiVersionFeature?.Version ?? "3.2";
+            var (apiVersion, culture) = this.GetCurrentVersionAndCulture();
             
             var siteStats = await listenBrainz.GetReleaseStatisticsAsync();
             Guard.IsNotNull(siteStats);
