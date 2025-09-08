@@ -43,10 +43,11 @@ namespace Zune.Net.Helpers
                 ? MBReleaseToAlbum(release)
                 : null;
         }
-        
-        public static Album MBReleaseToAlbum(IRelease mb_rel, DateTime? updated = null, bool includeRights = true)
+
+        public static Album MBReleaseToAlbum(IRelease mb_rel) => MBReleaseToAlbum(mb_rel, DateTime.Now);
+
+        public static Album MBReleaseToAlbum(IRelease mb_rel, DateTime updated, bool includeRights = true)
         {
-            updated ??= DateTime.Now;
             var mb_artist = mb_rel.ArtistCredit?[0].Artist;
             var artist = MBArtistToMiniArtist(mb_artist);
 
@@ -61,7 +62,7 @@ namespace Zune.Net.Helpers
                 {
                     new() { Id = mb_rel.Id }
                 },
-                Updated = updated.Value,
+                Updated = updated,
             };
 
             if (mb_rel.Genres is { Count: > 0 })
