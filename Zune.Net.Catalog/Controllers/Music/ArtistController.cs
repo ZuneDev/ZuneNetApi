@@ -1,26 +1,23 @@
-using Atom.Xml;
+﻿using Atom.Xml;
 using Flurl.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Zune.DB;
+using Zune.Net.Features;
 using Zune.Net.Helpers;
 using Zune.Xml.Catalog;
+using ListenBrainz = Zune.Net.Helpers.ListenBrainz;
 
 namespace Zune.Net.Catalog.Controllers.Music
 {
     [Route("/music/artist/")]
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
-    public class ArtistController : Controller
+    public class ArtistController(ZuneNetContext database) : Controller
     {
-        private readonly ZuneNetContext _database;
-        public ArtistController(ZuneNetContext database)
-        {
-            _database = database;
-        }
-
         [HttpGet, Route("")]
         public ActionResult<Feed<Artist>> Search()
         {
@@ -46,7 +43,7 @@ namespace Zune.Net.Catalog.Controllers.Music
                 if (dc_artist_image != null)
                 {
                     string artistImageUrl = dc_artist_image.Value<string>("uri");
-                    var artistImageEntry = await _database.AddImageAsync(artistImageUrl);
+                    var artistImageEntry = await database.AddImageAsync(artistImageUrl);
 
                     artist.BackgroundImage = new()
                     {
@@ -59,40 +56,92 @@ namespace Zune.Net.Catalog.Controllers.Music
         }
 
         [HttpGet, Route("{mbid}/tracks")]
-        public ActionResult<Feed<Track>> Tracks(Guid mbid)
+        public async Task<ActionResult<Feed<Track>>> Tracks(Guid mbid,
+            [FromQuery] int? chunkSize = null, [FromQuery(Name = "orderby")] string orderBy = null)
         {
-            if (!Request.Query.TryGetValue("chunkSize", out var chunkSizeStrs) || chunkSizeStrs.Count != 1)
-                return BadRequest();
-
-            return MusicBrainz.GetArtistTracksByMBID(mbid, Request.Path, int.Parse(chunkSizeStrs[0]));
-        }
-
-        [HttpGet, Route("{mbid}/albums")]
-        public ActionResult<Feed<Album>> Albums(Guid mbid)
-        {
-            var feed = MusicBrainz.GetArtistAlbumsByMBID(mbid, Request.Path);
-
-            Comparison<Album> sortComparer = (a, b) => a.ReleaseDate.Year.CompareTo(b.ReleaseDate.Year);
-            if (Request.Query.TryGetValue("orderby", out var orderByValue))
+            Feed<Track> feed = new()
             {
-                string orderBy = orderByValue.Single().ToLower();
-                switch (orderBy)
-                {
-                    case "title":
-                        sortComparer = (a, b) => (a.SortTitle ?? a.Title.Value).CompareTo(b.SortTitle ?? b.Title.Value);
-                        break;
+                Id = mbid.ToString(),
+                Title = "albums",
+                Links = { new Link(Request.Path) },
+                Entries = await MusicBrainz.GetArtistTracksByMBID(mbid, chunkSize)
+                    .Take(chunkSize ?? 20)
+                    .ToListAsync(),
+                Updated = DateTime.Now,
+            };
 
-                    case "mostplayed":
-                        sortComparer = (a, b) => a.Popularity.CompareTo(b.Popularity);
-                        break;
-                }
+            orderBy = orderBy?.ToLowerInvariant();
+            if (orderBy is "mostplayed" or "playrank")
+            {
+                // We need data from ListenBrainz to sort this
+                var trackMbids = feed.Entries.Select(track => track.Id).ToList();
+                var popularities = await ListenBrainz.GetRecordingPopularity(trackMbids);
+
+                foreach (var track in feed.Entries)
+                    if (popularities.TryGetValue(track.Id, out var popularity))
+                        track.Popularity = popularity;
             }
+            
+            var cultureFeature = HttpContext.Features.Get<ICultureFeature>();
+            var culture = cultureFeature?.GetCultureInfo() ?? CultureInfo.CurrentCulture;
+
+            Comparison<Track> sortComparer = orderBy switch
+            {
+                "title" => (a, b) => culture.CompareInfo.Compare(a.SortTitle ?? a.Title.Value, b.SortTitle ?? b.Title.Value),
+                "mostplayed" or
+                "playrank" or
+                _ => (a, b) => b.Popularity.CompareTo(a.Popularity),
+            };
 
             feed.Entries.Sort(sortComparer);
             return feed;
         }
 
- 	[HttpGet, Route("{mbid}/deviceBackgroundImage")]
+        [HttpGet, Route("{mbid}/albums")]
+        [HttpGet, Route("{mbid}/relatedAlbums")]
+        public async Task<ActionResult<Feed<Album>>> Albums(Guid mbid,
+            [FromQuery] int? chunkSize = null, [FromQuery(Name = "orderby")] string orderBy = null)
+        {
+            Feed<Album> feed = new()
+            {
+                Id = mbid.ToString(),
+                Title = "albums",
+                Links = { new Link(Request.Path) },
+                Entries = await MusicBrainz.GetArtistAlbumsByMBID(mbid, chunkSize)
+                    .Take(chunkSize ?? 20)
+                    .ToListAsync(),
+                Updated = DateTime.Now,
+            };
+            
+            orderBy = orderBy?.ToLowerInvariant();
+            if (orderBy is "mostplayed" or "playrank")
+            {
+                // We need data from ListenBrainz to sort this
+                var releaseMbids = feed.Entries.Select(album => album.Id).ToList();
+                var popularities = await ListenBrainz.GetReleasePopularity(releaseMbids);
+
+                foreach (var album in feed.Entries)
+                    if (popularities.TryGetValue(album.Id, out var popularity))
+                        album.Popularity = popularity;
+            }
+            
+            var cultureFeature = HttpContext.Features.Get<ICultureFeature>();
+            var culture = cultureFeature?.GetCultureInfo() ?? CultureInfo.CurrentCulture;
+
+            Comparison<Album> sortComparer = orderBy?.ToLowerInvariant() switch
+            {
+                "title" => (a, b) => culture.CompareInfo.Compare(a.SortTitle ?? a.Title.Value, b.SortTitle ?? b.Title.Value),
+                "mostplayed" or
+                "playrank" => (a, b) => b.Popularity.CompareTo(a.Popularity),
+                "releasedate" or
+                _ => (a, b) => b.ReleaseDate.Year.CompareTo(a.ReleaseDate.Year)
+            };
+
+            feed.Entries.Sort(sortComparer);
+            return feed;
+        }
+
+ 	    [HttpGet, Route("{mbid}/deviceBackgroundImage")]
         [HttpGet, Route("{mbid}/primaryImage")]
         public async Task<ActionResult> PrimaryImage(Guid mbid)
         {

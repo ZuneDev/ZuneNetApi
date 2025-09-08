@@ -2,6 +2,7 @@
 using MetaBrainz.MusicBrainz;
 using MetaBrainz.MusicBrainz.Interfaces.Entities;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Zune.Xml.Catalog;
 
@@ -45,55 +46,25 @@ namespace Zune.Net.Helpers
             return MBArtistToArtist(mb_artist);
         }
 
-        public static Feed<Track> GetArtistTracksByMBID(Guid mbid, string requestPath, int chunkSize)
+        public static async IAsyncEnumerable<Track> GetArtistTracksByMBID(Guid mbid, int? pageSize = null)
         {
-            var results = _query.BrowseAllArtistRecordings(mbid, pageSize: chunkSize, inc: Include.ArtistCredits);
-            var updated = DateTime.Now;
-            Feed<Track> feed = new()
-            {
-                Id = mbid.ToString(),
-                Title = "tracks",
-                Links = { new(requestPath) },
-                Updated = updated,
-                Entries = new(chunkSize)
-            };
+            var results = _query.BrowseAllArtistRecordings(mbid,
+                inc: Include.ArtistCredits | Include.ReleaseRelationships,
+                pageSize: pageSize);
 
-            // Add results to feed
-            foreach (var mb_rec in results)
-            {
-                if (feed.Entries.Count == chunkSize) break;
-
-                feed.Entries.Add(MBRecordingToTrack(mb_rec, updated: updated, includeRights: true));
-            }
-
-            return feed;
+            await foreach (var recording in results.AsAsyncEnumerable())
+                yield return MBRecordingToTrack(recording);
         }
 
-        public static Feed<Album> GetArtistAlbumsByMBID(Guid mbid, string requestPath)
+        public static async IAsyncEnumerable<Album> GetArtistAlbumsByMBID(Guid mbid, int? pageSize = null)
         {
-            var results = _query.BrowseAllArtistReleases(mbid, inc: Include.ArtistCredits | Include.ReleaseRelationships);
-            var updated = DateTime.Now;
-            Feed<Album> feed = new()
-            {
-                Id = mbid.ToString(),
-                Title = "albums",
-                Links = { new(requestPath) },
-                Updated = updated,
-                Entries = new()
-            };
+            var results = _query.BrowseAllArtistReleases(mbid,
+                inc: Include.ArtistCredits | Include.ReleaseRelationships,
+                pageSize: pageSize);
 
-            // Add results to feed
-            const int chunkSize = 100;
-            foreach (var mb_release in results)
-            {
-                if (feed.Entries.Count == chunkSize) break;
-
-                feed.Entries.Add(MBReleaseToAlbum(mb_release, updated: updated));
-            }
-
-            return feed;
+            await foreach (var release in results.AsAsyncEnumerable())
+                yield return MBReleaseToAlbum(release);
         }
-
 
         public static Artist MBArtistToArtist(IArtist mb_artist, DateTime? updated = null)
         {
