@@ -2,40 +2,46 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
+using Flurl.Http;
 using Zune.DB;
 using Zune.Net.Helpers;
 using Zune.Xml.Catalog;
 
 namespace Zune.Net.Catalog.Controllers.Podcast
 {
-    [Route("/v{version:decimal}/{culture}/")]
+    [Route("")]
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
-    public class PodcastController : Controller
+    public class PodcastController(ZuneNetContext database) : Controller
     {
-        private readonly ZuneNetContext _database;
-        public PodcastController(ZuneNetContext database)
-        {
-            _database = database;
-        }
-
         [HttpGet, Route("podcast")]
-        public async Task<ActionResult<Feed<PodcastSeries>>> Search()
+        public async Task<IActionResult> Search([FromQuery(Name = "q")] string query,
+            [FromQuery] string url)
         {
-            if (!Request.Query.TryGetValue("q", out var queries) || queries.Count != 1)
-                return BadRequest();
-
-            var feed = await Taddy.SearchPodcasts(queries[0]);
+            if (url is not null)
+            {
+                // TODO: See https://zunepodcasts.net/
+                await using var podcastStream = await url.GetStreamAsync();
+                return File(podcastStream, "application/rss+xml");
+            }
+            
+            var feed = await Listen.SearchPodcasts(query);
             foreach (var podcast in feed.Entries)
-                await AddImagesToDatabase(_database, podcast);
+                await AddImagesToDatabase(database, podcast);
 
-            return feed;
+            return Ok(feed);
         }
 
-        [HttpGet, Route("podcast/{tdid}")]
-        public async Task<PodcastSeries> Details(Guid tdid)
+        [HttpGet, Route("podcast/{lnid}")]
+        public async Task<PodcastSeries> Details(Guid lnid)
         {
-            var podcast = await Taddy.GetPodcastByTDID(tdid);
-            await AddImagesToDatabase(_database, podcast);
+            var podcast = await Listen.GetPodcast(lnid.ToString("N"));
+            
+            // Search on Taddy for RSS URL
+            var td_pod = await Taddy.GetMinimalPodcastInfo(podcast.Title.Value);
+            podcast.Id = td_pod.Id.ToString();
+            podcast.FeedUrl = td_pod.RssUrl;
+            
+            await AddImagesToDatabase(database, podcast);
             return podcast;
         }
 
@@ -58,14 +64,14 @@ namespace Zune.Net.Catalog.Controllers.Podcast
         [NonAction]
         internal static async Task AddImagesToDatabase(ZuneNetContext database, PodcastSeries podcast)
         {
-            if (podcast != null && podcast.Images != null && podcast.Images.Count > 0)
-            {
-                // Add image ID
-                var img = podcast.Images[0];
-                var imgInst = img.Instances[0];
-                var imgEntry = await database.AddImageAsync(imgInst.Url);
-                img.Id = imgInst.Id = imgEntry.Id;
-            }
+            if (podcast is not { Images.Count: > 0 })
+                return;
+
+            // Add image ID
+            var img = podcast.Images[0];
+            var imgInst = img.Instances[0];
+            var imgEntry = await database.AddImageAsync(imgInst.Url);
+            img.Id = imgInst.Id = imgEntry.Id;
         }
     }
 }

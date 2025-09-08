@@ -45,21 +45,70 @@ namespace Zune.Net.Helpers
             return feed;
         }
 
+        public static async Task<Feed<PodcastSeries>> SearchPodcasts(string query, string region = null, int? pageSize = null, int? offset = null)
+        {
+            Dictionary<string, string> parameters = new()
+            {
+                ["q"] = query,
+                ["only_in"] = "title,description",
+                ["type"] = "podcast",
+            };
+            if (pageSize is not null)
+                parameters.Add("page_size", pageSize.Value.ToString());
+            if (offset is not null)
+                parameters.Add("offset", offset.Value.ToString());
+            if (region != null)
+                parameters.Add("region", region.ToLowerInvariant());
+            var result = await _client.Search(parameters);
+
+            var ln_podcasts = result.ToJSON<JToken>()["results"];
+            var updated = DateTime.Now;
+            Feed<PodcastSeries> feed = new()
+            {
+                Id = "podcasts",
+                Title = "Podcasts",
+                Author = LN_AUTHOR,
+                Entries = ln_podcasts.Select(LNPodcastToPodcastSeries).ToList(),
+                Updated = updated,
+            };
+
+            return feed;
+        }
+        
+        public static async Task<PodcastSeries> GetPodcast(string id)
+        {
+            Dictionary<string, string> parameters = new()
+            {
+                ["id"] = id,
+                ["sort"] = "recent_first",
+            };
+            
+            var result = await _client.FetchPodcastById(parameters);
+
+            var ln_podcast = result.ToJSON<JToken>();
+
+            return LNPodcastToPodcastSeries(ln_podcast);
+        }
+
         public static PodcastSeries LNPodcastToPodcastSeries(JToken ln_podcast)
         {
-            string authorName = ln_podcast.Value<string>("publisher");
+            var authorName = ln_podcast.Value<string>("publisher");
+            var description = ln_podcast.Value<string>("description")
+                ?? ln_podcast.Value<string>("description_original");
+            var title = ln_podcast.Value<string>("title")
+                ?? ln_podcast.Value<string>("title_original");
 
-            return new()
+            PodcastSeries podcast = new()
             {
                 // Convert LNID to GUID just for consistency
                 Id = new Guid(ln_podcast.Value<string>("id")).ToString(),
-                Title = ln_podcast.Value<string>("title"),
+                Title = title,
                 FeedUrl = ln_podcast.Value<string>("rss"),
                 Type = ln_podcast.Value<string>("type"),
-                Content = ln_podcast.Value<string>("description"),
-                PrimaryArtist = new()
+                Content = new Content
                 {
-                    Title = authorName,
+                    Type = ContentType.HTML,
+                    Value = description,
                 },
                 Author = new()
                 {
@@ -84,6 +133,8 @@ namespace Zune.Net.Helpers
                     }
                 }
             };
+
+            return podcast;
         }
     }
 }

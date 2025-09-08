@@ -2,31 +2,25 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Zune.DB;
+using Zune.Net.Features;
 using Zune.Net.Helpers;
 using Zune.Xml.Catalog;
 
 namespace Zune.Net.Catalog.Controllers.Podcast
 {
-    [Route("/v{version:decimal}/{culture}/podcastchart/zune/")]
+    [Route("/podcastchart/zune/")]
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
-    public class ChartController : Controller
+    public class ChartController(ZuneNetContext database) : Controller
     {
-        private readonly ZuneNetContext _database;
-        public ChartController(ZuneNetContext database)
-        {
-            _database = database;
-        }
-
         [HttpGet, Route("podcasts")]
-        public async Task<ActionResult<Feed<PodcastSeries>>> Podcasts(string culture)
+        public async Task<ActionResult<Feed<PodcastSeries>>> Podcasts([FromQuery] int chunkSize = 50)
         {
-            int limit = 26;
-            if (Request.Query.TryGetValue("chunkSize", out var chunkSizeVal))
-                limit = int.Parse(chunkSizeVal[0]);
+            var cultureFeature = HttpContext.Features.Get<ICultureFeature>();
+            var region = cultureFeature.Region;
+            
+            var feed = await Listen.GetBestPodcasts(region, limit: chunkSize);
 
-            var feed = await Listen.GetBestPodcasts(culture[(culture.IndexOf('-') + 1)..], limit: limit);
-
-            foreach (var podcast in feed.Entries)
+            await Parallel.ForEachAsync(feed.Entries, async (podcast, token) =>
             {
                 try
                 {
@@ -36,10 +30,10 @@ namespace Zune.Net.Catalog.Controllers.Podcast
                     podcast.FeedUrl = td_pod.RssUrl;
                     podcast.Content = td_pod.Description;
 
-                    await PodcastController.AddImagesToDatabase(_database, podcast);
+                    await PodcastController.AddImagesToDatabase(database, podcast);
                 }
                 catch { }
-            }
+            });
 
             return feed;
         }
