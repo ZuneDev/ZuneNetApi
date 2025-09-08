@@ -22,6 +22,7 @@ namespace Zune.Net.Catalog
             services.AddControllersWithViews(o => o.UseZestFormatters());
             services.AddScoped<AppleMusicSharp.AppleMusicClient>();
             services.AddSingleton<MetaBrainz.ListenBrainz.ListenBrainz>();
+            services.AddSingleton<IdMapper>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

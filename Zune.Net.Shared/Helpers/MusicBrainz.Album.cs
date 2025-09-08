@@ -66,7 +66,12 @@ namespace Zune.Net.Helpers
             };
 
             if (mb_rel.Genres is { Count: > 0 })
-                album.PrimaryGenre = MBGenreToGenre(mb_rel.Genres[0]);
+            {
+                var highestRatedGenre = mb_rel.Genres
+                    .OrderByDescending(g => g.VoteCount ?? 0)
+                    .First();
+                album.PrimaryGenre = MBGenreToGenre(highestRatedGenre);
+            }
 
             if (mb_rel.Date is not null)
                 album.ReleaseDate = mb_rel.Date.NearestDate;

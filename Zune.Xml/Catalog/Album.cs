@@ -15,5 +15,8 @@ namespace Zune.Xml.Catalog
 
         [XmlElement(ElementName = "entry")]
         public List<Track> Tracks { get; set; }
+        
+        [XmlElement(ElementName = "review")]
+        public Review Review { get; set; }
     }
 }
