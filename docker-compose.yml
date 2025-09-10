@@ -48,6 +48,11 @@ services:
       - "traefik.http.routers.catalog-ssl.rule=Host(`catalog-ssl.${DOMAIN_ROOT}`)"
       - "traefik.http.routers.catalog-ssl.entrypoints=websecure"
       - "traefik.http.routers.catalog-ssl.tls.certresolver=letsencrypt"
+      
+      - "traefik.http.routers.catalog-og.rule=Host(`catalog.zune.net`)"
+      - "traefik.http.routers.catalog-ssl-og.rule=Host(`catalog-ssl.zune.net`)"
+      - "traefik.http.routers.catalog-ssl-og.entrypoints=websecure"
+      - "traefik.http.routers.catalog-ssl-og.tls.certresolver=letsencrypt"
     environment:
       << : [*env-aspnet]
 
@@ -67,6 +72,11 @@ services:
       - "traefik.http.routers.catalog-image-ssl.rule=Host(`image.catalog.${DOMAIN_ROOT}`)"
       - "traefik.http.routers.catalog-image-ssl.entrypoints=websecure"
       - "traefik.http.routers.catalog-image-ssl.tls.certresolver=letsencrypt"
+      
+      - "traefik.http.routers.catalog-image-og.rule=Host(`image.catalog.zune.net`)"
+      - "traefik.http.routers.catalog-image-ssl-og.rule=Host(`image.catalog.zune.net`)"
+      - "traefik.http.routers.catalog-image-ssl-og.entrypoints=websecure"
+      - "traefik.http.routers.catalog-image-ssl-og.tls.certresolver=letsencrypt"
     environment:
       << : [*env-aspnet]
 
@@ -85,7 +95,10 @@ services:
       - "traefik.http.routers.commerce.rule=Host(`commerce.${DOMAIN_ROOT}`)"
       - "traefik.http.routers.commerce-ssl.rule=Host(`commerce-ssl.${DOMAIN_ROOT}`)"
       - "traefik.http.routers.commerce-ssl.entrypoints=websecure"
-      - "traefik.http.routers.commerce-ssl.tls.certresolver=letsencrypt"
+      
+      - "traefik.http.routers.commerce-og.rule=Host(`commerce.zune.net`)"
+      - "traefik.http.routers.commerce-ssl-og.rule=Host(`commerce-ssl.zune.net`)"
+      - "traefik.http.routers.commerce-ssl-og.entrypoints=websecure"
     environment:
       << : [*env-aspnet]
 
@@ -105,6 +118,11 @@ services:
       - "traefik.http.routers.inbox-ssl.rule=Host(`inbox-ssl.${DOMAIN_ROOT}`)"
       - "traefik.http.routers.inbox-ssl.entrypoints=websecure"
       - "traefik.http.routers.inbox-ssl.tls.certresolver=letsencrypt"
+      
+      - "traefik.http.routers.inbox-og.rule=Host(`inbox.zune.net`)"
+      - "traefik.http.routers.inbox-ssl-og.rule=Host(`inbox-ssl.zune.net`)"
+      - "traefik.http.routers.inbox-ssl-og.entrypoints=websecure"
+      - "traefik.http.routers.inbox-ssl-og.tls.certresolver=letsencrypt"
     environment:
       << : [*env-aspnet]
 
@@ -124,6 +142,11 @@ services:
       - "traefik.http.routers.login-ssl.rule=Host(`login-ssl.${DOMAIN_ROOT}`)"
       - "traefik.http.routers.login-ssl.entrypoints=websecure"
       - "traefik.http.routers.login-ssl.tls.certresolver=letsencrypt"
+      
+      - "traefik.http.routers.login-og.rule=Host(`login.zune.net`)"
+      - "traefik.http.routers.login-ssl-og.rule=Host(`login-ssl.zune.net`)"
+      - "traefik.http.routers.login-ssl-og.entrypoints=websecure"
+      - "traefik.http.routers.login-ssl-og.tls.certresolver=letsencrypt"
     environment:
       << : [*env-aspnet]
 
@@ -162,6 +185,11 @@ services:
       - "traefik.http.routers.mix-ssl.rule=Host(`mix-ssl.${DOMAIN_ROOT}`)"
       - "traefik.http.routers.mix-ssl.tls.certresolver=letsencrypt"
       - "traefik.http.routers.mix-ssl.entrypoints=websecure"
+      
+      - "traefik.http.routers.mix-og.rule=Host(`mix.zune.net`)"
+      - "traefik.http.routers.mix-ssl-og.rule=Host(`mix-ssl.zune.net`)"
+      - "traefik.http.routers.mix-ssl-og.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.mix-ssl-og.entrypoints=websecure"
     environment:
       << : [*env-aspnet]
 
@@ -181,6 +209,11 @@ services:
       - "traefik.http.routers.socialapi-ssl.rule=Host(`socialapi-ssl.${DOMAIN_ROOT}`)"
       - "traefik.http.routers.socialapi-ssl.tls.certresolver=letsencrypt"
       - "traefik.http.routers.socialapi-ssl.entrypoints=websecure"
+      
+      - "traefik.http.routers.socialapi-og.rule=Host(`socialapi.zune.net`)"
+      - "traefik.http.routers.socialapi-ssl-og.rule=Host(`socialapi-ssl.zune.net`)"
+      - "traefik.http.routers.socialapi-ssl-og.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.socialapi-ssl-og.entrypoints=websecure"
     environment:
       << : [*env-aspnet]
 
@@ -200,6 +233,11 @@ services:
       - "traefik.http.routers.tiles-ssl.rule=Host(`tiles-ssl.${DOMAIN_ROOT}`)"
       - "traefik.http.routers.tiles-ssl.tls.certresolver=letsencrypt"
       - "traefik.http.routers.tiles-ssl.entrypoints=websecure"
+      
+      - "traefik.http.routers.tiles-og.rule=Host(`tiles.zune.net`)"
+      - "traefik.http.routers.tiles-ssl-og.rule=Host(`tiles-ssl.zune.net`)"
+      - "traefik.http.routers.tiles-ssl-og.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.tiles-ssl-og.entrypoints=websecure"
     environment:
       << : [*env-aspnet]
 
@@ -219,6 +257,11 @@ services:
       - "traefik.http.routers.tuners-ssl.rule=Host(`tuners-ssl.${DOMAIN_ROOT}`)"
       - "traefik.http.routers.tuners-ssl.tls.certresolver=letsencrypt"
       - "traefik.http.routers.tuners-ssl.entrypoints=websecure"
+      
+      - "traefik.http.routers.tuners-og.rule=Host(`tuners.zune.net`)"
+      - "traefik.http.routers.tuners-ssl-og.rule=Host(`tuners-ssl.zune.net`)"
+      - "traefik.http.routers.tuners-ssl-og.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.tuners-ssl-og.entrypoints=websecure"
     environment:
       << : [*env-aspnet]
 
