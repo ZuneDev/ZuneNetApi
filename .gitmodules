@@ -1,3 +1,7 @@
 [submodule "Backing/lastfm"]
 	path = Backing/lastfm
 	url = https://github.com/yoshiask/lastfm
+[submodule "Backing/MetaBrainz.ListenBrainz"]
+	path = Backing/MetaBrainz.ListenBrainz
+	url = https://github.com/yoshiask/MetaBrainz.ListenBrainz.git
+	branch = tmp/legacy-nuget-pkgs

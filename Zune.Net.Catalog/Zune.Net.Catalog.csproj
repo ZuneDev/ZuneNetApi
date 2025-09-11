@@ -12,8 +12,7 @@
 
     <ItemGroup>
         <PackageReference Include="Flurl.Http" Version="3.2.4" />
-        
-        <ProjectReference Include="..\..\..\Zastai\MetaBrainz.ListenBrainz\MetaBrainz.ListenBrainz\MetaBrainz.ListenBrainz.csproj" />
+        <ProjectReference Include="..\Backing\MetaBrainz.ListenBrainz\MetaBrainz.ListenBrainz\MetaBrainz.ListenBrainz.csproj" />
         <!--<PackageReference Include="MetaBrainz.ListenBrainz" Version="4.0.0" />-->
         
         <PackageReference Include="Microsoft.NET.Build.Containers" Version="9.0.102" />
