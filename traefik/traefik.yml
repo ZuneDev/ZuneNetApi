@@ -11,6 +11,8 @@ entryPoints:
     http:
       tls:
         certResolver: letsencrypt
+  webinsecure:
+    address: ":443"
 
 serversTransport:
   insecureSkipVerify: true
