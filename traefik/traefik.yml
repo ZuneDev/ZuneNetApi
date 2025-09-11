@@ -8,11 +8,6 @@ entryPoints:
     address: ":80"
   websecure:
     address: ":443"
-    http:
-      tls:
-        certResolver: letsencrypt
-  webinsecure:
-    address: ":443"
 
 serversTransport:
   insecureSkipVerify: true

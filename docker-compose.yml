@@ -51,7 +51,7 @@ services:
       
       - "traefik.http.routers.catalog-og.rule=Host(`catalog.zune.net`)"
       - "traefik.http.routers.catalog-ssl-og.rule=Host(`catalog-ssl.zune.net`)"
-      - "traefik.http.routers.catalog-ssl-og.entrypoints=webinsecure"
+      - "traefik.http.routers.catalog-ssl-og.entrypoints=websecure"
     environment:
       << : [*env-aspnet]
 
@@ -74,7 +74,7 @@ services:
       
       - "traefik.http.routers.catalog-image-og.rule=Host(`image.catalog.zune.net`)"
       - "traefik.http.routers.catalog-image-ssl-og.rule=Host(`image.catalog.zune.net`)"
-      - "traefik.http.routers.catalog-image-ssl-og.entrypoints=webinsecure"
+      - "traefik.http.routers.catalog-image-ssl-og.entrypoints=websecure"
     environment:
       << : [*env-aspnet]
 
@@ -93,10 +93,11 @@ services:
       - "traefik.http.routers.commerce.rule=Host(`commerce.${DOMAIN_ROOT}`)"
       - "traefik.http.routers.commerce-ssl.rule=Host(`commerce-ssl.${DOMAIN_ROOT}`)"
       - "traefik.http.routers.commerce-ssl.entrypoints=websecure"
+      - "traefik.http.routers.commerce-ssl.tls.certresolver=letsencrypt"
       
       - "traefik.http.routers.commerce-og.rule=Host(`commerce.zune.net`)"
       - "traefik.http.routers.commerce-ssl-og.rule=Host(`commerce-ssl.zune.net`)"
-      - "traefik.http.routers.commerce-ssl-og.entrypoints=webinsecure"
+      - "traefik.http.routers.commerce-ssl-og.entrypoints=websecure"
     environment:
       << : [*env-aspnet]
 
@@ -119,7 +120,7 @@ services:
       
       - "traefik.http.routers.inbox-og.rule=Host(`inbox.zune.net`)"
       - "traefik.http.routers.inbox-ssl-og.rule=Host(`inbox-ssl.zune.net`)"
-      - "traefik.http.routers.inbox-ssl-og.entrypoints=webinsecure"
+      - "traefik.http.routers.inbox-ssl-og.entrypoints=websecure"
     environment:
       << : [*env-aspnet]
 
@@ -142,7 +143,7 @@ services:
       
       - "traefik.http.routers.login-og.rule=Host(`login.zune.net`)"
       - "traefik.http.routers.login-ssl-og.rule=Host(`login-ssl.zune.net`)"
-      - "traefik.http.routers.login-ssl-og.entrypoints=webinsecure"
+      - "traefik.http.routers.login-ssl-og.entrypoints=websecure"
     environment:
       << : [*env-aspnet]
 
@@ -184,7 +185,7 @@ services:
       
       - "traefik.http.routers.mix-og.rule=Host(`mix.zune.net`)"
       - "traefik.http.routers.mix-ssl-og.rule=Host(`mix-ssl.zune.net`)"
-      - "traefik.http.routers.mix-ssl-og.entrypoints=webinsecure"
+      - "traefik.http.routers.mix-ssl-og.entrypoints=websecure"
     environment:
       << : [*env-aspnet]
 
@@ -207,7 +208,7 @@ services:
       
       - "traefik.http.routers.socialapi-og.rule=Host(`socialapi.zune.net`)"
       - "traefik.http.routers.socialapi-ssl-og.rule=Host(`socialapi-ssl.zune.net`)"
-      - "traefik.http.routers.socialapi-ssl-og.entrypoints=webinsecure"
+      - "traefik.http.routers.socialapi-ssl-og.entrypoints=websecure"
     environment:
       << : [*env-aspnet]
 
@@ -230,7 +231,7 @@ services:
       
       - "traefik.http.routers.tiles-og.rule=Host(`tiles.zune.net`)"
       - "traefik.http.routers.tiles-ssl-og.rule=Host(`tiles-ssl.zune.net`)"
-      - "traefik.http.routers.tiles-ssl-og.entrypoints=webinsecure"
+      - "traefik.http.routers.tiles-ssl-og.entrypoints=websecure"
     environment:
       << : [*env-aspnet]
 
@@ -253,7 +254,7 @@ services:
       
       - "traefik.http.routers.tuners-og.rule=Host(`tuners.zune.net`)"
       - "traefik.http.routers.tuners-ssl-og.rule=Host(`tuners-ssl.zune.net`)"
-      - "traefik.http.routers.tuners-ssl-og.entrypoints=webinsecure"
+      - "traefik.http.routers.tuners-ssl-og.entrypoints=websecure"
     environment:
       << : [*env-aspnet]
 
