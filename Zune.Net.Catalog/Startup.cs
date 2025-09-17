@@ -26,8 +26,7 @@ namespace Zune.Net.Catalog
             
             services.AddCors(options =>
             {
-                options.AddDefaultPolicy(
-                    policy => policy.AllowAnyOrigin());
+                options.AddUnrestrictedCorsDefault();
             });
         }
 

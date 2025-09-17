@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Routing;
 using System.Reflection;
 using System.Linq;
 using System.IO;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Zune.Net.Features;
 
 namespace Zune.Net
@@ -71,6 +72,14 @@ namespace Zune.Net
             {
                 return Results.Content(_homeRouteHtml, "text/html");
             });
+        }
+
+        public static void AddUnrestrictedCorsDefault(this CorsOptions options)
+        {
+            options.AddDefaultPolicy(policy => policy
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
         }
 
         public static JToken SerializeToJson(this IConfiguration config)
