@@ -20,6 +20,7 @@ public class IdMapper
         ["alid"] = new(WikidataProperty.ALArtistId, (m, v) => m.AllMusic = v),
         ["dcid"] = new(WikidataProperty.DCArtistId, (m, v) => m.Discogs = v),
         ["dzid"] = new(WikidataProperty.DZArtistId, (m, v) => m.Deezer = v),
+        ["fmid"] = new(WikidataProperty.FMId, (m, v) => m.LastFM = v),
         ["spid"] = new(WikidataProperty.SPArtistId, (m, v) => m.Spotify = v),
         ["tiid"] = new(WikidataProperty.TIArtistId, (m, v) => m.Tidal = v),
     };
@@ -31,6 +32,7 @@ public class IdMapper
         ["amid"] = new(WikidataProperty.AMAlbumId, (m, v) => m.AppleMusic = v),
         ["dcid"] = new(WikidataProperty.DCMasterId, (m, v) => m.Discogs = v),
         ["dzid"] = new(WikidataProperty.DZAlbumId, (m, v) => m.Deezer = v),
+        ["fmid"] = new(WikidataProperty.FMId, (m, v) => m.LastFM = v),
         ["spid"] = new(WikidataProperty.SPAlbumId, (m, v) => m.Spotify = v),
         ["tiid"] = new(WikidataProperty.TIAlbumId, (m, v) => m.Tidal = v),
     };

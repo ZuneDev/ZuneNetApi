@@ -23,6 +23,9 @@ public enum WikidataProperty
     MBReleaseId = 5813,
     SPAlbumId = 2205,
     TIAlbumId = 4577,
+    
+    /* Universal */
+    FMId = 3192,
 }
 
 public class ArtistIdMap
@@ -30,6 +33,7 @@ public class ArtistIdMap
     public string? AllMusic { get; set; }
     public string? Discogs { get; set; }
     public string? Deezer { get; set; }
+    public string? LastFM { get; set; }
     public Guid? MusicBrainz { get; set; }
     public string? Spotify { get; set; }
     public string? Tidal { get; set; }
@@ -41,6 +45,7 @@ public class AlbumIdMap
     public string? AllMusic { get; set; }
     public string? Discogs { get; set; }
     public string? Deezer { get; set; }
+    public string? LastFM { get; set; }
     public Guid? MusicBrainzReleaseGroup { get; set; }
     public string? Spotify { get; set; }
     public string? Tidal { get; set; }
