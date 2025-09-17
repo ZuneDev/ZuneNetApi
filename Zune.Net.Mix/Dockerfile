@@ -4,9 +4,8 @@ WORKDIR /source
 
 #  cache the build result to speed up subsequent package steps
 COPY ./ .
-RUN dotnet restore
-
-RUN dotnet publish -c release -o /app --no-restore
+RUN dotnet restore ./Zune.Net.Mix/Zune.Net.Mix.csproj
+RUN dotnet publish -c release -o /app --no-restore ./Zune.Net.Mix/Zune.Net.Mix.csproj
 
 # final stage/image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
