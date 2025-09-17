@@ -37,12 +37,12 @@ namespace Zune.Net.Catalog.Image
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCors();
+
             app.UseRequestBuffering();
 
             app.UseCommonRouting();
             app.UseRouting();
-
-            app.UseCors();
 
             app.UseEndpoints(endpoints =>
             {

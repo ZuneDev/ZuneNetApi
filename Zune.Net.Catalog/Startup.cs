@@ -39,13 +39,13 @@ namespace Zune.Net.Catalog
             {
                 app.UseDeveloperExceptionPage();
             }
+            
+            app.UseCors();
 
             app.UseRequestBuffering();
 
             app.UseCommonRouting();
             app.UseRouting();
-            
-            app.UseCors();
 
             app.UseEndpoints(endpoints =>
             {
