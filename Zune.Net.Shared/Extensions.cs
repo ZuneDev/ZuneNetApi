@@ -74,12 +74,12 @@ namespace Zune.Net
             });
         }
 
-        public static void AddUnrestrictedCorsDefault(this CorsOptions options)
+        public static void PermissiveCorsPolicy(this CorsPolicyBuilder policy)
         {
-            options.AddDefaultPolicy(policy => policy
+            policy
                 .AllowAnyOrigin()
                 .AllowAnyMethod()
-                .AllowAnyHeader());
+                .AllowAnyHeader();
         }
 
         public static JToken SerializeToJson(this IConfiguration config)

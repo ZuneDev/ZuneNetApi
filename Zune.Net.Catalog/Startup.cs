@@ -26,7 +26,7 @@ namespace Zune.Net.Catalog
             
             services.AddCors(options =>
             {
-                options.AddUnrestrictedCorsDefault();
+                options.AddPolicy("AllowAll", Extensions.PermissiveCorsPolicy);
             });
         }
 
@@ -40,7 +40,7 @@ namespace Zune.Net.Catalog
                 app.UseDeveloperExceptionPage();
             }
             
-            app.UseCors();
+            app.UseCors("AllowAll");
 
             app.UseRequestBuffering();
 
