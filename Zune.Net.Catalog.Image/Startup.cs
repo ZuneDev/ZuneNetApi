@@ -20,6 +20,12 @@ namespace Zune.Net.Catalog.Image
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews(o => o.UseZestFormatters());
+            
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    policy => policy.AllowAnyHeader());
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -32,12 +38,12 @@ namespace Zune.Net.Catalog.Image
                 app.UseDeveloperExceptionPage();
             }
 
-            //app.UseHttpsRedirection();
-
             app.UseRequestBuffering();
 
             app.UseCommonRouting();
             app.UseRouting();
+
+            app.UseCors();
 
             app.UseEndpoints(endpoints =>
             {
