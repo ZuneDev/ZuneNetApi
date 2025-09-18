@@ -4,7 +4,7 @@ WORKDIR /source
 
 #  cache the build result to speed up subsequent package steps
 COPY ./ .
-RUN dotnet restore ./Zune.Net.Inbox/Zune.Net.Inbox.csproj
+RUN dotnet restore
 RUN dotnet publish -c release -o /app --no-restore ./Zune.Net.Inbox/Zune.Net.Inbox.csproj
 
 # final stage/image

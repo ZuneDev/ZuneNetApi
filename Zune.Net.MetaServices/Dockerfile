@@ -4,7 +4,7 @@ WORKDIR /source
 
 #  cache the build result to speed up subsequent package steps
 COPY ./ .
-RUN dotnet restore ./Zune.Net.MetaServices/Zune.Net.MetaServices.csproj
+RUN dotnet restore
 RUN dotnet publish -c release -o /app --no-restore ./Zune.Net.MetaServices/Zune.Net.MetaServices.csproj
 
 # final stage/image
