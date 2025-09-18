@@ -4,8 +4,9 @@ WORKDIR /source
 
 #  cache the build result to speed up subsequent package steps
 COPY ./ .
+WORKDIR Zune.Net.Catalog.Image
 RUN dotnet restore
-RUN dotnet publish -c release -o /app --no-restore ./Zune.Net.Catalog.Image/Zune.Net.Catalog.Image.csproj
+RUN dotnet publish -c release -o /app --no-restore
 
 # final stage/image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
