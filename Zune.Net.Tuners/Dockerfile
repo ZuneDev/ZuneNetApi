@@ -4,7 +4,7 @@ WORKDIR /source
 
 #  cache the build result to speed up subsequent package steps
 COPY ./ .
-RUN dotnet restore
+RUN dotnet restore ./Zune.Net.Tuners/Zune.Net.Tuners.csproj
 RUN dotnet publish -c release -o /app --no-restore ./Zune.Net.Tuners/Zune.Net.Tuners.csproj
 
 # final stage/image
