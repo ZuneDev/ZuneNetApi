@@ -1,78 +1,69 @@
 # ZuneNetApi
 This repository contains implementations of the now defunct Zune.net web services. Roughly each C# project titled `Zune.Net.*` corresponds with the original service domain, for example: `Zune.Net.Catalog` is an implementation of `catalog.zune.net`.
 
-# Using these servers
-It is highly advised to use the Community Webservices mod from [Zune Modding Helper](https://github.com/ZuneDev/ZuneModdingHelper/releases). This mod patches the official Zune desktop software to use versions of these servers hosted by the Zune community.
+# Setup
+## Community-hosted
+It is highly advised to use the Community Webservices mod from [Zune Modding Helper](https://github.com/ZuneDev/ZuneModdingHelper/releases). This mod patches the official Zune desktop software to use versions of these servers hosted by the Zune community at [zunes.me](https://zunes.me).
 
-If you would rather host the servers yourself, you can add the following to your `hosts` file to redirect all requests made to the Zune.net endpoints to your local servers. Make sure you have also modified each project's `launchSettings.json` to use the correct `applicationUrl`.
-```
-127.0.0.1 fai.music.metaservices.microsoft.com
-127.0.0.2 catalog.zune.net
-127.0.0.2 catalog-ssl.zune.net
-127.0.0.3 commerce.zune.net
-127.0.0.4 image.catalog.zune.net
-127.0.0.5 socialapi.zune.net
-127.0.0.6 comments.zune.net
-127.0.0.7 inbox.zune.net
-127.0.0.8 mix.zune.net
-127.0.0.9 stats.zune.net
-127.0.0.10 cache-tiles.zune.net
-127.0.0.11 tuners.zune.net
-127.0.0.12 tiles.zune.net
-127.0.0.13 social.zune.net
-127.0.0.14 login.zune.net
-```
+## Local (for debugging)
+It can be helpful during development to run the servers directly on your dev machine.
 
-# hosting these servers on linux
+1. **Install a MongoDB server.** If you would like a GUI for exploring the database, consider [MongoDB Compass](https://www.mongodb.com/try/download/compass); otherwise, [MongoDB Community Edition](https://www.mongodb.com/try/download/community) should be sufficient. The ZuneNetApi services will automatically create the necessary collections.
 
-to use these first install `git`, `screen` and the `dotnet` runtime. installing screen is easy just run:
-```shell
-sudo apt update && sudo apt upgrade -y
-sudo apt install screen git
-```
+2. **Install required system packages.** Follow Microsoft's instructions for your operating system to [install the .NET 8 SDK](https://learn.microsoft.com/en-us/dotnet/core/install/). To install `git`...
+   - On Debian-based systems:
+     ```sh
+     sudo apt update
+     sudo apt install -y git
+     ```
+   - On Windows systems with `winget`:
+     ```sh
+     winget install -e --id Git.Git 
+     ```
 
-to install dotnet please look at https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu
+3. **Download the ZuneNetApi source code:**
+    ```sh
+    git clone --recurse-submodules -j8 https://github.com/ZuneDev/ZuneNetApi.git
+    cd ZuneNetApi
+    ```
 
-now to run the services you can do:
+4. **Obtain API keys.** ZuneNetApi is simply a data aggregator-- to use it, you'll need to sign up for API keys from [Discogs](https://www.discogs.com/developers), [Last.fm](https://www.last.fm/api). [ListenNotes](https://www.listennotes.com/api/), and [Taddy](https://taddy.org/developers/podcast-api). The free tier for each service should be sufficient for local development.
 
-```shell
-cd /opt/; git clone https://github.com/ZuneDev/ZuneNetApi.git && cd ./ZuneNetApi
-bash ./run_all.sh
-```
+5. **Populate your secret constants.** Create a file named `Constants.Secrets.cs` in the `Zune.Net.Shared` project directory. Use the following template, being sure to replace any placeholders with your API secrets.
+   ```cs
+   namespace Zune.Net;
 
-and to stop them all you can do
-```shell
-bash ./stop_all.sh
-```
+   public static partial class Constants
+   {
+       public const string DC_API_KEY = "<Discogs API key>";
+       public const string DC_API_SECRET = "<Discogs API secret>";
+   
+       public const string LN_API_KEY = "<ListenNotes API key>";
+   
+       public const string FM_API_KEY = "<Last.fm API key>";
+       public const string FM_API_SECRET = "<Last.fm API key>";
+   
+       public const string TD_API_KEY = "<Taddy API key>";
+       public const int TD_USER_ID = <Taddy user ID>;
+   }
+   ```
+   
+6. **Build and run the microservices.** This can be done for a single project from your IDE of choice or from a terminal. For example, to run the Catalog service:
+   ```sh
+   dotnet run --project Zune.Net.Catalog
+   ```
+   On Windows, if you wish to start all available services, you can run `./scripts/run_all.ps1`. 
 
-They will all run in their own screen sessions, which means you can close your SSH connection, and they will continue to run. Basic commands for managing screen sessions are:
+## Docker
+Using the pre-made Docker containers is recommended if you wish to deploy your own complete instance of ZuneNetApi.
 
-To list all the running screens:
-
-```shell
-screen -ls
-```
-
-To reconnect to a specific screen session:
-
-```shell
-screen -rd <name>
-```
-look at the screen documentation for more information.
-
-
-To access these services, you will need to use a proxy like Nginx and configure the following ports to point to the respective domains. Please note that if you are using your own domain, it cannot be more or less than 7 characters long.
-
-```
-8001 catalog.zunes.me
-8802 catalog-ssl.zunes.me
-8002 commerce.zunes.me
-8003 image.catalog.zunes.me
-8004 socialapi.zunes.me
-8005 mix.zunes.me
-8006 tiles.zunes.me
-8007 login.zunes.me
-```
+1. **Install Docker.** Follow the [official instructions](https://docs.docker.com/engine/install/) for your host system.
+2. **Set up source code.** Follow steps 2 through 5 for [local setup](#local-for-debugging) to download and prepare the ZuneNetApi source code for building.
+3. **Configure containers.** In `./scripts/dockerSecrets.sh`, update the following variables:
+    - `DOMAIN_ROOT` with the root domain you intend to host the servers at. For example, the community-hosted services use `zunes.me`, which results in microservices running at `catalog.zunes.me`.
+    - `MONGO_INITDB_ROOT_PASSWORD` with a unique and secure password.
+4. **Configure Let's Encrypt SSL.** In `./traefik/traefik.yml`, set the `letsencrypt` ACME email to your own address.
+5. **Build and run the Docker containers.** On Linux-based systems, it is recommended to use `./scripts/dockerBuild.sh`. Otherwise, each step in that script can be performed manually as appropriate for your system.
 
 # Unimplemented endpoints
 
@@ -91,7 +82,6 @@ To access these services, you will need to use a proxy like Nginx and configure 
 ```
 /music/chart/zune/playlists
 /music/chart/musicVideos
-/music/featured/albums
 ```
 
 ### Video hub
@@ -128,7 +118,6 @@ To access these services, you will need to use a proxy like Nginx and configure 
 
 /music/playlist?q={query}
 /music/musicvideo?q={query}
-/podcast?q={query}
 /movie?q={query}
 /tv/short?q={query}
 /tv/series?q={query}
