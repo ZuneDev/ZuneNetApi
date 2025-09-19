@@ -35,7 +35,9 @@ services:
   catalog:
     build:
       context: ./
-      dockerfile: Zune.Net.Catalog/Dockerfile
+      dockerfile: ./Dockerfile
+      args:
+        PROJ_NAME: Zune.Net.Catalog
     depends_on:
       - mongodb
       - traefik
@@ -58,7 +60,9 @@ services:
   catalog-image:
     build:
       context: ./
-      dockerfile: Zune.Net.Catalog.Image/Dockerfile
+      dockerfile: ./Dockerfile
+      args:
+        PROJ_NAME: Zune.Net.Catalog.Image
     depends_on:
       - mongodb
       - traefik
@@ -81,7 +85,9 @@ services:
   commerce:
     build:
       context: ./
-      dockerfile: Zune.Net.Commerce/Dockerfile
+      dockerfile: ./Dockerfile
+      args:
+        PROJ_NAME: Zune.Net.Commerce
     depends_on:
       - mongodb
       - traefik
@@ -104,7 +110,9 @@ services:
   inbox:
     build:
       context: ./
-      dockerfile: Zune.Net.Inbox/Dockerfile
+      dockerfile: ./Dockerfile
+      args:
+        PROJ_NAME: Zune.Net.Inbox
     depends_on:
       - mongodb
       - traefik
@@ -127,7 +135,9 @@ services:
   login:
     build:
       context: ./
-      dockerfile: Zune.Net.Login/Dockerfile
+      dockerfile: ./Dockerfile
+      args:
+        PROJ_NAME: Zune.Net.Login
     depends_on:
       - mongodb
       - traefik
@@ -150,7 +160,9 @@ services:
   metaservices:
     build:
       context: ./
-      dockerfile: Zune.Net.MetaServices/Dockerfile
+      dockerfile: ./Dockerfile
+      args:
+        PROJ_NAME: Zune.Net.MetaServices
     depends_on:
       - mongodb
       - traefik
@@ -169,7 +181,9 @@ services:
   mix:
     build:
       context: ./
-      dockerfile: Zune.Net.Mix/Dockerfile
+      dockerfile: ./Dockerfile
+      args:
+        PROJ_NAME: Zune.Net.Mix
     depends_on:
       - mongodb
       - traefik
@@ -189,10 +203,12 @@ services:
     environment:
       << : [*env-aspnet]
 
-  social:
+  socialapi:
     build:
       context: ./
-      dockerfile: Zune.Net.SocialApi/Dockerfile
+      dockerfile: ./Dockerfile
+      args:
+        PROJ_NAME: Zune.Net.SocialApi
     depends_on:
       - mongodb
       - traefik
@@ -215,7 +231,9 @@ services:
   tiles:
     build:
       context: ./
-      dockerfile: Zune.Net.Tiles/Dockerfile
+      dockerfile: ./Dockerfile
+      args:
+        PROJ_NAME: Zune.Net.Tiles
     depends_on:
       - mongodb
       - traefik
@@ -238,7 +256,9 @@ services:
   tuners:
     build:
       context: ./
-      dockerfile: Zune.Net.Tuners/Dockerfile
+      dockerfile: ./Dockerfile
+      args:
+        PROJ_NAME: Zune.Net.Tuners
     depends_on:
       - mongodb
       - traefik
