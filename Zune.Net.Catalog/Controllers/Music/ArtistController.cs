@@ -52,7 +52,7 @@ namespace Zune.Net.Catalog.Controllers.Music
 
                     artist.BackgroundImage = new()
                     {
-                        Id = artistImageEntry.Id
+                        Id = new Guid(dc_artist.Value<int>("id"), 0, 0, new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 })
                     };
                 }
             }
