@@ -8,7 +8,7 @@ using System.Net.Http.Headers;
 using VDS.RDF;
 using VDS.RDF.Query;
 
-namespace Zune.Net.Helpers;
+namespace Zune.Net.Identifiers;
 
 public class IdMapper
 {

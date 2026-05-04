@@ -14,8 +14,8 @@ namespace Zune.Net.Helpers
         public static void Initialize(IWebHostEnvironment env)
         {
             // assume worst-case scenario, mix is getting hit at the same time as catalog. The
-            // frontent cache, nginx, will serve up cached results, but this interleave of 1.5s
-            // might be enought to avoid a race.
+            // frontend cache, nginx, will serve up cached results, but this interleave of 1.5s
+            // might be enough to avoid a race.
             Query.DelayBetweenRequests = 1.5;
 
             _query.ConfigureClientCreation(delegate
