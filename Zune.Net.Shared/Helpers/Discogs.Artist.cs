@@ -21,8 +21,19 @@ namespace Zune.Net.Helpers
 
         public static async Task<(JObject dc_artist, IArtist mb_artist)> GetDCArtistByMBID(Guid mbid)
         {
-            var mb_artist = MusicBrainz._query.LookupArtist(mbid, Include.UrlRelationships | Include.Tags | Include.Releases);
-            return (await GetDCArtistByMBArtist(mb_artist), mb_artist);
+            var mbArtist = await MusicBrainz._query
+                .LookupArtistAsync(mbid, Include.UrlRelationships | Include.Tags | Include.Releases);
+            
+            return (await GetDCArtistByMBArtist(mbArtist), mbArtist);
+        }
+
+        public static async Task<JObject> GetDCArtistByMBID(Guid mbid, IdMapper mapper)
+        {
+            var artistIds = await mapper.GetArtistIdsByMbidAsync(mbid);
+            if (int.TryParse(artistIds?.Discogs, out var dcid))
+                return null;
+
+            return await GetDCArtistByDCID(dcid);
         }
 
         public static async Task<JObject> GetDCArtistByMBArtist(IArtist mb_artist)
