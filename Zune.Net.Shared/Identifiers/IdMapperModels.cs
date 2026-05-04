@@ -1,4 +1,6 @@
 ﻿#nullable enable
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 using System;
 
