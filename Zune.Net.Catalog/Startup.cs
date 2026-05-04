@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Zune.Net.Helpers;
+using Zune.Net.Identifiers;
 
 namespace Zune.Net.Catalog
 {

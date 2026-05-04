@@ -4,7 +4,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Zune.Net.Helpers;
+namespace Zune.Net.Identifiers;
 
 public static class IdMapperExtensions
 {

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Flurl.Http;
 using HtmlAgilityPack;
 using Zune.Net.Helpers;
+using Zune.Net.Identifiers;
 using Zune.Xml.Catalog;
 
 namespace Zune.Net.Catalog.Controllers.Music

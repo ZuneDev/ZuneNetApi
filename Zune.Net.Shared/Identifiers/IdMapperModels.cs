@@ -2,7 +2,7 @@
 
 using System;
 
-namespace Zune.Net.Helpers;
+namespace Zune.Net.Identifiers;
 
 public enum WikidataProperty
 {

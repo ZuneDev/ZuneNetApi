@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Zune.DB;
 using Zune.Net.Features;
 using Zune.Net.Helpers;
+using Zune.Net.Identifiers;
 using Zune.Xml.Catalog;
 using ListenBrainz = Zune.Net.Helpers.ListenBrainz;
 
