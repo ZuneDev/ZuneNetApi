@@ -21,9 +21,12 @@ namespace Zune.Net.Catalog
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews(o => o.UseZestFormatters());
-            services.AddScoped<AppleMusicSharp.AppleMusicClient>();
-            services.AddSingleton<MetaBrainz.ListenBrainz.ListenBrainz>();
-            services.AddSingleton<IdMapper>();
+            
+            services
+                .AddScoped<AppleMusicSharp.AppleMusicClient>()
+                .AddSingleton<MetaBrainz.ListenBrainz.ListenBrainz>()
+                .AddPropertyMapper()
+                .AddSingleton<IdMapper>();
             
             services.AddCors(options =>
             {

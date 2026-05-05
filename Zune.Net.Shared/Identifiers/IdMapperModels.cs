@@ -8,7 +8,7 @@ namespace Zune.Net.Identifiers;
 
 public enum WikidataProperty
 {
-    /* Artist */
+    /* Artists */
     ALArtistId = 1728,
     DCArtistId = 1953,
     DZArtistId = 2722,
@@ -28,6 +28,7 @@ public enum WikidataProperty
     
     /* Universal */
     FMId = 3192,
+    WKPerformerId = 175,
 }
 
 public class ArtistIdMap

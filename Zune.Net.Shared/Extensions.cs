@@ -16,6 +16,7 @@ using System.Linq;
 using System.IO;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Zune.Net.Features;
+using Zune.Net.Identifiers;
 
 namespace Zune.Net
 {
@@ -57,6 +58,17 @@ namespace Zune.Net
             });
         }
 
+        public static IServiceCollection AddPropertyMapper(this IServiceCollection services)
+        {
+            PropertyMapperRegistry registry = new();
+            
+            registry.RegisterMapper(new WikidataIdMapper());
+            
+            return services
+                .AddSingleton(registry)
+                .AddSingleton<CompositePropertyMapper>();
+        }
+        
         public static RouteHandlerBuilder MapHomeRoute(this IEndpointRouteBuilder endpoints)
         {
             var assembly = Assembly.GetExecutingAssembly();
