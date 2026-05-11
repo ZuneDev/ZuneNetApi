@@ -118,7 +118,7 @@ public class WikidataIdMapper : IPropertyMapper
         return outputs.ToImmutableHashSet();
     }
     
-    public async Task<IPropertyBag> ExecuteAsync(IPropertyBag inputs)
+    public async Task<IPropertyBag> ExecuteAsync(IPropertyBag inputs, IReadOnlyPropertySet desiredOutputs)
     {
         var inputsByEntityType = ((IDictionary<EntityProperty, object>)inputs)
             .GroupBy(i => i.Key.EntityType);
@@ -212,7 +212,7 @@ public class WikidataIdMapper : IPropertyMapper
         return httpClient;
     }
 
-    private static IReadOnlySet<PropertyMapping> GetAvailableMappings()
+    private static HashSet<PropertyMapping> GetAvailableMappings()
     {
         const int cost = 10;
 
@@ -222,8 +222,8 @@ public class WikidataIdMapper : IPropertyMapper
         {
             foreach (var propType in props.Keys)
             {
-                var input = new EntityProperty(entityType, propType);
-                var inputs = new PropertySet([input]);
+                EntityProperty input = new(entityType, propType);
+                IPropertySet inputs = [input];
                 
                 var outputs = props.Keys
                     .Where(p => p != propType)
