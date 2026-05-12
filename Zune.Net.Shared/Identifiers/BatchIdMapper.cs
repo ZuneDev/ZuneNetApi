@@ -10,7 +10,7 @@ using VDS.RDF.Query;
 
 namespace Zune.Net.Identifiers;
 
-public class IdMapper
+public class BatchIdMapper
 {
     private readonly SparqlQueryClient _wikidata = new(CreateHttpClient(), new Uri("https://query.wikidata.org/sparql"));
 
@@ -18,7 +18,7 @@ public class IdMapper
     {
         ["mbid"] = new(WikidataProperty.MBArtistId, (m, v) => m.MusicBrainz = new Guid(v)),
         ["alid"] = new(WikidataProperty.ALArtistId, (m, v) => m.AllMusic = v),
-        ["dcid"] = new(WikidataProperty.DCArtistId, (m, v) => m.Discogs = v),
+        ["dcid"] = new(WikidataProperty.DCArtistId, (m, v) => m.Discogs = int.Parse(v)),
         ["dzid"] = new(WikidataProperty.DZArtistId, (m, v) => m.Deezer = v),
         ["fmid"] = new(WikidataProperty.FMId, (m, v) => m.LastFM = v),
         ["spid"] = new(WikidataProperty.SPArtistId, (m, v) => m.Spotify = v),
@@ -30,7 +30,7 @@ public class IdMapper
         ["mbid"] = new(WikidataProperty.MBReleaseGroupId, (m, v) => m.MusicBrainzReleaseGroup = new Guid(v)),
         ["alid"] = new(WikidataProperty.ALAlbumId, (m, v) => m.AllMusic = v),
         ["amid"] = new(WikidataProperty.AMAlbumId, (m, v) => m.AppleMusic = v),
-        ["dcid"] = new(WikidataProperty.DCMasterId, (m, v) => m.Discogs = v),
+        ["dcid"] = new(WikidataProperty.DCMasterId, (m, v) => m.Discogs = int.Parse(v)),
         ["dzid"] = new(WikidataProperty.DZAlbumId, (m, v) => m.Deezer = v),
         ["fmid"] = new(WikidataProperty.FMId, (m, v) => m.LastFM = v),
         ["spid"] = new(WikidataProperty.SPAlbumId, (m, v) => m.Spotify = v),

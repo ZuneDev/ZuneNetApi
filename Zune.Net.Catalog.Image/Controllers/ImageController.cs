@@ -13,7 +13,7 @@ namespace Zune.Net.Catalog.Image.Controllers
 {
     [Route("/")]
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
-    public class ImageController(ZuneNetContext database, IdMapper idMapper) : Controller
+    public class ImageController(ZuneNetContext database, BatchIdMapper batchIdMapper) : Controller
     {
         private static readonly ConcurrentDictionary<int, JObject> DcArtistCache = new();
         private static readonly int[] CaaSupportedSizes = [250, 500, 1200];
@@ -70,7 +70,7 @@ namespace Zune.Net.Catalog.Image.Controllers
             if (type == "primaryImage")
             {
                 var mbid = Guid.Parse(id);
-                var dcArtist = await Discogs.GetDCArtistByMBID(mbid, idMapper);
+                var dcArtist = await Discogs.GetDCArtistByMBID(mbid, batchIdMapper);
 
                 imageUrl = dcArtist.Value<JArray>("images")?
                     .FirstOrDefault(i => i.Value<string>("type") == "primary")?

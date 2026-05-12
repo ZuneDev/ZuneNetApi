@@ -34,7 +34,7 @@ public enum WikidataProperty
 public class ArtistIdMap
 {
     public string? AllMusic { get; set; }
-    public string? Discogs { get; set; }
+    public int? Discogs { get; set; }
     public string? Deezer { get; set; }
     public string? LastFM { get; set; }
     public Guid? MusicBrainz { get; set; }
@@ -46,7 +46,7 @@ public class AlbumIdMap
 {
     public string? AppleMusic { get; set; }
     public string? AllMusic { get; set; }
-    public string? Discogs { get; set; }
+    public int? Discogs { get; set; }
     public string? Deezer { get; set; }
     public string? LastFM { get; set; }
     public Guid? MusicBrainzReleaseGroup { get; set; }

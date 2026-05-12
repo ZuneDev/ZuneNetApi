@@ -28,13 +28,14 @@ namespace Zune.Net.Helpers
             return (await GetDCArtistByMBArtist(mbArtist), mbArtist);
         }
 
-        public static async Task<JObject> GetDCArtistByMBID(Guid mbid, IdMapper mapper)
+        public static async Task<JObject> GetDCArtistByMBID(Guid mbid, BatchIdMapper mapper)
         {
             var artistIds = await mapper.GetArtistIdsByMbidAsync(mbid);
-            if (int.TryParse(artistIds?.Discogs, out var dcid))
+            var dcid = artistIds?.Discogs;
+            if (dcid is null)
                 return null;
 
-            return await GetDCArtistByDCID(dcid);
+            return await GetDCArtistByDCID(dcid.Value);
         }
 
         public static async Task<JObject> GetDCArtistByMBArtist(IArtist mb_artist)

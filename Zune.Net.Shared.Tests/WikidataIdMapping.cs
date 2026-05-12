@@ -81,7 +81,7 @@ public class Tests
     {
         var mbid = new Guid("534ee493-bfac-4575-a44a-0ae41e2c3fe4");
 
-        var idMapper = new IdMapper();
+        var idMapper = new BatchIdMapper();
 
         Stopwatch stopwatch = new();
         stopwatch.Start();

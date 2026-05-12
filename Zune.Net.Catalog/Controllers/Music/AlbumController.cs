@@ -32,7 +32,7 @@ namespace Zune.Net.Catalog.Controllers.Music
         }
 
         [HttpGet, Route("{mbid:guid}/review")]
-        public async Task<ActionResult<Album>> Review(Guid mbid, IdMapper idMapper)
+        public async Task<ActionResult<Album>> Review(Guid mbid, BatchIdMapper batchIdMapper)
         {
             var releaseGroupResults = await MusicBrainz._query
                 .FindReleaseGroupsAsync($"reid:{mbid}", simple: false, limit: 1);
@@ -41,7 +41,7 @@ namespace Zune.Net.Catalog.Controllers.Music
             if (releaseGroupMbid is null)
                 return BadRequest();
             
-            var albumIdMap = await idMapper.GetAlbumIdsByMbidAsync(releaseGroupMbid.Value);
+            var albumIdMap = await batchIdMapper.GetAlbumIdsByMbidAsync(releaseGroupMbid.Value);
 
             var alid = albumIdMap?.AllMusic;
             if (alid is null)
