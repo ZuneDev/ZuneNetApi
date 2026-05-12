@@ -26,7 +26,7 @@ namespace Zune.Net.Catalog
                 .AddScoped<AppleMusicSharp.AppleMusicClient>()
                 .AddSingleton<MetaBrainz.ListenBrainz.ListenBrainz>()
                 .AddPropertyMapper()
-                .AddSingleton<IdMapper>();
+                .AddSingleton<BatchIdMapper>();
             
             services.AddCors(options =>
             {
