@@ -117,11 +117,23 @@ public class CompositePropertyMapper(PropertyMapperRegistry mapperRegistry)
                 
                 // Perform the mapping
                 var outputsToRequest = mapping.Outputs.Intersect(desiredOutputs).ToPropertySet();
-                var results = await mapper.ExecuteAsync(edgeInputValues, outputsToRequest);
+
+                IPropertyBag results;
+                try
+                {
+                    results = await mapper.ExecuteAsync(edgeInputValues, outputsToRequest);
+                }
+                catch
+                {
+                    break;
+                }
+                finally
+                {
+                    usedHyperedges.Add(hyperedge);
+                }
+                
+                
                 variables.TryAddFrom(results);
-                
-                usedHyperedges.Add(hyperedge);
-                
                 desiredOutputs.ExceptWith(mapping.Outputs);
                 
                 TotalCost += mapping.Cost;
