@@ -8,8 +8,7 @@ namespace Zune.Net.Identifiers;
 
 public class CompositePropertyMapper(PropertyMapperRegistry mapperRegistry)
 {
-    public int NumEdgesEvaluated { get; private set; }
-    public int TotalCost { get; private set; }
+    public DebugCompositePropertyMapperResult DebugInfo { get; private set; }
     
     public async Task<object> MapAsync(EntityProperty sourceProperty, object source, EntityProperty targetProperty)
     {
@@ -20,9 +19,7 @@ public class CompositePropertyMapper(PropertyMapperRegistry mapperRegistry)
     public async Task<IPropertyBag> MapAsync(EntityProperty sourceProperty,
         object source, IReadOnlyPropertySet targetProperties)
     {
-        // TODO: Remove debug properties
-        NumEdgesEvaluated = 0;
-        TotalCost = 0; 
+        DebugInfo = new();
 
         var initialPaths = mapperRegistry
             .ForInputs([sourceProperty])
@@ -37,7 +34,7 @@ public class CompositePropertyMapper(PropertyMapperRegistry mapperRegistry)
         // Explore paths, noting ones that produce any of the target properties
         while (incompletePaths.TryDequeue(out var incompletePath))
         {
-            NumEdgesEvaluated++;
+            DebugInfo.NumEdgesEvaluated++;
             
             var currentOutputs = incompletePath
                 .SelectMany(n => n.Edge.Outputs)
@@ -64,17 +61,6 @@ public class CompositePropertyMapper(PropertyMapperRegistry mapperRegistry)
 
                 var newPath = incompletePath.Add(currentHyperedge);
                 incompletePaths.Enqueue(newPath);
-
-                // Alternative, less strict metric; we consider paths that produce some subset of the target properties
-                // var newOutputs = newPath
-                //     .SelectMany(n => n.Edge.Outputs)
-                //     .ToPropertySet();
-                
-                // var newOutputOverlap = newOutputs.Intersect(targetProperties).Count();
-                // var currentOutputOverlap = currentOutputs.Intersect(targetProperties).Count();
-                //
-                // if (newOutputOverlap > currentOutputOverlap)
-                //     pathsOfInterest.Add(newPath);
             }
         }
         
@@ -93,16 +79,13 @@ public class CompositePropertyMapper(PropertyMapperRegistry mapperRegistry)
                 .ToHashSet();
             desiredOutputs.Remove(sourceProperty);
 
-            foreach (var hyperedge in path)
+            // Evaluated mappings, skipping ones we've already done (doesn't matter if it succeeded)
+            foreach (var hyperedge in path.Where(hyperedge => !usedHyperedges.Contains(hyperedge)))
             {
-                // We've already performed this mapping. Either it failed or it didn't; either way, skip it.
-                if (usedHyperedges.Contains(hyperedge))
-                    continue;
-                
                 var (mapper, mapping) = hyperedge;
                 
                 // Abort paths that have more mappings than necessary
-                // (e.g. an edge is traversed that doesn't produce any useful properties)
+                // (e.g., an edge is traversed that doesn't produce any useful properties)
                 if (!mapping.Outputs.Any(desiredOutputs.Contains))
                     break;
 
@@ -127,11 +110,10 @@ public class CompositePropertyMapper(PropertyMapperRegistry mapperRegistry)
                     usedHyperedges.Add(hyperedge);
                 }
                 
-                
                 variables.TryAddFrom(results);
                 desiredOutputs.ExceptWith(mapping.Outputs);
                 
-                TotalCost += mapping.Cost;
+                DebugInfo.TotalCost += mapping.Cost;
             }
             
             // Check if we're done
@@ -141,4 +123,10 @@ public class CompositePropertyMapper(PropertyMapperRegistry mapperRegistry)
         
         return variables;
     }
+}
+
+public class DebugCompositePropertyMapperResult
+{
+    public int NumEdgesEvaluated { get; set; } = 0;
+    public int TotalCost { get; set; } = 0;
 }
