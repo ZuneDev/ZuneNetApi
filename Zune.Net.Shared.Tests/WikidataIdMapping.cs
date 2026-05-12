@@ -18,9 +18,9 @@ public class Tests
     public async Task MapArtistMbidToDcid()
     {
         var mbid = new Guid("534ee493-bfac-4575-a44a-0ae41e2c3fe4");
-        var result = await _mapper.MapOneToOneAsync(EntityType.Artist,
-            EntityPropertyType.MusicBrainzArtistId, mbid,
-            EntityPropertyType.DiscogsArtistId);
+        var result = await _mapper.MapAsync(
+            Ep.Artist.MusicBrainzId, mbid,
+            Ep.Artist.DiscogsId);
 
         var dcid = Convert.ToInt32(result);
         Assert.That(dcid, Is.EqualTo(61800));
@@ -30,9 +30,9 @@ public class Tests
     public async Task GetArtistNameFromMbid()
     {
         var mbid = new Guid("534ee493-bfac-4575-a44a-0ae41e2c3fe4");
-        var result = await _mapper.MapOneToOneAsync(EntityType.Artist,
-            EntityPropertyType.MusicBrainzArtistId, mbid,
-            EntityPropertyType.ArtistName);
+        var result = await _mapper.MapAsync(
+            Ep.Artist.MusicBrainzId, mbid,
+            Ep.Artist.Name);
 
         var name = result?.ToString();
         Assert.That(name, Is.EqualTo("Rush"));
@@ -42,16 +42,13 @@ public class Tests
     public async Task GetArtistNameAndBioFromMbid()
     {
         var mbid = new Guid("534ee493-bfac-4575-a44a-0ae41e2c3fe4");
-        
-        var nameProperty = new EntityProperty(EntityType.Artist, EntityPropertyType.ArtistName);
-        var bioProperty = new EntityProperty(EntityType.Artist, EntityPropertyType.ArtistBio);
 
         Stopwatch stopwatch = new();
         stopwatch.Start();
 
-        var result = await _mapper.MapOneToManyAsync(EntityType.Artist,
-            EntityPropertyType.MusicBrainzArtistId, mbid,
-            [nameProperty, bioProperty]);
+        var result = await _mapper.MapAsync(
+            Ep.Artist.MusicBrainzId, mbid,
+            [Ep.Artist.Name, Ep.Artist.Bio]);
 
         stopwatch.Stop();
         
@@ -61,8 +58,8 @@ public class Tests
         await TestContext.Out.WriteLineAsync($"Total time: {stopwatch.Elapsed.TotalSeconds} seconds");
         await TestContext.Out.WriteLineAsync();
         
-        var name = result[nameProperty]?.ToString();
-        var bio = result[bioProperty]?.ToString();
+        var name = result[Ep.Artist.Name]?.ToString();
+        var bio = result[Ep.Artist.Bio]?.ToString();
         
         await TestContext.Out.WriteLineAsync($"== {name} ==");
         await TestContext.Out.WriteLineAsync(bio);
@@ -118,12 +115,12 @@ public class Tests
         var wikidataIdMapper = new WikidataIdMapper();
         
         var mbid = new Guid("534ee493-bfac-4575-a44a-0ae41e2c3fe4");
-        var targetProperty = new EntityProperty(EntityType.Artist, EntityPropertyType.DiscogsArtistId);
+        var targetProperty = Ep.Artist.DiscogsId;
         
         var output = await wikidataIdMapper.ExecuteAsync(
             new PropertyBag
             {
-                [new EntityProperty(EntityType.Artist, EntityPropertyType.MusicBrainzArtistId)] = mbid,
+                [Ep.Artist.MusicBrainzId] = mbid,
             },
             [targetProperty]);
 
