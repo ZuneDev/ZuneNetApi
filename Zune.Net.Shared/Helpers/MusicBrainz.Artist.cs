@@ -1,6 +1,7 @@
 ﻿using Atom.Xml;
 using MetaBrainz.MusicBrainz;
 using MetaBrainz.MusicBrainz.Interfaces.Entities;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,9 +74,10 @@ namespace Zune.Net.Helpers
             {
                 Id = mb_artist.Id.ToString(),
                 Title = mb_artist.Name,
-                SortTitle = mb_artist.SortName,
+                SortTitle = mb_artist.SortName, 
                 SortName = mb_artist.SortName,
                 IsVariousArtist = mb_artist.Id == ARTIST_VARIOUSARTISTS,
+                BiographyLink = $"https://catalog.zunes.me/v3.2/en-US/music/artist/{mb_artist.Id}/biography",
                 Updated = updated.Value,
             };
 

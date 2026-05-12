@@ -3,6 +3,7 @@ using Flurl.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -226,8 +227,34 @@ namespace Zune.Net.Catalog.Controllers.Music
         [HttpGet, Route("{mbid}/similarArtists")]
         public async Task<ActionResult<Feed<Artist>>> SimilarArtists(Guid mbid)
         {
-            return await LastFM.GetSimilarArtistsByMBID(mbid);
+            var relatedArtists = await LastFM.GetSimilarArtist(mbid);
+            var feed = LastFM.CreateFeed<Artist>($"/artist/{mbid}/similarArtists", "Similar");
+            IdMapper mapped = new IdMapper();
+            List<Guid> mbidList = [];
+
+            foreach (var artist in relatedArtists)
+            {
+                if(artist.Id != null)
+                    mbidList.Add(new Guid(artist.Id));
+            }
+
+            var artistIdList = await mapped.BatchGetArtistIdsAsync(mbidList, WikidataProperty.MBArtistId).ToListAsync();
+
+            foreach (var artist in relatedArtists)
+            {                
+                foreach (var artistId in artistIdList)
+                {
+                    if(artist.Id != null && artistId.Discogs != null)
+                    {
+                        if(artistId.MusicBrainz == new Guid(artist.Id))
+                            artist.Images = new() { new() { Id = new Guid(int.Parse(artistId.Discogs), 0, 0, new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 }) } }; 
+                    }
+                }
+
+                feed.Entries.Add(artist);
+            }
+
+            return feed;
         }
     }
 }
-
