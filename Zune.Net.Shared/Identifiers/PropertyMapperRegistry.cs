@@ -13,7 +13,6 @@ public class PropertyMapperRegistry
     public static PropertyMapperRegistry CreateDefault()
     {
         return new PropertyMapperRegistry()
-            .RegisterMapper(new MusicBrainzIdMapper())
             .RegisterMapper(new MusicBrainzPropertyMapper())
             .RegisterMapper(new DiscogsPropertyMapper())
             .RegisterMapper(new WikidataIdMapper());
