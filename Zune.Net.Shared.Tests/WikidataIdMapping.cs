@@ -53,8 +53,8 @@ public class Tests
         stopwatch.Stop();
         
         await TestContext.Out.WriteLineAsync();
-        await TestContext.Out.WriteLineAsync($"Evaluated edges: {_mapper.NumEdgesEvaluated}");
-        await TestContext.Out.WriteLineAsync($"Total cost: {_mapper.TotalCost}");
+        await TestContext.Out.WriteLineAsync($"Evaluated edges: {_mapper.DebugInfo.NumEdgesEvaluated}");
+        await TestContext.Out.WriteLineAsync($"Total cost: {_mapper.DebugInfo.TotalCost}");
         await TestContext.Out.WriteLineAsync($"Total time: {stopwatch.Elapsed.TotalSeconds} seconds");
         await TestContext.Out.WriteLineAsync();
         
@@ -69,7 +69,7 @@ public class Tests
             Assert.That(name, Is.EqualTo("Rush"));
             Assert.That(bio, Is.Not.Null);
             
-            Assert.That(_mapper.TotalCost, Is.LessThanOrEqualTo(20));
+            Assert.That(_mapper.DebugInfo.TotalCost, Is.LessThanOrEqualTo(20));
         }
     }
 
@@ -105,7 +105,7 @@ public class Tests
             Assert.That(name, Is.EqualTo("Rush"));
             Assert.That(bio, Is.Not.Null);
             
-            Assert.That(_mapper.TotalCost, Is.LessThanOrEqualTo(20));
+            Assert.That(_mapper.DebugInfo.TotalCost, Is.LessThanOrEqualTo(20));
         }
     }
 
