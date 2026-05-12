@@ -22,6 +22,57 @@ public record EntityProperty(EntityType EntityType, EntityPropertyType PropertyT
     public override string ToString() => $"{EntityType}.{PropertyType}";
 }
 
+public static class Ep
+{
+    public static class Artist
+    {
+        public static readonly EntityProperty Id = new(EntityType.Artist, EntityPropertyType.ArtistId);
+        public static readonly EntityProperty AllMusicId = new(EntityType.Artist, EntityPropertyType.AllMusicArtistId);
+        public static readonly EntityProperty DiscogsId = new(EntityType.Artist,EntityPropertyType.DiscogsArtistId);
+        public static readonly EntityProperty DeezerId = new(EntityType.Artist,EntityPropertyType.DeezerArtistId);
+        public static readonly EntityProperty LastFmId = new(EntityType.Artist,EntityPropertyType.LastFmArtistId);
+        public static readonly EntityProperty MusicBrainzId = new(EntityType.Artist,EntityPropertyType.MusicBrainzArtistId);
+        public static readonly EntityProperty SpotifyId = new(EntityType.Artist,EntityPropertyType.SpotifyArtistId);
+        public static readonly EntityProperty TidalId = new(EntityType.Artist,EntityPropertyType.TidalArtistId);
+        public static readonly EntityProperty WikidataId = new(EntityType.Artist, EntityPropertyType.WikidataPerformerId);
+    
+        public static readonly EntityProperty Name = new(EntityType.Artist,EntityPropertyType.ArtistName);
+        public static readonly EntityProperty AlbumIds = new(EntityType.Artist,EntityPropertyType.ArtistAlbumIds);
+        public static readonly EntityProperty Albums = new(EntityType.Artist,EntityPropertyType.ArtistAlbums);
+        public static readonly EntityProperty InfluenceIds = new(EntityType.Artist,EntityPropertyType.ArtistInfluenceIds);
+        public static readonly EntityProperty Influences = new(EntityType.Artist,EntityPropertyType.ArtistInfluences);
+        public static readonly EntityProperty InfluencerIds = new(EntityType.Artist,EntityPropertyType.ArtistInfluencerIds);
+        public static readonly EntityProperty Influencers = new(EntityType.Artist,EntityPropertyType.ArtistInfluencers);
+        public static readonly EntityProperty SimilarToIds = new(EntityType.Artist,EntityPropertyType.ArtistSimilarToIds);
+        public static readonly EntityProperty SimilarTo = new(EntityType.Artist,EntityPropertyType.ArtistSimilarTo);
+        public static readonly EntityProperty Bio = new(EntityType.Artist,EntityPropertyType.ArtistBio);
+        public static readonly EntityProperty Images = new(EntityType.Artist,EntityPropertyType.ArtistImages);
+        public static readonly EntityProperty PrimaryImage = new(EntityType.Artist,EntityPropertyType.ArtistPrimaryImage);
+    }
+
+    public static class Album
+    {
+        public static readonly EntityProperty Id = new(EntityType.Album, EntityPropertyType.AlbumId);
+        public static readonly EntityProperty AllMusicId = new(EntityType.Album, EntityPropertyType.AllMusicAlbumId);
+        public static readonly EntityProperty AppleMusicId = new(EntityType.Album, EntityPropertyType.AppleMusicAlbumId);
+        public static readonly EntityProperty DiscogsMasterId = new(EntityType.Album, EntityPropertyType.DiscogsMasterId);
+        public static readonly EntityProperty DeezerId = new(EntityType.Album, EntityPropertyType.DeezerAlbumId);
+        public static readonly EntityProperty LastFmId = new(EntityType.Album, EntityPropertyType.LastFmAlbumId);
+        public static readonly EntityProperty MusicBrainzReleaseGroupId = new(EntityType.Album, EntityPropertyType.MusicBrainzReleaseGroupId);
+        public static readonly EntityProperty MusicBrainzReleaseId = new(EntityType.Album, EntityPropertyType.MusicBrainzReleaseId);
+        public static readonly EntityProperty SpotifyId = new(EntityType.Album, EntityPropertyType.SpotifyAlbumId);
+        public static readonly EntityProperty TidalId = new(EntityType.Album, EntityPropertyType.TidalAlbumId);
+    
+        public static readonly EntityProperty Name = new(EntityType.Album, EntityPropertyType.AlbumName);
+        public static readonly EntityProperty TrackIds = new(EntityType.Album, EntityPropertyType.AlbumTrackIds);
+        public static readonly EntityProperty Tracks = new(EntityType.Album, EntityPropertyType.AlbumTracks);
+        public static readonly EntityProperty SimilarToIds = new(EntityType.Album, EntityPropertyType.AlbumSimilarToIds);
+        public static readonly EntityProperty SimilarTo = new(EntityType.Album, EntityPropertyType.AlbumSimilarTo);
+        public static readonly EntityProperty ArtistId = new(EntityType.Album, EntityPropertyType.AlbumArtistId);
+        public static readonly EntityProperty Artist = new(EntityType.Album, EntityPropertyType.AlbumArtist);
+    }
+}
+
 public enum EntityType
 {
     Unknown,
@@ -42,6 +93,7 @@ public enum EntityPropertyType
     MusicBrainzArtistId,
     SpotifyArtistId,
     TidalArtistId,
+    WikidataPerformerId,
     ArtistId,
     
     ArtistName,
@@ -51,7 +103,11 @@ public enum EntityPropertyType
     ArtistInfluences,
     ArtistInfluencerIds,
     ArtistInfluencers,
+    ArtistSimilarToIds,
+    ArtistSimilarTo,
     ArtistBio,
+    ArtistImages,
+    ArtistPrimaryImage,
     
     /* Albums */
     AllMusicAlbumId,
@@ -63,7 +119,6 @@ public enum EntityPropertyType
     MusicBrainzReleaseId,
     SpotifyAlbumId,
     TidalAlbumId,
-    WikidataPerformerId,
     AlbumId,
     
     AlbumName,
@@ -88,7 +143,11 @@ public static class EntityPropertyTypes
                 EntityPropertyType.ArtistInfluences,
                 EntityPropertyType.ArtistInfluencerIds,
                 EntityPropertyType.ArtistInfluencers,
+                EntityPropertyType.ArtistSimilarToIds,
+                EntityPropertyType.ArtistSimilarTo,
                 EntityPropertyType.ArtistBio,
+                EntityPropertyType.ArtistImages,
+                EntityPropertyType.ArtistPrimaryImage,
             ]
         },
         
@@ -105,6 +164,7 @@ public static class EntityPropertyTypes
         { EntityPropertyType.ArtistAlbumIds, [EntityPropertyType.ArtistAlbums] },
         { EntityPropertyType.ArtistInfluenceIds, [EntityPropertyType.ArtistInfluences] },
         { EntityPropertyType.ArtistInfluencerIds, [EntityPropertyType.ArtistInfluencers] },
+        { EntityPropertyType.ArtistSimilarToIds, [EntityPropertyType.ArtistSimilarTo] },
         
         { EntityPropertyType.AlbumTrackIds, [EntityPropertyType.AlbumTracks] },
         { EntityPropertyType.AlbumSimilarToIds, [EntityPropertyType.AlbumSimilarTo] },
