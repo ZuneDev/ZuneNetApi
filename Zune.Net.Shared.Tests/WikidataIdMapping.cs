@@ -77,6 +77,42 @@ public class Tests
     }
 
     [Test]
+    public async Task ManuallyGetArtistNameAndBioFromMbid()
+    {
+        var mbid = new Guid("534ee493-bfac-4575-a44a-0ae41e2c3fe4");
+
+        var idMapper = new IdMapper();
+
+        Stopwatch stopwatch = new();
+        stopwatch.Start();
+
+        var idResults = await idMapper.GetArtistIdsByMbidAsync(mbid);
+        var dcid = Convert.ToInt32(idResults?.Discogs);
+        
+        var (dcArtist, _) = await Helpers.Discogs.GetDCArtistByMBID(mbid);
+        var name = dcArtist.Value<string>("name");
+        var bio = dcArtist.Value<string>("profile");
+
+        stopwatch.Stop();
+        
+        await TestContext.Out.WriteLineAsync();
+        await TestContext.Out.WriteLineAsync($"Total time: {stopwatch.Elapsed.TotalSeconds} seconds");
+        await TestContext.Out.WriteLineAsync();
+        
+        await TestContext.Out.WriteLineAsync($"== {name} ==");
+        await TestContext.Out.WriteLineAsync(bio);
+        
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(dcid, Is.EqualTo(61800));
+            Assert.That(name, Is.EqualTo("Rush"));
+            Assert.That(bio, Is.Not.Null);
+            
+            Assert.That(_mapper.TotalCost, Is.LessThanOrEqualTo(20));
+        }
+    }
+
+    [Test]
     public async Task MapArtistMbidToDcidUsingWikidata()
     {
         var wikidataIdMapper = new WikidataIdMapper();
