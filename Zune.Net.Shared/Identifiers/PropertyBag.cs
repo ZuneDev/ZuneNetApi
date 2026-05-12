@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
@@ -8,14 +9,17 @@ namespace Zune.Net.Identifiers;
 public interface IPropertyBag : IDictionary<EntityProperty, object>
 {
     IReadOnlyPropertySet AsReadOnlyPropertySet();
-    
-    IPropertyBag GetForSet(IReadOnlyPropertySet properties);
+
+    bool TryGetForSet(IReadOnlyPropertySet properties, out IPropertyBag bag);
 }
 
+[DebuggerDisplay("{DebuggerDisplay,nq}")]
 public class PropertyBag(IDictionary<EntityProperty, object> properties = null) : IPropertyBag
 {
     private readonly IDictionary<EntityProperty, object> _properties = properties
         ?? new Dictionary<EntityProperty, object>();
+
+    private string DebuggerDisplay => ToString();
 
     #region IDictionary implementation
 
@@ -62,15 +66,18 @@ public class PropertyBag(IDictionary<EntityProperty, object> properties = null) 
     
     public IReadOnlyPropertySet AsReadOnlyPropertySet() => new PropertySetView(_properties.Keys);
     
-    public IPropertyBag GetForSet(IReadOnlyPropertySet properties)
+    public bool TryGetForSet(IReadOnlyPropertySet properties, out IPropertyBag bag)
     {
-        var bag = new PropertyBag();
+        bag = new PropertyBag();
         foreach (var property in properties)
         {
-            if (_properties.TryGetValue(property, out var value))
-                bag.Add(property, value);
+            if (!_properties.TryGetValue(property, out var value))
+                return false;
+            
+            bag.Add(property, value);
         }
-        return bag;
+
+        return true;
     }
     
     public override int GetHashCode()
@@ -82,7 +89,7 @@ public class PropertyBag(IDictionary<EntityProperty, object> properties = null) 
 
     public override string ToString()
     {
-        return string.Join("; ", _properties.Keys.Select(p => p.ToString()));
+        return string.Join(", ", _properties.Keys.Select(p => p.ToString()));
     }
 
     private class PropertySetView(ICollection<EntityProperty> keys) : IReadOnlyPropertySet

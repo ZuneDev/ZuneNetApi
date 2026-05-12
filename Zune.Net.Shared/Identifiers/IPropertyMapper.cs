@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Zune.Net.Identifiers;
@@ -13,6 +14,7 @@ public interface IPropertyMapper
     Task<IPropertyBag> ExecuteAsync(IPropertyBag inputs, IReadOnlyPropertySet desiredOutputs);
 }
 
+[DebuggerDisplay("{Cost}: ({Inputs}) -> ({Outputs})")]
 public record PropertyMapping(int Cost, IReadOnlyPropertySet Inputs, IReadOnlyPropertySet Outputs);
 
 public record EntityProperty(EntityType EntityType, EntityPropertyType PropertyType)

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
+using OwlCore.Extensions;
 
 namespace Zune.Net.Identifiers;
 
@@ -27,105 +29,105 @@ public class CompositePropertyMapper(PropertyMapperRegistry mapperRegistry)
         TotalCost = 0; 
         
         var sourceProperty = new EntityProperty(entity, sourcePropertyType);
-        
-        var openSet = new PriorityQueue<EntityProperty, int>();
-        openSet.Enqueue(sourceProperty, 0);
-        
-        // TODO: Is this necessary?
-        var closedSet = new HashSet<PropertyMapperNode>();
-        
-        var distances = new Dictionary<EntityProperty, int>
-        {
-            [sourceProperty] = 0
-        };
-        
-        foreach (var targetProperty in targetProperties)
-            distances[targetProperty] = int.MaxValue;
-        
-        var bestMapping = new Dictionary<EntityProperty, PropertyMapperNode>();
 
-        // Process the queue until all reachable vertices are finalized
-        while (openSet.TryDequeue(out var u, out var d))
+        var initialPaths = mapperRegistry
+            .ForInputs([sourceProperty])
+            .Select(n => n.IntoList().ToImmutableList())
+            .ToList();
+        
+        var incompletePaths = new Queue<ImmutableList<PropertyMapperHyperedge>>(initialPaths);
+        
+        var pathsOfInterest = new HashSet<ImmutableList<PropertyMapperHyperedge>>(
+            new EnumerableEqualityComparer<PropertyMapperHyperedge>());
+        
+        // Explore paths, noting ones that produce any of the target properties
+        while (incompletePaths.TryDequeue(out var incompletePath))
         {
-            var uDistance = distances.GetValueOrDefault(u, int.MaxValue);
+            NumEdgesEvaluated++;
             
-            // If this distance is not the latest shortest one, skip it
-            if (distances.TryGetValue(u, out var previousDistance) && d > previousDistance)
-                continue;
-
-            // Explore all adjacent vertices
-            var connectedNodes = mapperRegistry
-                .ForInputs([u])
-                .Where(m => !closedSet.Contains(m));
-            foreach (var currentNode in connectedNodes)
-            {
-                closedSet.Add(currentNode);
+            var currentOutputs = incompletePath
+                .SelectMany(n => n.Edge.Outputs)
+                .ToPropertySet();
                 
-                var (_, currentMapping) = currentNode;
-                var (w, _, vs) = currentMapping;
+            // Strict metric, we only care about paths that produce all target properties
+            if (targetProperties.IsSubsetOf(currentOutputs))
+                pathsOfInterest.Add(incompletePath);
+            
+            currentOutputs.Add(sourceProperty);
+            
+            // Explore all connecting edges
+            var connectedHyperedges = mapperRegistry.ForInputs(currentOutputs);
+            
+            foreach (var currentHyperedge in connectedHyperedges)
+            {
+                // Ignore edges we've already traversed
+                if (incompletePath.Contains(currentHyperedge))
+                    continue;
+                
+                // Ignore edges that only provide outputs we already have
+                if (currentHyperedge.Edge.Outputs.IsSubsetOf(currentOutputs))
+                    continue;
 
-                foreach (var v in vs)
-                {
-                    NumEdgesEvaluated++;
-                    var vDistance = distances.GetValueOrDefault(v, int.MaxValue);
+                var newPath = incompletePath.Add(currentHyperedge);
+                incompletePaths.Enqueue(newPath);
 
-                    // If we found a shorter path to v through u, update it
-                    if (uDistance + w < vDistance)
-                    {
-                        vDistance = uDistance + w;
-                        distances[v] = vDistance;
-                        
-                        openSet.Enqueue(v, vDistance);
-                        bestMapping[v] = currentNode with
-                        {
-                            Edge = currentMapping with
-                            {
-                                Inputs = [u],
-                                Outputs = [v]
-                            }
-                        };
-                    }
-                }
+                // Alternative, less strict metric; we consider paths that produce some subset of the target properties
+                // var newOutputs = newPath
+                //     .SelectMany(n => n.Edge.Outputs)
+                //     .ToPropertySet();
+                
+                // var newOutputOverlap = newOutputs.Intersect(targetProperties).Count();
+                // var currentOutputOverlap = currentOutputs.Intersect(targetProperties).Count();
+                //
+                // if (newOutputOverlap > currentOutputOverlap)
+                //     pathsOfInterest.Add(newPath);
             }
         }
-
-        Stack<PropertyMapperNode> procedure = new();
-            
+        
         PropertyBag variables = new()
         {
             [sourceProperty] = source
         };
 
-        foreach (var targetProperty in targetProperties)
+        HashSet<PropertyMapperHyperedge> usedHyperedges = [];
+
+        var rankedPaths = pathsOfInterest.OrderBy(p => p.Sum(h => h.Edge.Cost));
+        foreach (var path in rankedPaths)
         {
-            if (!bestMapping.TryGetValue(targetProperty, out var bestNode))
-                throw new InvalidOperationException($"No path found from {sourceProperty} to {targetProperty}");
+            var desiredOutputs = targetProperties
+                .Union(path.SelectMany(n => n.Edge.Inputs))
+                .ToHashSet();
+            desiredOutputs.Remove(sourceProperty);
 
-            do
+            foreach (var hyperedge in path)
             {
-                procedure.Push(bestNode);
-
-                var input = bestNode.Edge.Inputs.Single();
-                if (input == sourceProperty)
-                    break;
-                
-                bestNode = bestMapping[input];
-            } while (bestMapping.TryGetValue(bestNode.Edge.Outputs.Single(), out bestNode));
-
-            while (procedure.TryPop(out var nextStep))
-            {
-                if (variables.AsReadOnlyPropertySet().IsSupersetOf(nextStep.Edge.Outputs))
+                // We've already performed this mapping. Either it failed or it didn't; either way, skip it.
+                if (usedHyperedges.Contains(hyperedge))
                     continue;
                 
-                var stepInputs = variables.GetForSet(nextStep.Edge.Inputs);
+                var (mapper, mapping) = hyperedge;
                 
-                var stepOutputs = await nextStep.Mapper.ExecuteAsync(stepInputs, nextStep.Edge.Outputs);
-                
-                TotalCost += nextStep.Edge.Cost;
-                variables.TryAddFrom(stepOutputs);
-            }
+                // Abort paths that have more mappings than necessary
+                // (e.g. an edge is traversed that doesn't produce any useful properties)
+                if (!mapping.Outputs.Any(desiredOutputs.Remove))
+                    break;
 
-            procedure.Clear();
+                // Attempt to get the values we'll input to the mapper
+                if (!variables.TryGetForSet(mapping.Inputs, out var edgeInputValues))
+                    break;
+                
+                // Perform the mapping
+                var results = await mapper.ExecuteAsync(edgeInputValues, mapping.Outputs);
+                variables.TryAddFrom(results);
+                
+                usedHyperedges.Add(hyperedge);
+                
+                TotalCost += mapping.Cost;
+            }
+            
+            // Check if we're done
+            if (variables.TryGetForSet(targetProperties, out _))
+                return variables;
         }
         
         return variables;
