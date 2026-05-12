@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -109,7 +108,7 @@ public class CompositePropertyMapper(PropertyMapperRegistry mapperRegistry)
                 
                 // Abort paths that have more mappings than necessary
                 // (e.g. an edge is traversed that doesn't produce any useful properties)
-                if (!mapping.Outputs.Any(desiredOutputs.Remove))
+                if (!mapping.Outputs.Any(desiredOutputs.Contains))
                     break;
 
                 // Attempt to get the values we'll input to the mapper
@@ -117,10 +116,13 @@ public class CompositePropertyMapper(PropertyMapperRegistry mapperRegistry)
                     break;
                 
                 // Perform the mapping
-                var results = await mapper.ExecuteAsync(edgeInputValues, mapping.Outputs);
+                var outputsToRequest = mapping.Outputs.Intersect(desiredOutputs).ToPropertySet();
+                var results = await mapper.ExecuteAsync(edgeInputValues, outputsToRequest);
                 variables.TryAddFrom(results);
                 
                 usedHyperedges.Add(hyperedge);
+                
+                desiredOutputs.ExceptWith(mapping.Outputs);
                 
                 TotalCost += mapping.Cost;
             }
