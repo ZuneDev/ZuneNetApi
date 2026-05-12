@@ -11,23 +11,18 @@ public class CompositePropertyMapper(PropertyMapperRegistry mapperRegistry)
     public int NumEdgesEvaluated { get; private set; }
     public int TotalCost { get; private set; }
     
-    public async Task<object> MapOneToOneAsync(EntityType entity, EntityPropertyType sourcePropertyType,
-        object source, EntityPropertyType targetPropertyType)
+    public async Task<object> MapAsync(EntityProperty sourceProperty, object source, EntityProperty targetProperty)
     {
-        var targetProperty = new EntityProperty(entity, targetPropertyType);
-        var outputs = await MapOneToManyAsync(entity, sourcePropertyType, source,
-            [targetProperty]);
+        var outputs = await MapAsync(sourceProperty, source, [targetProperty]);
         return outputs[targetProperty];
     }
     
-    public async Task<IPropertyBag> MapOneToManyAsync(EntityType entity, EntityPropertyType sourcePropertyType,
+    public async Task<IPropertyBag> MapAsync(EntityProperty sourceProperty,
         object source, IReadOnlyPropertySet targetProperties)
     {
         // TODO: Remove debug properties
         NumEdgesEvaluated = 0;
         TotalCost = 0; 
-        
-        var sourceProperty = new EntityProperty(entity, sourcePropertyType);
 
         var initialPaths = mapperRegistry
             .ForInputs([sourceProperty])
