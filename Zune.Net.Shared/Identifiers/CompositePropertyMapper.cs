@@ -4,10 +4,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using OwlCore.Extensions;
 
+using Hyperpath = System.Collections.Immutable.ImmutableList<Zune.Net.Identifiers.PropertyMapperHyperedge>;
+using RankedHyperpath = System.Linq.IOrderedEnumerable<System.Collections.Immutable.ImmutableList<Zune.Net.Identifiers.PropertyMapperHyperedge>>;
+
 namespace Zune.Net.Identifiers;
 
 public class CompositePropertyMapper(PropertyMapperRegistry mapperRegistry)
 {
+    private readonly Dictionary<(IReadOnlyPropertySet, IReadOnlyPropertySet), RankedHyperpath> _pathsCache = new();
+    
     public DebugCompositePropertyMapperResult DebugInfo { get; private set; }
     
     public async Task<object> MapAsync(EntityProperty sourceProperty, object source, EntityProperty targetProperty)
@@ -20,21 +25,97 @@ public class CompositePropertyMapper(PropertyMapperRegistry mapperRegistry)
         object source, IReadOnlyPropertySet targetProperties)
     {
         DebugInfo = new();
+        
+        PropertyBag variables = new()
+        {
+            [sourceProperty] = source
+        };
 
+        var rankedPaths = GetOrComputeMap(
+            variables.AsReadOnlyPropertySet(),
+            targetProperties);
+
+        HashSet<PropertyMapperHyperedge> usedHyperedges = [];
+
+        foreach (var path in rankedPaths)
+        {
+            var remainingOutputs = targetProperties
+                .Union(path.SelectMany(n => n.Edge.Inputs))
+                .ToHashSet();
+            remainingOutputs.Remove(sourceProperty);
+
+            // Evaluated mappings, skipping ones we've already done (doesn't matter if it succeeded)
+            foreach (var hyperedge in path.Where(hyperedge => !usedHyperedges.Contains(hyperedge)))
+            {
+                var (mapper, mapping) = hyperedge;
+                
+                // Abort paths that have more mappings than necessary
+                // (e.g., an edge is traversed that doesn't produce any useful properties)
+                if (!mapping.Outputs.Any(remainingOutputs.Contains))
+                    break;
+
+                // Attempt to get the values we'll input to the mapper
+                if (!variables.TryGetForSet(mapping.Inputs, out var edgeInputValues))
+                    break;
+                
+                // Only request the properties we need
+                var outputsToRequest = mapping.Outputs.Intersect(remainingOutputs).ToPropertySet();
+
+                // Perform the mapping
+                IPropertyBag results;
+                try
+                {
+                    results = await mapper.ExecuteAsync(edgeInputValues, outputsToRequest);
+                }
+                catch
+                {
+                    break;
+                }
+                finally
+                {
+                    usedHyperedges.Add(hyperedge);
+                }
+                
+                // Save results and mark outputs as done
+                variables.TryAddFrom(results);
+                remainingOutputs.ExceptWith(mapping.Outputs);
+                
+                DebugInfo.TotalCost += mapping.Cost;
+                ++DebugInfo.NumEdgesExecuted;
+            }
+            
+            // Check if we're done
+            if (variables.TryGetForSet(targetProperties, out _))
+                return variables;
+        }
+        
+        return variables;
+    }
+    
+    public RankedHyperpath GetOrComputeMap(
+        IReadOnlyPropertySet sourceProperties, IReadOnlyPropertySet targetProperties)
+    {
+        var key = (sourceProperties, targetProperties);
+        if (_pathsCache.TryGetValue(key, out var paths))
+            return paths;
+        
+        return _pathsCache[key] = ComputeMap(sourceProperties, targetProperties);
+    }
+
+    private RankedHyperpath ComputeMap(
+        IReadOnlyPropertySet sourceProperties, IReadOnlyPropertySet targetProperties)
+    {
         var initialPaths = mapperRegistry
-            .ForInputs([sourceProperty])
-            .Select(n => n.IntoList().ToImmutableList())
-            .ToList();
+            .ForInputs(sourceProperties)
+            .Select(n => n.IntoList().ToImmutableList());
         
-        var incompletePaths = new Queue<ImmutableList<PropertyMapperHyperedge>>(initialPaths);
-        
-        var pathsOfInterest = new HashSet<ImmutableList<PropertyMapperHyperedge>>(
-            new EnumerableEqualityComparer<PropertyMapperHyperedge>());
+        var incompletePaths = new Queue<Hyperpath>(initialPaths);
+        var pathsOfInterest = new HashSet<Hyperpath>(new EnumerableEqualityComparer<PropertyMapperHyperedge>());
         
         // Explore paths, noting ones that produce any of the target properties
         while (incompletePaths.TryDequeue(out var incompletePath))
         {
-            DebugInfo.NumEdgesEvaluated++;
+            ++DebugInfo.NumEdgesTested;
             
             var currentOutputs = incompletePath
                 .SelectMany(n => n.Edge.Outputs)
@@ -44,7 +125,7 @@ public class CompositePropertyMapper(PropertyMapperRegistry mapperRegistry)
             if (targetProperties.IsSubsetOf(currentOutputs))
                 pathsOfInterest.Add(incompletePath);
             
-            currentOutputs.Add(sourceProperty);
+            currentOutputs.UnionWith(sourceProperties);
             
             // Explore all connecting edges
             var connectedHyperedges = mapperRegistry.ForInputs(currentOutputs);
@@ -63,70 +144,14 @@ public class CompositePropertyMapper(PropertyMapperRegistry mapperRegistry)
                 incompletePaths.Enqueue(newPath);
             }
         }
-        
-        PropertyBag variables = new()
-        {
-            [sourceProperty] = source
-        };
 
-        HashSet<PropertyMapperHyperedge> usedHyperedges = [];
-
-        var rankedPaths = pathsOfInterest.OrderBy(p => p.Sum(h => h.Edge.Cost));
-        foreach (var path in rankedPaths)
-        {
-            var desiredOutputs = targetProperties
-                .Union(path.SelectMany(n => n.Edge.Inputs))
-                .ToHashSet();
-            desiredOutputs.Remove(sourceProperty);
-
-            // Evaluated mappings, skipping ones we've already done (doesn't matter if it succeeded)
-            foreach (var hyperedge in path.Where(hyperedge => !usedHyperedges.Contains(hyperedge)))
-            {
-                var (mapper, mapping) = hyperedge;
-                
-                // Abort paths that have more mappings than necessary
-                // (e.g., an edge is traversed that doesn't produce any useful properties)
-                if (!mapping.Outputs.Any(desiredOutputs.Contains))
-                    break;
-
-                // Attempt to get the values we'll input to the mapper
-                if (!variables.TryGetForSet(mapping.Inputs, out var edgeInputValues))
-                    break;
-                
-                // Perform the mapping
-                var outputsToRequest = mapping.Outputs.Intersect(desiredOutputs).ToPropertySet();
-
-                IPropertyBag results;
-                try
-                {
-                    results = await mapper.ExecuteAsync(edgeInputValues, outputsToRequest);
-                }
-                catch
-                {
-                    break;
-                }
-                finally
-                {
-                    usedHyperedges.Add(hyperedge);
-                }
-                
-                variables.TryAddFrom(results);
-                desiredOutputs.ExceptWith(mapping.Outputs);
-                
-                DebugInfo.TotalCost += mapping.Cost;
-            }
-            
-            // Check if we're done
-            if (variables.TryGetForSet(targetProperties, out _))
-                return variables;
-        }
-        
-        return variables;
+        return pathsOfInterest.OrderBy(p => p.Sum(h => h.Edge.Cost));
     }
 }
 
 public class DebugCompositePropertyMapperResult
 {
-    public int NumEdgesEvaluated { get; set; } = 0;
+    public int NumEdgesTested { get; set; } = 0;
+    public int NumEdgesExecuted { get; set; } = 0;
     public int TotalCost { get; set; } = 0;
 }

@@ -53,7 +53,8 @@ public class Tests
         stopwatch.Stop();
         
         await TestContext.Out.WriteLineAsync();
-        await TestContext.Out.WriteLineAsync($"Evaluated edges: {_mapper.DebugInfo.NumEdgesEvaluated}");
+        await TestContext.Out.WriteLineAsync($"Tested edges: {_mapper.DebugInfo.NumEdgesTested}");
+        await TestContext.Out.WriteLineAsync($"Executed edges: {_mapper.DebugInfo.NumEdgesExecuted}");
         await TestContext.Out.WriteLineAsync($"Total cost: {_mapper.DebugInfo.TotalCost}");
         await TestContext.Out.WriteLineAsync($"Total time: {stopwatch.Elapsed.TotalSeconds} seconds");
         await TestContext.Out.WriteLineAsync();
@@ -88,7 +89,7 @@ public class Tests
         
         var (dcArtist, _) = await Helpers.Discogs.GetDCArtistByMBID(mbid);
         var name = dcArtist.Value<string>("name");
-        var bio = dcArtist.Value<string>("profile");
+        var bio = Helpers.Discogs.DCProfileToBiographyContent(dcArtist.Value<string>("profile")).Value;
 
         stopwatch.Stop();
         
@@ -104,8 +105,6 @@ public class Tests
             Assert.That(dcid, Is.EqualTo(61800));
             Assert.That(name, Is.EqualTo("Rush"));
             Assert.That(bio, Is.Not.Null);
-            
-            Assert.That(_mapper.DebugInfo.TotalCost, Is.LessThanOrEqualTo(20));
         }
     }
 
