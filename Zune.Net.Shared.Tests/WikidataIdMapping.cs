@@ -1,4 +1,5 @@
-﻿using Zune.Net.Identifiers;
+﻿using System.Diagnostics;
+using Zune.Net.Identifiers;
 
 namespace Zune.Net.Shared.Tests;
 
@@ -45,12 +46,26 @@ public class Tests
         var nameProperty = new EntityProperty(EntityType.Artist, EntityPropertyType.ArtistName);
         var bioProperty = new EntityProperty(EntityType.Artist, EntityPropertyType.ArtistBio);
 
+        Stopwatch stopwatch = new();
+        stopwatch.Start();
+
         var result = await _mapper.MapOneToManyAsync(EntityType.Artist,
             EntityPropertyType.MusicBrainzArtistId, mbid,
             [nameProperty, bioProperty]);
 
+        stopwatch.Stop();
+        
+        await TestContext.Out.WriteLineAsync();
+        await TestContext.Out.WriteLineAsync($"Evaluated edges: {_mapper.NumEdgesEvaluated}");
+        await TestContext.Out.WriteLineAsync($"Total cost: {_mapper.TotalCost}");
+        await TestContext.Out.WriteLineAsync($"Total time: {stopwatch.Elapsed.TotalSeconds} seconds");
+        await TestContext.Out.WriteLineAsync();
+        
         var name = result[nameProperty]?.ToString();
         var bio = result[bioProperty]?.ToString();
+        
+        await TestContext.Out.WriteLineAsync($"== {name} ==");
+        await TestContext.Out.WriteLineAsync(bio);
         
         using (Assert.EnterMultipleScope())
         {

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -10,8 +11,15 @@ public interface IReadOnlyPropertySet : IReadOnlySet<EntityProperty>;
 [CollectionBuilder(typeof(IPropertySetBuilder), nameof(IPropertySetBuilder.Create))]
 public interface IPropertySet : IReadOnlyPropertySet, ISet<EntityProperty>;
 
+[DebuggerDisplay("{DebuggerDisplay,nq}")]
 public class PropertySet : HashSet<EntityProperty>, IPropertySet
 {
+    private string DebuggerDisplay => ToString();
+    
+    public PropertySet()
+    {
+    }
+    
     public PropertySet(IEnumerable<EntityProperty> collection) : base(collection)
     {
     }
@@ -25,7 +33,7 @@ public class PropertySet : HashSet<EntityProperty>, IPropertySet
     
     public override string ToString()
     {
-        return string.Join("; ", this.Select(p => p.ToString()));
+        return string.Join(", ", this.Select(p => p.ToString()));
     }
 }
 

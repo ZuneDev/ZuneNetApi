@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Zune.Net.Identifiers;
@@ -35,12 +36,12 @@ public class PropertyMapperRegistry
         return this;
     }
 
-    public IEnumerable<PropertyMapperNode> ForInputs(IReadOnlyPropertySet inputs)
+    public IEnumerable<PropertyMapperHyperedge> ForInputs(IReadOnlyPropertySet inputs)
     {
         return _mappers.SelectMany(mr => 
             mr.AvailableMappings
                 .Where(ma => ma.Inputs.IsSubsetOf(inputs))
-                .Select(ma => new PropertyMapperNode(mr, ma)));
+                .Select(ma => new PropertyMapperHyperedge(mr, ma)));
     }
     
     public IEnumerable<IPropertyMapper> ForInput(EntityProperty input) => _incidenceMatrix[input].InputTo;
@@ -56,4 +57,5 @@ public class PropertyMapperRegistry
     }
 }
 
-public record PropertyMapperNode(IPropertyMapper Mapper, PropertyMapping Edge);
+[DebuggerDisplay("{Mapper.GetType().Name}: {Edge}")]
+public record PropertyMapperHyperedge(IPropertyMapper Mapper, PropertyMapping Edge);
