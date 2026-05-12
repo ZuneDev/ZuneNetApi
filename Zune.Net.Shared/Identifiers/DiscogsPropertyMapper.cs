@@ -26,10 +26,13 @@ public class DiscogsPropertyMapper : IPropertyMapper
                 var dcArtist = await Discogs.GetDCArtistByDCID(dcid);
                 
                 var name = dcArtist.Value<string>("name");
-                var bio = Discogs.DCProfileToBiographyContent(dcArtist.Value<string>("profile")).Value;
-                
                 outputs[new EntityProperty(EntityType.Artist, EntityPropertyType.ArtistName)] = name;
-                outputs[new EntityProperty(EntityType.Artist, EntityPropertyType.ArtistBio)] = bio;
+
+                if (desiredOutputs.Contains(new EntityProperty(EntityType.Artist, EntityPropertyType.ArtistBio)))
+                {
+                    var bio = Discogs.DCProfileToBiographyContent(dcArtist.Value<string>("profile")).Value;
+                    outputs[new EntityProperty(EntityType.Artist, EntityPropertyType.ArtistBio)] = bio;
+                }
             }
         }
         catch (Exception e)
