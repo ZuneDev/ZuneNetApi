@@ -77,6 +77,7 @@ namespace Zune.Net.Helpers
                 SortTitle = mb_artist.SortName, 
                 SortName = mb_artist.SortName,
                 IsVariousArtist = mb_artist.Id == ARTIST_VARIOUSARTISTS,
+                BiographyLink = $"https://catalog.zunes.me/v3.2/en-US/music/artist/{mb_artist.Id}/biography",
                 Updated = updated.Value,
             };
 
