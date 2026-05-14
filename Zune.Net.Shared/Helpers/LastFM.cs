@@ -1,9 +1,11 @@
 ﻿using Atom.Xml;
 using IF.Lastfm.Core.Api;
 using IF.Lastfm.Core.Objects;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Zune.Xml.Catalog;
@@ -19,7 +21,7 @@ namespace Zune.Net.Helpers
             Name = "Last.fm",
             Url = "https://last.fm"
         };
-
+                                                                                             
         public static async Task<Feed<Track>> GetSimilarTracksByMBID(Guid mbid)
         {
             var response = await _client.Track.GetSimilarByMbidAsync(mbid.ToString());
@@ -50,6 +52,21 @@ namespace Zune.Net.Helpers
             return feed;
         }
 
+        public static async Task<List<Artist>> GetSimilarArtist(Guid mbid)
+        {
+            var response = await _client.Artist.GetSimilarByMbidAsync(mbid.ToString());
+
+            List<Artist> artistList = new List<Artist>();
+
+            foreach (var relatedArtist in response)
+            {
+                artistList.Add(FMArtistToArtist(relatedArtist));
+            }
+
+            return artistList;
+
+        }
+        
         public static async Task<IReadOnlyList<LastTrack>> GetTopTracks()
         {
             var response = await _client.Chart.GetTopTracksAsync();

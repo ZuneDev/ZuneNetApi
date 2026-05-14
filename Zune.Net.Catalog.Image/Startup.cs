@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -27,6 +28,7 @@ namespace Zune.Net.Catalog.Image
             });
         }
 
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -36,6 +38,13 @@ namespace Zune.Net.Catalog.Image
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.Use(async (context, next) =>
+            {
+                context.Response.Headers.Append("Expires", "Sun, 19 Apr 2071 10:00:00 GMT");
+                context.Response.Headers.Append("Keep-Alive", "timeout=150000, max=10");
+                await next.Invoke();
+            });
 
             app.UseCors("AllowAll");
 
