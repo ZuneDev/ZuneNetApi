@@ -26,12 +26,12 @@ public class DiscogsPropertyMapper : IPropertyMapper
                 var dcArtist = await Discogs.GetDCArtistByDCID(dcid);
                 
                 var name = dcArtist.Value<string>("name");
-                outputs[new EntityProperty(EntityType.Artist, EntityPropertyType.ArtistName)] = name;
+                outputs[Ep.Artist.Name] = name;
 
-                if (desiredOutputs.Contains(new EntityProperty(EntityType.Artist, EntityPropertyType.ArtistBio)))
+                if (desiredOutputs.Contains(Ep.Artist.Bio))
                 {
                     var bio = Discogs.DCProfileToBiographyContent(dcArtist.Value<string>("profile")).Value;
-                    outputs[new EntityProperty(EntityType.Artist, EntityPropertyType.ArtistBio)] = bio;
+                    outputs[Ep.Artist.Bio] = bio;
                 }
             }
         }
@@ -45,10 +45,12 @@ public class DiscogsPropertyMapper : IPropertyMapper
     private static IEnumerable<PropertyMapping> GetAvailableMappings()
     {
         yield return new PropertyMapping(10,
-            [new EntityProperty(EntityType.Artist, EntityPropertyType.DiscogsArtistId)],
+            [Ep.Artist.DiscogsId],
             [
-                new EntityProperty(EntityType.Artist, EntityPropertyType.ArtistName),
-                new EntityProperty(EntityType.Artist, EntityPropertyType.ArtistBio),
+                Ep.Artist.Name,
+                Ep.Artist.Bio,
+                Ep.Artist.Images,
+                Ep.Artist.PrimaryImage,
             ]);
     }
 }

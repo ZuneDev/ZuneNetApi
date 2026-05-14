@@ -89,10 +89,10 @@ public partial class MusicBrainzPropertyMapper : IPropertyMapper
     private static IEnumerable<PropertyMapping> GetAvailableMappings()
     {
         yield return new PropertyMapping(20,
-            [new EntityProperty(EntityType.Artist, EntityPropertyType.MusicBrainzArtistId)],
+            [Ep.Artist.MusicBrainzId],
             [
-                new EntityProperty(EntityType.Artist, EntityPropertyType.ArtistName),
-                new EntityProperty(EntityType.Artist, EntityPropertyType.ArtistAlbumIds),
+                Ep.Artist.Name,
+                Ep.Artist.AlbumIds,
                 
                 ..PropsFromUrlRels.Keys,
             ]);
