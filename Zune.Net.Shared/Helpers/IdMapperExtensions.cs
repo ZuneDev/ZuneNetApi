@@ -16,6 +16,9 @@ public static class IdMapperExtensions
         TSrcId srcId, WikidataProperty srcProp) =>
         await idMapper.BatchGetAlbumIdsAsync([srcId], srcProp).FirstOrDefaultAsync();
     
+    public static async Task<ArtistIdMap?> GetArtistIdsByMbidAsync(this IdMapper idMapper, Guid artistMbid) =>
+        await idMapper.BatchGetArtistIdsAsync([artistMbid], WikidataProperty.MBArtistId).FirstOrDefaultAsync();
+    
     public static async Task<AlbumIdMap?> GetAlbumIdsByMbidAsync(this IdMapper idMapper, Guid releaseGroupMbid) =>
         await idMapper.BatchGetAlbumIdsAsync([releaseGroupMbid], WikidataProperty.MBReleaseGroupId).FirstOrDefaultAsync();
 }

@@ -1,11 +1,11 @@
 ﻿using Atom.Xml;
-using Flurl.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using Zune.DB;
 using Zune.Net.Features;
@@ -17,7 +17,7 @@ namespace Zune.Net.Catalog.Controllers.Music
 {
     [Route("/music/artist/")]
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
-    public class ArtistController(ZuneNetContext database) : Controller
+    public class ArtistController(ZuneNetContext database, IdMapper idMapper) : Controller
     {
         [HttpGet, Route("")]
         public ActionResult<Feed<Artist>> Search()
@@ -146,19 +146,18 @@ namespace Zune.Net.Catalog.Controllers.Music
             return feed;
         }
 
- 	    [HttpGet, Route("{mbid}/deviceBackgroundImage")]
-        [HttpGet, Route("{mbid}/primaryImage")]
-        public async Task<ActionResult> PrimaryImage(Guid mbid)
+ 	    [HttpGet, Route("{mbid:guid}/deviceBackgroundImage")]
+        [HttpGet, Route("{mbid:guid}/primaryImage")]
+        public async Task<IActionResult> PrimaryImage(Guid mbid,
+            [FromQuery] bool resize = false, [FromQuery(Name = "width")] int? requestedWidth = null,
+            [FromQuery] string contentType = MediaTypeNames.Image.Jpeg)
         {
-            (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(mbid);
-            if (dc_artist == null)
-                return StatusCode(404);
+            var dcArtist = await Discogs.GetDCArtistByMBID(mbid, idMapper);
+            var imgUrl = dcArtist["images"]?
+                .FirstOrDefault(i => i.Value<string>("type") == "primary")?
+                .Value<string>("uri");
 
-            string imgUrl = dc_artist["images"].First(i => i.Value<string>("type") == "primary").Value<string>("uri");
-            var imgResponse = await imgUrl.GetAsync();
-            if (imgResponse.StatusCode != 200)
-                return StatusCode(imgResponse.StatusCode);
-            return File(await imgResponse.GetStreamAsync(), "image/jpeg");
+            return await this.GetAndResizeImageAsync(imgUrl, resize, requestedWidth, contentType);
         }
 
         [HttpGet, Route("{mbid}/biography")]
