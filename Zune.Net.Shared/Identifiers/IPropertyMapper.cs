@@ -46,8 +46,8 @@ public static class Ep
         public static readonly EntityProperty SimilarToIds = new(EntityType.Artist,EntityPropertyType.ArtistSimilarToIds);
         public static readonly EntityProperty SimilarTo = new(EntityType.Artist,EntityPropertyType.ArtistSimilarTo);
         public static readonly EntityProperty Bio = new(EntityType.Artist,EntityPropertyType.ArtistBio);
-        public static readonly EntityProperty Images = new(EntityType.Artist,EntityPropertyType.ArtistImages);
-        public static readonly EntityProperty PrimaryImage = new(EntityType.Artist,EntityPropertyType.ArtistPrimaryImage);
+        public static readonly EntityProperty Images = new(EntityType.Artist,EntityPropertyType.ArtistImageUrls);
+        public static readonly EntityProperty PrimaryImage = new(EntityType.Artist,EntityPropertyType.ArtistPrimaryImageUrl);
     }
 
     public static class Album
@@ -71,6 +71,16 @@ public static class Ep
         public static readonly EntityProperty ArtistId = new(EntityType.Album, EntityPropertyType.AlbumArtistId);
         public static readonly EntityProperty Artist = new(EntityType.Album, EntityPropertyType.AlbumArtist);
     }
+
+    public static class Image
+    {
+        public static readonly EntityProperty Id = new(EntityType.Image, EntityPropertyType.ImageId);
+        public static readonly EntityProperty CoverArtArchvieId = new(EntityType.Image, EntityPropertyType.CoverArtArchiveId);
+        public static readonly EntityProperty ZuneId = new(EntityType.Image, EntityPropertyType.ZuneImageId);
+    
+        public static readonly EntityProperty ImageUrl = new(EntityType.Image, EntityPropertyType.ImageUrl);
+        public static readonly EntityProperty ImageStream = new(EntityType.Image, EntityPropertyType.ImageStream);
+    }
 }
 
 public enum EntityType
@@ -81,12 +91,14 @@ public enum EntityType
     Track,
     Genre,
     Feature,
+    Image,
 }
 
 public enum EntityPropertyType
 {
     /* Artists */
     AllMusicArtistId,
+    BandcampArtistId,
     DiscogsArtistId,
     DeezerArtistId,
     LastFmArtistId,
@@ -106,12 +118,13 @@ public enum EntityPropertyType
     ArtistSimilarToIds,
     ArtistSimilarTo,
     ArtistBio,
-    ArtistImages,
-    ArtistPrimaryImage,
+    ArtistImageUrls,
+    ArtistPrimaryImageUrl,
     
     /* Albums */
     AllMusicAlbumId,
     AppleMusicAlbumId,
+    BandcampAlbumId,
     DiscogsMasterId,
     DeezerAlbumId,
     LastFmAlbumId,
@@ -128,6 +141,15 @@ public enum EntityPropertyType
     AlbumSimilarTo,
     AlbumArtistId,
     AlbumArtist,
+    
+    /* Images */
+    BandcampImageId,
+    CoverArtArchiveId,
+    ZuneImageId,
+    ImageId,
+    
+    ImageUrl,
+    ImageStream,
 }
 
 public static class EntityPropertyTypes
@@ -146,8 +168,8 @@ public static class EntityPropertyTypes
                 EntityPropertyType.ArtistSimilarToIds,
                 EntityPropertyType.ArtistSimilarTo,
                 EntityPropertyType.ArtistBio,
-                EntityPropertyType.ArtistImages,
-                EntityPropertyType.ArtistPrimaryImage,
+                EntityPropertyType.ArtistImageUrls,
+                EntityPropertyType.ArtistPrimaryImageUrl,
             ]
         },
         
