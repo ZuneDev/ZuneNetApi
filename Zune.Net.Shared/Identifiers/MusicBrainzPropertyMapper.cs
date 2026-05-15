@@ -57,8 +57,9 @@ public partial class MusicBrainzPropertyMapper : IPropertyMapper
                 
                 if (mbArtist.Releases is not null)
                 {
-                    // TODO: How should it be specified that the album IDs are MusicBrainz IDs?
-                    var albumIds = mbArtist.Releases.Select(r => r.Id).ToArray();
+                    var albumIds = mbArtist.Releases
+                        .Select(r => r.Id)
+                        .ToPropertyValueList(Ep.Album.MusicBrainzReleaseId);
                     outputs[Ep.Artist.AlbumIds] = albumIds;
                 }
 
