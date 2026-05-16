@@ -1,23 +1,24 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using MetaBrainz.MusicBrainz;
 using Zune.Net.Helpers;
 
-namespace Zune.Net.Ontology;
+namespace Zune.Net.Ontology.Mappers;
 
 public partial class MusicBrainzPropertyMapper : IPropertyMapper
 {
     public IReadOnlySet<PropertyMapping> AvailableMappings { get; } = GetAvailableMappings().ToHashSet();
 
-    private static readonly Dictionary<IEntityProperty, (Guid, Func<Regex>, Func<string, object>)> PropsFromUrlRels = new()
+    private static readonly Dictionary<IEntityProperty, (Guid, Func<Regex>)> PropsFromUrlRels = new()
     {
-        [Ep.Artist.AllMusicId] = (Guid.Parse("6b3e3c85-0002-4f34-aca6-80ace0d7e846"), RxUrlArtistAllMusic, s => s),
-        [Ep.Artist.DiscogsId] = (Guid.Parse("04a5b104-a4c2-4bac-99a1-7b837c37d9e4"), RxUrlArtistDiscogs, s => int.Parse(s)),
-        [Ep.Artist.LastFmId] = (Guid.Parse("08db8098-c0df-4b78-82c3-c8697b4bba7f"), RxUrlLastFm, s => s),
-        [Ep.Artist.WikidataPerformerId] = (Guid.Parse("689870a4-a1e4-4912-b17f-7b2664215698"), RxUrlWikidata, s => s),
+        [Ep.Artist.AllMusicId] = (Guid.Parse("6b3e3c85-0002-4f34-aca6-80ace0d7e846"), RxUrlArtistAllMusic),
+        [Ep.Artist.DiscogsId] = (Guid.Parse("04a5b104-a4c2-4bac-99a1-7b837c37d9e4"), RxUrlArtistDiscogs),
+        [Ep.Artist.LastFmId] = (Guid.Parse("08db8098-c0df-4b78-82c3-c8697b4bba7f"), RxUrlLastFm),
+        [Ep.Artist.WikidataPerformerId] = (Guid.Parse("689870a4-a1e4-4912-b17f-7b2664215698"), RxUrlWikidata),
     };
     
     public async Task<IPropertyBag> ExecuteAsync(IPropertyBag inputs, IReadOnlyPropertySet desiredOutputs)
@@ -66,7 +67,7 @@ public partial class MusicBrainzPropertyMapper : IPropertyMapper
 
                 foreach (var idProp in propsMappedFromRelationships)
                 {
-                    var (typeId, rxUrl, parse) = PropsFromUrlRels[idProp];
+                    var (typeId, rxUrl) = PropsFromUrlRels[idProp];
                     
                     var relationship = mbArtist.Relationships?.FirstOrDefault(rel => rel.TypeId == typeId);
                     var resourceUrl = relationship?.Url?.Resource?.ToString();
@@ -76,8 +77,21 @@ public partial class MusicBrainzPropertyMapper : IPropertyMapper
                     var match = rxUrl().Match(resourceUrl);
                     if (!match.Success)
                         continue;
+                    
+                    var idStr = match.Groups[1].Value;
+                    
+                    var idPropType = idProp.GetType();
+                    if (idPropType.GetGenericTypeDefinition() == typeof(TypedEntityProperty<>))
+                    {
+                        var valueType = idPropType.GenericTypeArguments[0];
+                        var converter = TypeDescriptor.GetConverter(valueType);
+                        outputs[idProp] = converter.ConvertFromInvariantString(idStr);
+                    }
+                    else
+                    {
+                        outputs[idProp] = idStr;
+                    }
 
-                    outputs[idProp] = parse(match.Groups[1].Value);
                 }
             }
         }

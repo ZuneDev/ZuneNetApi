@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using VDS.RDF;
 using VDS.RDF.Query;
 
-namespace Zune.Net.Ontology;
+namespace Zune.Net.Ontology.Mappers;
 
 public class WikidataIdMapper : IPropertyMapper
 {
