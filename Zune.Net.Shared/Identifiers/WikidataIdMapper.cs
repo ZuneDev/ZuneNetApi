@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
+using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -15,134 +15,95 @@ public class WikidataIdMapper : IPropertyMapper
     private readonly SparqlQueryClient
         _wikidata = new(CreateHttpClient(), new Uri("https://query.wikidata.org/sparql"));
 
-    private static readonly Dictionary<EntityType, Dictionary<EntityPropertyType, WikidataProperty>>
-        EntityToWikidataPropMap = new()
-        {
-            /* Artists */
-            {
-                EntityType.Artist, new()
-                {
-                    { EntityPropertyType.MusicBrainzArtistId, WikidataProperty.MBArtistId },
-                    { EntityPropertyType.AllMusicArtistId, WikidataProperty.ALArtistId },
-                    { EntityPropertyType.DiscogsArtistId, WikidataProperty.DCArtistId },
-                    { EntityPropertyType.DeezerArtistId, WikidataProperty.DZArtistId },
-                    { EntityPropertyType.LastFmArtistId, WikidataProperty.FMId },
-                    { EntityPropertyType.SpotifyArtistId, WikidataProperty.SPArtistId },
-                    { EntityPropertyType.TidalArtistId, WikidataProperty.TIArtistId },
-                    { EntityPropertyType.WikidataPerformerId, WikidataProperty.WKPerformerId },
-                }
-            },
-
+    private static readonly Dictionary<IEntityProperty, WikidataProperty> EntityToWikidataPropMap = new()
+    {
+        /* Artists */
+        { Ep.Artist.AllMusicId, WikidataProperty.ALArtistId },
+        { Ep.Artist.DiscogsId, WikidataProperty.DCArtistId },
+        { Ep.Artist.DeezerId, WikidataProperty.DZArtistId },
+        { Ep.Artist.LastFmId, WikidataProperty.FMId },
+        { Ep.Artist.MusicBrainzId, WikidataProperty.MBArtistId },
+        { Ep.Artist.SpotifyId, WikidataProperty.SPArtistId },
+        { Ep.Artist.TidalId, WikidataProperty.TIArtistId },
+        { Ep.Artist.WikidataPerformerId, WikidataProperty.WKPerformerId },
+        
         /* Albums */
-        {
-            EntityType.Album, new()
-            {
-                { EntityPropertyType.MusicBrainzReleaseGroupId, WikidataProperty.MBReleaseGroupId },
-                { EntityPropertyType.MusicBrainzReleaseId, WikidataProperty.MBReleaseId },
-                { EntityPropertyType.AllMusicAlbumId, WikidataProperty.ALAlbumId },
-                { EntityPropertyType.AppleMusicAlbumId, WikidataProperty.AMAlbumId },
-                { EntityPropertyType.DiscogsMasterId, WikidataProperty.DCMasterId },
-                { EntityPropertyType.DeezerAlbumId, WikidataProperty.DZAlbumId },
-                { EntityPropertyType.LastFmArtistId, WikidataProperty.FMId },
-                { EntityPropertyType.SpotifyAlbumId, WikidataProperty.SPAlbumId },
-                { EntityPropertyType.TidalAlbumId, WikidataProperty.TIAlbumId },
-                { EntityPropertyType.WikidataPerformerId, WikidataProperty.WKPerformerId },
-            }
-        },
+        { Ep.Album.MusicBrainzReleaseGroupId, WikidataProperty.MBReleaseGroupId },
+        { Ep.Album.MusicBrainzReleaseId, WikidataProperty.MBReleaseId },
+        { Ep.Album.AllMusicId, WikidataProperty.ALAlbumId },
+        { Ep.Album.AppleMusicId, WikidataProperty.AMAlbumId },
+        { Ep.Album.DiscogsMasterId, WikidataProperty.DCMasterId },
+        { Ep.Album.DeezerId, WikidataProperty.DZAlbumId },
+        { Ep.Album.LastFmId, WikidataProperty.FMId },
+        { Ep.Album.SpotifyId, WikidataProperty.SPAlbumId },
+        { Ep.Album.TidalId, WikidataProperty.TIAlbumId },
     };
 
-    private static readonly Dictionary<EntityType, Dictionary<WikidataProperty, EntityPropertyType>> WikidataToEntityPropMaps = new()
+    private static readonly Dictionary<EntityType, Dictionary<WikidataProperty, IEntityProperty>> WikidataToEntityPropMaps = new()
     {
         {
             EntityType.Artist, new()
             {
-                { WikidataProperty.MBArtistId, EntityPropertyType.MusicBrainzArtistId },
-                { WikidataProperty.ALArtistId, EntityPropertyType.AllMusicArtistId },
-                { WikidataProperty.DCArtistId, EntityPropertyType.DiscogsArtistId },
-                { WikidataProperty.DZArtistId, EntityPropertyType.DeezerArtistId },
-                { WikidataProperty.FMId, EntityPropertyType.LastFmArtistId },
-                { WikidataProperty.SPArtistId, EntityPropertyType.SpotifyArtistId },
-                { WikidataProperty.TIArtistId, EntityPropertyType.TidalArtistId },
-                { WikidataProperty.WKPerformerId, EntityPropertyType.WikidataPerformerId },
+                { WikidataProperty.MBArtistId, Ep.Artist.MusicBrainzId },
+                { WikidataProperty.ALArtistId, Ep.Artist.AllMusicId },
+                { WikidataProperty.DCArtistId, Ep.Artist.DiscogsId },
+                { WikidataProperty.DZArtistId, Ep.Artist.DeezerId },
+                { WikidataProperty.FMId, Ep.Artist.LastFmId },
+                { WikidataProperty.SPArtistId, Ep.Artist.SpotifyId },
+                { WikidataProperty.TIArtistId, Ep.Artist.TidalId },
+                { WikidataProperty.WKPerformerId, Ep.Artist.WikidataPerformerId },
             }
         },
 
         {
             EntityType.Album, new()
             {
-                { WikidataProperty.MBReleaseGroupId, EntityPropertyType.MusicBrainzReleaseGroupId },
-                { WikidataProperty.MBReleaseId, EntityPropertyType.MusicBrainzReleaseId },
-                { WikidataProperty.ALAlbumId, EntityPropertyType.AllMusicAlbumId },
-                { WikidataProperty.AMAlbumId, EntityPropertyType.AppleMusicAlbumId },
-                { WikidataProperty.DCMasterId, EntityPropertyType.DiscogsMasterId },
-                { WikidataProperty.DZAlbumId, EntityPropertyType.DeezerAlbumId },
-                { WikidataProperty.FMId, EntityPropertyType.LastFmArtistId },
-                { WikidataProperty.SPAlbumId, EntityPropertyType.SpotifyAlbumId },
-                { WikidataProperty.TIAlbumId, EntityPropertyType.TidalAlbumId },
-                { WikidataProperty.WKPerformerId, EntityPropertyType.WikidataPerformerId },
+                { WikidataProperty.MBReleaseGroupId, Ep.Album.MusicBrainzReleaseGroupId },
+                { WikidataProperty.MBReleaseId, Ep.Album.MusicBrainzReleaseId },
+                { WikidataProperty.ALAlbumId, Ep.Album.AllMusicId },
+                { WikidataProperty.AMAlbumId, Ep.Album.AppleMusicId },
+                { WikidataProperty.DCMasterId, Ep.Album.DiscogsMasterId },
+                { WikidataProperty.DZAlbumId, Ep.Album.DeezerId },
+                { WikidataProperty.FMId, Ep.Album.LastFmId },
+                { WikidataProperty.SPAlbumId, Ep.Album.SpotifyId },
+                { WikidataProperty.TIAlbumId, Ep.Album.TidalId },
+                // { WikidataProperty.WKPerformerId, Ep.Album.WikidataPerformerId },
             }
         },
     };
 
-    private static Dictionary<EntityType, HashSet<EntityProperty>> GetAvailableOutputEntityProperties()
+    private static HashSet<IEntityProperty> GetAvailableOutputEntityProperties(EntityType entityType)
     {
-        return EntityToWikidataPropMap.ToDictionary(
-            em => em.Key,
-            em =>
-                em.Value.Select(pm => new EntityProperty(em.Key, pm.Key)).ToHashSet());;
+        return EntityToWikidataPropMap
+            .Keys
+            .Where(p => p.EntityType == entityType)
+            .ToHashSet();
     }
 
     public IReadOnlySet<PropertyMapping> AvailableMappings { get; } = GetAvailableMappings();
-
-    public ImmutableHashSet<EntityProperty> WouldMap(ISet<EntityProperty> inputs)
-    {
-        var inputsByEntityType = inputs
-            .GroupBy(i => i.EntityType);
-
-        var outputsByEntityType = GetAvailableOutputEntityProperties();
-
-        HashSet<EntityProperty> outputs = [];
-
-        foreach (var entityInputs in inputsByEntityType)
-        {
-            var entityType = entityInputs.Key;
-
-            var availableInputs = entityInputs.ToHashSet();
-            var availableOutputs = outputsByEntityType[entityType];
-            
-            availableOutputs.IntersectWith(availableInputs);
-            
-            outputs.UnionWith(availableOutputs);
-        }
-
-        return outputs.ToImmutableHashSet();
-    }
     
     public async Task<IPropertyBag> ExecuteAsync(IPropertyBag inputs, IReadOnlyPropertySet desiredOutputs)
     {
-        var inputsByEntityType = ((IDictionary<EntityProperty, object>)inputs)
+        var inputsByEntityType = ((IDictionary<IEntityProperty, object>)inputs)
             .GroupBy(i => i.Key.EntityType);
 
-        var outputsByEntityType = GetAvailableOutputEntityProperties();
-
-        Dictionary<EntityProperty, object> outputs = [];
+        Dictionary<IEntityProperty, object> outputs = [];
 
         foreach (var entityInputs in inputsByEntityType)
         {
             var entityType = entityInputs.Key;
             var wikidataToEntityPropMap = WikidataToEntityPropMaps[entityType];
-            var entityToWikidataPropMap = EntityToWikidataPropMap[entityType];
 
             var availableInputs = entityInputs.Select(i => i.Key).ToHashSet();
-            var availableOutputs = outputsByEntityType[entityType];
+            var availableOutputs = GetAvailableOutputEntityProperties(entityType);
             
             availableOutputs.ExceptWith(availableInputs);
 
             var wikidataOutputs = availableOutputs
-                .Select(a => entityToWikidataPropMap[a.PropertyType])
+                .Select(a => EntityToWikidataPropMap[a])
                 .ToHashSet();
             var entitySourceIds = entityInputs.ToDictionary(
-                s => entityToWikidataPropMap[s.Key.PropertyType],
+                s => EntityToWikidataPropMap[s.Key],
                 s => s.Value?.ToString());
             
             await ExecuteMappingQueryAsync(entitySourceIds, wikidataOutputs, EntityOutputSetter);
@@ -151,7 +112,20 @@ public class WikidataIdMapper : IPropertyMapper
 
             void EntityOutputSetter(WikidataProperty prop, string id)
             {
-                outputs[new EntityProperty(entityType, wikidataToEntityPropMap[prop])] = id;
+                var entityProp = wikidataToEntityPropMap[prop];
+
+                var entityPropType = entityProp.GetType();
+                if (entityPropType.GetGenericTypeDefinition() == typeof(TypedEntityProperty<>))
+                {
+                    var valueType = entityPropType.GenericTypeArguments[0];
+                    var converter = TypeDescriptor.GetConverter(valueType);
+                    var result = converter.ConvertFromInvariantString(id);
+                    outputs[wikidataToEntityPropMap[prop]] = result;
+                }
+                else
+                {
+                    outputs[wikidataToEntityPropMap[prop]] = id;
+                }
             }
         }
 
@@ -218,20 +192,16 @@ public class WikidataIdMapper : IPropertyMapper
 
         HashSet<PropertyMapping> mappings = new(EntityToWikidataPropMap.Count * 10);
         
-        foreach (var (entityType, props) in EntityToWikidataPropMap)
+        foreach (var (inputEntityProp, wkProp) in EntityToWikidataPropMap)
         {
-            foreach (var propType in props.Keys)
-            {
-                EntityProperty input = new(entityType, propType);
-                IPropertySet inputs = [input];
+            IPropertySet inputs = [inputEntityProp];
                 
-                var outputs = props.Keys
-                    .Where(p => p != propType)
-                    .Select(p => new EntityProperty(entityType, p))
-                    .ToPropertySet();
+            var outputs = EntityToWikidataPropMap.Keys
+                .Where(p => p.EntityType == inputEntityProp.EntityType)
+                .Where(p => p != inputEntityProp)
+                .ToPropertySet();
                 
-                mappings.Add(new PropertyMapping(cost, inputs, outputs));
-            }
+            mappings.Add(new PropertyMapping(cost, inputs, outputs));
         }
 
         return mappings;

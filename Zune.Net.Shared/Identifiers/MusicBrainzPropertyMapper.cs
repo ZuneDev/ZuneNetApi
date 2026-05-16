@@ -12,12 +12,12 @@ public partial class MusicBrainzPropertyMapper : IPropertyMapper
 {
     public IReadOnlySet<PropertyMapping> AvailableMappings { get; } = GetAvailableMappings().ToHashSet();
 
-    private static readonly Dictionary<EntityProperty, (Guid, Func<Regex>, Func<string, object>)> PropsFromUrlRels = new()
+    private static readonly Dictionary<IEntityProperty, (Guid, Func<Regex>, Func<string, object>)> PropsFromUrlRels = new()
     {
         [Ep.Artist.AllMusicId] = (Guid.Parse("6b3e3c85-0002-4f34-aca6-80ace0d7e846"), RxUrlArtistAllMusic, s => s),
         [Ep.Artist.DiscogsId] = (Guid.Parse("04a5b104-a4c2-4bac-99a1-7b837c37d9e4"), RxUrlArtistDiscogs, s => int.Parse(s)),
         [Ep.Artist.LastFmId] = (Guid.Parse("08db8098-c0df-4b78-82c3-c8697b4bba7f"), RxUrlLastFm, s => s),
-        [Ep.Artist.WikidataId] = (Guid.Parse("689870a4-a1e4-4912-b17f-7b2664215698"), RxUrlWikidata, s => s),
+        [Ep.Artist.WikidataPerformerId] = (Guid.Parse("689870a4-a1e4-4912-b17f-7b2664215698"), RxUrlWikidata, s => s),
     };
     
     public async Task<IPropertyBag> ExecuteAsync(IPropertyBag inputs, IReadOnlyPropertySet desiredOutputs)
@@ -27,7 +27,7 @@ public partial class MusicBrainzPropertyMapper : IPropertyMapper
         try
         {
             var inputProperty = inputs.Keys.Single(p =>
-                p.PropertyType is EntityPropertyType.MusicBrainzArtistId or EntityPropertyType.MusicBrainzReleaseId);
+                p.Fact is EntityFact.MusicBrainzArtistId or EntityFact.MusicBrainzReleaseId);
             
             var mbid = (Guid)inputs[inputProperty];
             
@@ -37,8 +37,9 @@ public partial class MusicBrainzPropertyMapper : IPropertyMapper
                 
                 // ---
                 // I | Decide what we need to include in our request
-                
-                if (desiredOutputs.Contains(Ep.Artist.AlbumIds))
+
+                var releaseMbidsProp = Ep.Artist.AlbumIds(Ep.Album.MusicBrainzReleaseId);
+                if (desiredOutputs.Contains(releaseMbidsProp))
                     includes |= Include.Releases;
 
                 var propsMappedFromRelationships = PropsFromUrlRels.Keys.Where(desiredOutputs.Contains).ToHashSet();
@@ -60,7 +61,7 @@ public partial class MusicBrainzPropertyMapper : IPropertyMapper
                     var albumIds = mbArtist.Releases
                         .Select(r => r.Id)
                         .ToPropertyValueList(Ep.Album.MusicBrainzReleaseId);
-                    outputs[Ep.Artist.AlbumIds] = albumIds;
+                    outputs[releaseMbidsProp] = albumIds;
                 }
 
                 foreach (var idProp in propsMappedFromRelationships)
@@ -93,7 +94,7 @@ public partial class MusicBrainzPropertyMapper : IPropertyMapper
             [Ep.Artist.MusicBrainzId],
             [
                 Ep.Artist.Name,
-                Ep.Artist.AlbumIds,
+                Ep.Artist.AlbumIds(Ep.Album.MusicBrainzReleaseId),
                 
                 ..PropsFromUrlRels.Keys,
             ]);
