@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
-namespace Zune.Net.Identifiers;
+namespace Zune.Net.Ontology;
 
 public interface IPropertyBag : IDictionary<IEntityProperty, object>
 {

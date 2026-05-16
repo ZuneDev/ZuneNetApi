@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace Zune.Net.Identifiers;
+namespace Zune.Net.Ontology;
 
 public class PropertyMapperRegistry
 {

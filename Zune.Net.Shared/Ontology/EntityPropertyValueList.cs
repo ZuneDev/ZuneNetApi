@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Zune.Net.Identifiers;
+namespace Zune.Net.Ontology;
 
 /// <summary>
 /// Stores a list of values, annotated with the property they represent.

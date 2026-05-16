@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace Zune.Net.Identifiers;
+namespace Zune.Net.Ontology;
 
 public interface IPropertyMapper
 {

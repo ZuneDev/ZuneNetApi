@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using OwlCore.Extensions;
 
-using Hyperpath = System.Collections.Immutable.ImmutableList<Zune.Net.Identifiers.PropertyMapperHyperedge>;
-using RankedHyperpath = System.Linq.IOrderedEnumerable<System.Collections.Immutable.ImmutableList<Zune.Net.Identifiers.PropertyMapperHyperedge>>;
+using Hyperpath = System.Collections.Immutable.ImmutableList<Zune.Net.Ontology.PropertyMapperHyperedge>;
+using RankedHyperpath = System.Linq.IOrderedEnumerable<System.Collections.Immutable.ImmutableList<Zune.Net.Ontology.PropertyMapperHyperedge>>;
 
-namespace Zune.Net.Identifiers;
+namespace Zune.Net.Ontology;
 
 public class CompositePropertyMapper(PropertyMapperRegistry mapperRegistry)
 {

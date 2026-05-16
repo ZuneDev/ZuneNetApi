@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-namespace Zune.Net.Identifiers;
+namespace Zune.Net.Ontology;
 
 [CollectionBuilder(typeof(IReadOnlyPropertySetBuilder), nameof(IReadOnlyPropertySetBuilder.Create))]
 public interface IReadOnlyPropertySet : IReadOnlySet<IEntityProperty>;

@@ -4,7 +4,7 @@
 
 using System;
 
-namespace Zune.Net.Identifiers;
+namespace Zune.Net.Ontology;
 
 public enum WikidataProperty
 {
