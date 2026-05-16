@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using MetaBrainz.MusicBrainz;
 using Zune.Net.Helpers;
 
-namespace Zune.Net.Identifiers;
+namespace Zune.Net.Ontology;
 
 public partial class MusicBrainzPropertyMapper : IPropertyMapper
 {

@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using Zune.Net.Identifiers;
+using Zune.Net.Ontology;
 
 namespace Zune.Net.Shared.Tests;
 

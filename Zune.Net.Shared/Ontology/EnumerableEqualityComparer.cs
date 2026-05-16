@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Zune.Net.Identifiers;
+namespace Zune.Net.Ontology;
 
 public class EnumerableEqualityComparer<T> : IEqualityComparer<IEnumerable<T>>
 {

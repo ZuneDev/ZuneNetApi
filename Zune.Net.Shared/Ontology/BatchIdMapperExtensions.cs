@@ -4,7 +4,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Zune.Net.Identifiers;
+namespace Zune.Net.Ontology;
 
 public static class BatchIdMapperExtensions
 {

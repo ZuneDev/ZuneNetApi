@@ -7,7 +7,7 @@ using System.Net.Mime;
 using System.Threading.Tasks;
 using Zune.DB;
 using Zune.Net.Helpers;
-using Zune.Net.Identifiers;
+using Zune.Net.Ontology;
 
 namespace Zune.Net.Catalog.Image.Controllers
 {

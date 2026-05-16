@@ -8,7 +8,7 @@ using System.Net.Http.Headers;
 using VDS.RDF;
 using VDS.RDF.Query;
 
-namespace Zune.Net.Identifiers;
+namespace Zune.Net.Ontology;
 
 public class BatchIdMapper
 {
