@@ -35,6 +35,8 @@ public record TypedEntityProperty<T>(EntityType EntityType, EntityFact Fact)
     public override int GetHashCode() => base.GetHashCode();
 
     protected override Type EqualityContract => base.EqualityContract;
+    
+    public override string ToString() => base.ToString();
 }
 
 public record TypedListEntityProperty<T>(EntityType EntityType, EntityFact Fact, TypedEntityProperty<T> ChildProperty)
@@ -43,6 +45,8 @@ public record TypedListEntityProperty<T>(EntityType EntityType, EntityFact Fact,
     public override int GetHashCode() => base.GetHashCode();
 
     protected override Type EqualityContract => base.EqualityContract;
+    
+    public override string ToString() => base.ToString();
 }
 
 public static class Ep

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -14,7 +15,7 @@ public class PropertyMapperRegistry
     public static PropertyMapperRegistry CreateDefault()
     {
         return new PropertyMapperRegistry()
-            .RegisterMapper(new Mappers.MusicBrainzPropertyMapper())
+            .RegisterMapper(new MusicBrainzPropertyMapper())
             .RegisterMapper(new DiscogsPropertyMapper())
             .RegisterMapper(new WikidataIdMapper());
     }
@@ -25,11 +26,16 @@ public class PropertyMapperRegistry
         return this;
     }
 
-    public IEnumerable<PropertyMapperHyperedge> ForInputs(IReadOnlyPropertySet inputs)
+    public IEnumerable<PropertyMapperHyperedge> ForInputs(IReadOnlyPropertySet inputs) =>
+        GetMappings(ma => ma.Inputs.IsSubsetOf(inputs));
+
+    public IEnumerable<PropertyMapperHyperedge> GetMappings(Func<PropertyMapping, bool> predicate = null)
     {
-        return _mappers.SelectMany(mr => 
+        predicate ??= _ => true;
+        
+        return _mappers.SelectMany(mr =>
             mr.AvailableMappings
-                .Where(ma => ma.Inputs.IsSubsetOf(inputs))
+                .Where(predicate)
                 .Select(ma => new PropertyMapperHyperedge(mr, ma)));
     }
 }
