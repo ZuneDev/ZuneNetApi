@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Zune.Net.Helpers;
 
-namespace Zune.Net.Ontology;
+namespace Zune.Net.Ontology.Mappers;
 
 public class DiscogsPropertyMapper : IPropertyMapper
 {

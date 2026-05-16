@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Zune.Net.Ontology;
+using Zune.Net.Ontology.Mappers;
 
 namespace Zune.Net.Shared.Tests;
 

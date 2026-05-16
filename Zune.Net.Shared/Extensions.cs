@@ -17,6 +17,7 @@ using System.IO;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Zune.Net.Features;
 using Zune.Net.Ontology;
+using Zune.Net.Ontology.Mappers;
 
 namespace Zune.Net
 {

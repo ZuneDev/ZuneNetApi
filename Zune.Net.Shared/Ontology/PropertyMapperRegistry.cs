@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Zune.Net.Ontology.Mappers;
 
 namespace Zune.Net.Ontology;
 
@@ -13,7 +14,7 @@ public class PropertyMapperRegistry
     public static PropertyMapperRegistry CreateDefault()
     {
         return new PropertyMapperRegistry()
-            .RegisterMapper(new MusicBrainzPropertyMapper())
+            .RegisterMapper(new Mappers.MusicBrainzPropertyMapper())
             .RegisterMapper(new DiscogsPropertyMapper())
             .RegisterMapper(new WikidataIdMapper());
     }
