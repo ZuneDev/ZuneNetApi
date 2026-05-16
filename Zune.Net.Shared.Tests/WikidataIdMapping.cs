@@ -18,11 +18,10 @@ public class Tests
     public async Task MapArtistMbidToDcid()
     {
         var mbid = new Guid("534ee493-bfac-4575-a44a-0ae41e2c3fe4");
-        var result = await _mapper.MapAsync(
+        var dcid = await _mapper.MapAsync(
             Ep.Artist.MusicBrainzId, mbid,
             Ep.Artist.DiscogsId);
 
-        var dcid = Convert.ToInt32(result);
         Assert.That(dcid, Is.EqualTo(61800));
     }
 
@@ -30,11 +29,10 @@ public class Tests
     public async Task GetArtistNameFromMbid()
     {
         var mbid = new Guid("534ee493-bfac-4575-a44a-0ae41e2c3fe4");
-        var result = await _mapper.MapAsync(
+        var name = await _mapper.MapAsync(
             Ep.Artist.MusicBrainzId, mbid,
             Ep.Artist.Name);
 
-        var name = result?.ToString();
         Assert.That(name, Is.EqualTo("Rush"));
     }
 
@@ -59,8 +57,8 @@ public class Tests
         await TestContext.Out.WriteLineAsync($"Total time: {stopwatch.Elapsed.TotalSeconds} seconds");
         await TestContext.Out.WriteLineAsync();
         
-        var name = result[Ep.Artist.Name]?.ToString();
-        var bio = result[Ep.Artist.Bio]?.ToString();
+        var name = result.Get(Ep.Artist.Name);
+        var bio = result.Get(Ep.Artist.Bio);
         
         await TestContext.Out.WriteLineAsync($"== {name} ==");
         await TestContext.Out.WriteLineAsync(bio);
@@ -125,8 +123,7 @@ public class Tests
 
         Assert.That(output, Is.Not.Null);
         
-
-        var dcid = Convert.ToInt32(output[targetProperty]);
+        var dcid = output.Get(targetProperty);
         Assert.That(dcid, Is.EqualTo(61800));
     }
 }

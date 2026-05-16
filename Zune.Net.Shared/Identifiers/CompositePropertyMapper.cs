@@ -15,13 +15,26 @@ public class CompositePropertyMapper(PropertyMapperRegistry mapperRegistry)
     
     public DebugCompositePropertyMapperResult DebugInfo { get; private set; }
     
-    public async Task<object> MapAsync(EntityProperty sourceProperty, object source, EntityProperty targetProperty)
+    public async Task<object> MapAsync(IEntityProperty sourceProperty, object source, IEntityProperty targetProperty)
     {
         var outputs = await MapAsync(sourceProperty, source, [targetProperty]);
         return outputs[targetProperty];
     }
     
-    public async Task<IPropertyBag> MapAsync(EntityProperty sourceProperty,
+    public async Task<TTarget> MapAsync<TSource, TTarget>(TypedEntityProperty<TSource> sourceProperty, TSource source,
+        TypedEntityProperty<TTarget> targetProperty)
+    {
+        var outputs = await MapAsync(sourceProperty, source, [targetProperty]);
+        return outputs.Get(targetProperty);
+    }
+
+    public async Task<IPropertyBag> MapAsync<TSource>(TypedEntityProperty<TSource> sourceProperty,
+        TSource source, IReadOnlyPropertySet targetProperties)
+    {
+        return await MapAsync((IEntityProperty)sourceProperty, source, targetProperties);
+    }
+    
+    public async Task<IPropertyBag> MapAsync(IEntityProperty sourceProperty,
         object source, IReadOnlyPropertySet targetProperties)
     {
         DebugInfo = new();

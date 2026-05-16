@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Zune.Net.Identifiers;
 
-public interface IPropertyBag : IDictionary<EntityProperty, object>
+public interface IPropertyBag : IDictionary<IEntityProperty, object>
 {
     IReadOnlyPropertySet AsReadOnlyPropertySet();
 
@@ -14,56 +14,56 @@ public interface IPropertyBag : IDictionary<EntityProperty, object>
 }
 
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
-public class PropertyBag(IDictionary<EntityProperty, object> properties = null) : IPropertyBag
+public class PropertyBag(IDictionary<IEntityProperty, object> properties = null) : IPropertyBag
 {
-    private readonly IDictionary<EntityProperty, object> _properties = properties
-        ?? new Dictionary<EntityProperty, object>();
+    private readonly IDictionary<IEntityProperty, object> _properties = properties
+        ?? new Dictionary<IEntityProperty, object>();
 
     private string DebuggerDisplay => ToString();
 
     #region IDictionary implementation
 
-    public IEnumerator<KeyValuePair<EntityProperty, object>> GetEnumerator() => _properties.GetEnumerator();
+    public IEnumerator<KeyValuePair<IEntityProperty, object>> GetEnumerator() => _properties.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_properties).GetEnumerator();
 
-    public void Add(KeyValuePair<EntityProperty, object> item) =>
-        ((ICollection<KeyValuePair<EntityProperty, object>>)_properties).Add(item);
+    public void Add(KeyValuePair<IEntityProperty, object> item) =>
+        ((ICollection<KeyValuePair<IEntityProperty, object>>)_properties).Add(item);
 
     public void Clear() => _properties.Clear();
 
-    public bool Contains(KeyValuePair<EntityProperty, object> item) =>
-        ((ICollection<KeyValuePair<EntityProperty, object>>)_properties).Contains(item);
+    public bool Contains(KeyValuePair<IEntityProperty, object> item) =>
+        ((ICollection<KeyValuePair<IEntityProperty, object>>)_properties).Contains(item);
 
-    public void CopyTo(KeyValuePair<EntityProperty, object>[] array, int arrayIndex) =>
-        ((ICollection<KeyValuePair<EntityProperty, object>>)_properties).CopyTo(array, arrayIndex);
+    public void CopyTo(KeyValuePair<IEntityProperty, object>[] array, int arrayIndex) =>
+        ((ICollection<KeyValuePair<IEntityProperty, object>>)_properties).CopyTo(array, arrayIndex);
 
-    public bool Remove(KeyValuePair<EntityProperty, object> item) =>
-        ((ICollection<KeyValuePair<EntityProperty, object>>)_properties).Remove(item);
+    public bool Remove(KeyValuePair<IEntityProperty, object> item) =>
+        ((ICollection<KeyValuePair<IEntityProperty, object>>)_properties).Remove(item);
 
     public int Count => _properties.Count;
     public bool IsReadOnly => false;
 
-    public void Add(EntityProperty key, object value) => _properties.Add(key, value);
+    public void Add(IEntityProperty key, object value) => _properties.Add(key, value);
 
-    public bool ContainsKey(EntityProperty key) => _properties.ContainsKey(key);
+    public bool ContainsKey(IEntityProperty key) => _properties.ContainsKey(key);
 
-    public bool Remove(EntityProperty key) => _properties.Remove(key);
+    public bool Remove(IEntityProperty key) => _properties.Remove(key);
 
-    public bool TryGetValue(EntityProperty key, [MaybeNullWhen(false)] out object value) =>
+    public bool TryGetValue(IEntityProperty key, [MaybeNullWhen(false)] out object value) =>
         _properties.TryGetValue(key, out value);
 
-    public object this[EntityProperty key]
+    public object this[IEntityProperty key]
     {
         get => _properties[key];
         set => _properties[key] = value;
     }
 
-    public ICollection<EntityProperty> Keys => _properties.Keys;
+    public ICollection<IEntityProperty> Keys => _properties.Keys;
     public ICollection<object> Values => _properties.Values;
 
     #endregion
-    
+
     public IReadOnlyPropertySet AsReadOnlyPropertySet() => new PropertySetView(_properties.Keys);
     
     public bool TryGetForSet(IReadOnlyPropertySet properties, out IPropertyBag bag)
@@ -83,7 +83,7 @@ public class PropertyBag(IDictionary<EntityProperty, object> properties = null) 
     public override int GetHashCode()
     {
         return _properties.Keys
-            .Select(prop => EqualityComparer<EntityProperty>.Default.GetHashCode(prop))
+            .Select(prop => EqualityComparer<IEntityProperty>.Default.GetHashCode(prop))
             .Aggregate(0, (current, curHash) => unchecked(current + curHash * 37));
     }
 
@@ -92,27 +92,27 @@ public class PropertyBag(IDictionary<EntityProperty, object> properties = null) 
         return string.Join(", ", _properties.Keys.Select(p => p.ToString()));
     }
 
-    private class PropertySetView(ICollection<EntityProperty> keys) : IReadOnlyPropertySet
+    private class PropertySetView(ICollection<IEntityProperty> keys) : IReadOnlyPropertySet
     {
         public int Count => keys.Count;
 
-        public bool Contains(EntityProperty item) => keys.Contains(item);
+        public bool Contains(IEntityProperty item) => keys.Contains(item);
 
-        public IEnumerator<EntityProperty> GetEnumerator() => keys.GetEnumerator();
+        public IEnumerator<IEntityProperty> GetEnumerator() => keys.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => keys.GetEnumerator();
 
-        public bool IsProperSubsetOf(IEnumerable<EntityProperty> other) => keys.ToHashSet().IsProperSubsetOf(other);
-        public bool IsProperSupersetOf(IEnumerable<EntityProperty> other) => keys.ToHashSet().IsProperSupersetOf(other);
-        public bool IsSubsetOf(IEnumerable<EntityProperty> other) => keys.ToHashSet().IsSubsetOf(other);
-        public bool IsSupersetOf(IEnumerable<EntityProperty> other) => keys.ToHashSet().IsSupersetOf(other);
-        public bool Overlaps(IEnumerable<EntityProperty> other) => keys.Any(other.Contains);
-        public bool SetEquals(IEnumerable<EntityProperty> other) => keys.ToHashSet().SetEquals(other);
+        public bool IsProperSubsetOf(IEnumerable<IEntityProperty> other) => keys.ToHashSet().IsProperSubsetOf(other);
+        public bool IsProperSupersetOf(IEnumerable<IEntityProperty> other) => keys.ToHashSet().IsProperSupersetOf(other);
+        public bool IsSubsetOf(IEnumerable<IEntityProperty> other) => keys.ToHashSet().IsSubsetOf(other);
+        public bool IsSupersetOf(IEnumerable<IEntityProperty> other) => keys.ToHashSet().IsSupersetOf(other);
+        public bool Overlaps(IEnumerable<IEntityProperty> other) => keys.Any(other.Contains);
+        public bool SetEquals(IEnumerable<IEntityProperty> other) => keys.ToHashSet().SetEquals(other);
     }
 }
 
 public static class PropertyBagExtensions
 {
-    public static IPropertyBag ToPropertyBag(this IDictionary<EntityProperty, object> values)
+    public static IPropertyBag ToPropertyBag(this IDictionary<IEntityProperty, object> values)
     {
         return new PropertyBag(values);
     }
@@ -128,4 +128,8 @@ public static class PropertyBagExtensions
         foreach (var (prop, value) in source)
             target.TryAdd(prop, value);
     }
+    
+    public static T Get<T>(this IPropertyBag bag, TypedEntityProperty<T> prop) => (T)bag[prop];
+    
+    public static IEnumerable<T> Get<T>(this IPropertyBag bag, TypedListEntityProperty<T> prop) => (IEnumerable<T>)bag[prop];
 }

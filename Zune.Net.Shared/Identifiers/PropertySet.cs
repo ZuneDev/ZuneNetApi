@@ -6,13 +6,13 @@ using System.Runtime.CompilerServices;
 namespace Zune.Net.Identifiers;
 
 [CollectionBuilder(typeof(IReadOnlyPropertySetBuilder), nameof(IReadOnlyPropertySetBuilder.Create))]
-public interface IReadOnlyPropertySet : IReadOnlySet<EntityProperty>;
+public interface IReadOnlyPropertySet : IReadOnlySet<IEntityProperty>;
 
 [CollectionBuilder(typeof(IPropertySetBuilder), nameof(IPropertySetBuilder.Create))]
-public interface IPropertySet : IReadOnlyPropertySet, ISet<EntityProperty>;
+public interface IPropertySet : IReadOnlyPropertySet, ISet<IEntityProperty>;
 
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
-public class PropertySet : HashSet<EntityProperty>, IPropertySet
+public class PropertySet : HashSet<IEntityProperty>, IPropertySet
 {
     private string DebuggerDisplay => ToString();
     
@@ -20,14 +20,14 @@ public class PropertySet : HashSet<EntityProperty>, IPropertySet
     {
     }
     
-    public PropertySet(IEnumerable<EntityProperty> collection) : base(collection)
+    public PropertySet(IEnumerable<IEntityProperty> collection) : base(collection)
     {
     }
     
     public override int GetHashCode()
     {
         return this
-            .Select(prop => EqualityComparer<EntityProperty>.Default.GetHashCode(prop))
+            .Select(prop => EqualityComparer<IEntityProperty>.Default.GetHashCode(prop))
             .Aggregate(0, (current, curHash) => unchecked(current + curHash * 37));
     }
     
@@ -39,7 +39,7 @@ public class PropertySet : HashSet<EntityProperty>, IPropertySet
 
 public static class PropertySetExtensions
 {
-    public static IPropertySet ToPropertySet(this IEnumerable<EntityProperty> props) => new PropertySet(props);
+    public static IPropertySet ToPropertySet(this IEnumerable<IEntityProperty> props) => new PropertySet(props);
     
-    public static IPropertySet IntoPropertySet(this EntityProperty prop) => new PropertySet([prop]);
+    public static IPropertySet IntoPropertySet(this IEntityProperty prop) => new PropertySet([prop]);
 }

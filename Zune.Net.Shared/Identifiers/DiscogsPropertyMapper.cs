@@ -17,7 +17,7 @@ public class DiscogsPropertyMapper : IPropertyMapper
         try
         {
             var inputProperty = inputs.Keys.Single(p =>
-                p.PropertyType is EntityPropertyType.DiscogsArtistId or EntityPropertyType.DiscogsMasterId);
+                p.Fact is EntityFact.DiscogsArtistId or EntityFact.DiscogsMasterId);
             
             var dcid = Convert.ToInt32(inputs[inputProperty]);
             
@@ -49,8 +49,8 @@ public class DiscogsPropertyMapper : IPropertyMapper
             [
                 Ep.Artist.Name,
                 Ep.Artist.Bio,
-                Ep.Artist.Images,
-                Ep.Artist.PrimaryImage,
+                Ep.Artist.ImageUrls,
+                Ep.Artist.PrimaryImageUrl,
             ]);
     }
 }
