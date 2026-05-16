@@ -7,16 +7,17 @@ namespace Zune.Net.Shared.Tests;
 public class Tests
 {
     private CompositePropertyMapper _mapper;
-    
+    private PropertyMapperRegistry? _registry;
+
     [SetUp]
     public void Setup()
     {
-        var registry = PropertyMapperRegistry.CreateDefault();
-        _mapper = new(registry);
+        _registry = PropertyMapperRegistry.CreateDefault();
+        _mapper = new(_registry);
     }
 
     [Test]
-    public async Task MapArtistMbidToDcid()
+    public async Task GetArtistDcidFromMbid()
     {
         var mbid = new Guid("534ee493-bfac-4575-a44a-0ae41e2c3fe4");
         var dcid = await _mapper.MapAsync(
@@ -126,5 +127,23 @@ public class Tests
         
         var dcid = output.Get(targetProperty);
         Assert.That(dcid, Is.EqualTo(61800));
+    }
+
+    [Test]
+    public async Task OntologyGraphvizDirected()
+    {
+        OntologyVisualizer visualizer = new(_registry);
+        var graphviz = visualizer.SerializeToGraphviz(true);
+        
+        await TestContext.Out.WriteLineAsync(graphviz);
+    }
+    
+    [Test]
+    public async Task OntologyGraphvizUndirected()
+    {
+        OntologyVisualizer visualizer = new(_registry);
+        var graphviz = visualizer.SerializeToGraphviz(false);
+        
+        await TestContext.Out.WriteLineAsync(graphviz);
     }
 }
