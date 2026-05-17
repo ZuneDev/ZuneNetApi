@@ -6,19 +6,28 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using MetaBrainz.MusicBrainz;
 using Zune.Net.Helpers;
+using Zune.Net.Ontology.Identifiers;
 
 namespace Zune.Net.Ontology.Mappers;
 
-public partial class MusicBrainzPropertyMapper : IPropertyMapper
+public class MusicBrainzPropertyMapper : IPropertyMapper
 {
     public IReadOnlySet<PropertyMapping> AvailableMappings { get; } = GetAvailableMappings().ToHashSet();
 
-    private static readonly Dictionary<IEntityProperty, (Guid, Func<Regex>)> PropsFromUrlRels = new()
+    private static readonly Dictionary<IEntityProperty, (Guid, Func<Regex>)> ArtistPropsFromUrlRels = new()
     {
-        [Ep.Artist.AllMusicId] = (Guid.Parse("6b3e3c85-0002-4f34-aca6-80ace0d7e846"), RxUrlArtistAllMusic),
-        [Ep.Artist.DiscogsId] = (Guid.Parse("04a5b104-a4c2-4bac-99a1-7b837c37d9e4"), RxUrlArtistDiscogs),
-        [Ep.Artist.LastFmId] = (Guid.Parse("08db8098-c0df-4b78-82c3-c8697b4bba7f"), RxUrlLastFm),
-        [Ep.Artist.WikidataPerformerId] = (Guid.Parse("689870a4-a1e4-4912-b17f-7b2664215698"), RxUrlWikidata),
+        [AllMusicIdProperty.Artist] = (MusicBrainz.UrlIdAllMusic, MusicBrainz.RxUrlAllMusicArtist),
+        [DiscogsIdProperty.Artist] = (MusicBrainz.UrlIdDiscogs, MusicBrainz.RxUrlDiscogsArtist),
+        [LastFmIdProperty.Artist] = (MusicBrainz.UrlIdLastFm, MusicBrainz.RxUrlLastFm),
+    };
+
+    private static readonly Dictionary<IEntityProperty, (Guid, Func<Regex>)> ReleasePropsFromUrlRels = new()
+    {
+        [AllMusicIdProperty.Album] = (MusicBrainz.UrlIdAllMusic, MusicBrainz.RxUrlAllMusicAlbum),
+        [AllMusicIdProperty.Release] = (MusicBrainz.UrlIdAllMusic, MusicBrainz.RxUrlAllMusicRelease),
+        [DiscogsIdProperty.Master] = (MusicBrainz.UrlIdDiscogs, MusicBrainz.RxUrlDiscogsMaster),
+        [DiscogsIdProperty.Release] = (MusicBrainz.UrlIdDiscogs, MusicBrainz.RxUrlDiscogsRelease),
+        [LastFmIdProperty.Album] = (MusicBrainz.UrlIdLastFm, MusicBrainz.RxUrlLastFm),
     };
     
     public async Task<IPropertyBag> ExecuteAsync(IPropertyBag inputs, IReadOnlyPropertySet desiredOutputs)
@@ -27,10 +36,8 @@ public partial class MusicBrainzPropertyMapper : IPropertyMapper
         
         try
         {
-            var inputProperty = inputs.Keys.Single(p =>
-                p.Fact is EntityFact.MusicBrainzArtistId or EntityFact.MusicBrainzReleaseId);
-            
-            var mbid = (Guid)inputs[inputProperty];
+            var inputProperty = inputs.Keys.OfType<MusicBrainzIdProperty>().Single();
+            var mbid = inputs.Get(inputProperty);
             
             if (inputProperty.EntityType is EntityType.Artist)
             {
@@ -39,11 +46,15 @@ public partial class MusicBrainzPropertyMapper : IPropertyMapper
                 // ---
                 // I | Decide what we need to include in our request
 
-                var releaseMbidsProp = Ep.Artist.AlbumIds(Ep.Album.MusicBrainzReleaseId);
+                var releaseMbidsProp = Ep.Artist.AlbumIds(MusicBrainzIdProperty.Release);
                 if (desiredOutputs.Contains(releaseMbidsProp))
                     includes |= Include.Releases;
 
-                var propsMappedFromRelationships = PropsFromUrlRels.Keys.Where(desiredOutputs.Contains).ToHashSet();
+                var releaseGroupMbidsProp = Ep.Artist.AlbumIds(MusicBrainzIdProperty.ReleaseGroup);
+                if (desiredOutputs.Contains(releaseGroupMbidsProp))
+                    includes |= Include.ReleaseGroups;
+
+                var propsMappedFromRelationships = ArtistPropsFromUrlRels.Keys.Where(desiredOutputs.Contains).ToHashSet();
                 if (propsMappedFromRelationships.Count > 0)
                     includes |= Include.UrlRelationships;
                 
@@ -55,19 +66,27 @@ public partial class MusicBrainzPropertyMapper : IPropertyMapper
                 // ---
                 // III | Parse the results
                 
-                outputs[Ep.Artist.Name] = mbArtist.Name;
+                outputs.Set(Ep.Artist.Name, mbArtist.Name);
                 
                 if (mbArtist.Releases is not null)
                 {
-                    var albumIds = mbArtist.Releases
+                    var releaseMbids = mbArtist.Releases
                         .Select(r => r.Id)
-                        .ToPropertyValueList(Ep.Album.MusicBrainzReleaseId);
-                    outputs[releaseMbidsProp] = albumIds;
+                        .ToPropertyValueList(MusicBrainzIdProperty.Release);
+                    outputs.Set(releaseMbidsProp, releaseMbids);
+                }
+                
+                if (mbArtist.ReleaseGroups is not null)
+                {
+                    var releaseGroupMbids = mbArtist.ReleaseGroups
+                        .Select(r => r.Id)
+                        .ToPropertyValueList(MusicBrainzIdProperty.ReleaseGroup);
+                    outputs.Set(releaseGroupMbidsProp, releaseGroupMbids);
                 }
 
                 foreach (var idProp in propsMappedFromRelationships)
                 {
-                    var (typeId, rxUrl) = PropsFromUrlRels[idProp];
+                    var (typeId, rxUrl) = ArtistPropsFromUrlRels[idProp];
                     
                     var relationship = mbArtist.Relationships?.FirstOrDefault(rel => rel.TypeId == typeId);
                     var resourceUrl = relationship?.Url?.Resource?.ToString();
@@ -80,18 +99,7 @@ public partial class MusicBrainzPropertyMapper : IPropertyMapper
                     
                     var idStr = match.Groups[1].Value;
                     
-                    var idPropType = idProp.GetType();
-                    if (idPropType.GetGenericTypeDefinition() == typeof(TypedEntityProperty<>))
-                    {
-                        var valueType = idPropType.GenericTypeArguments[0];
-                        var converter = TypeDescriptor.GetConverter(valueType);
-                        outputs[idProp] = converter.ConvertFromInvariantString(idStr);
-                    }
-                    else
-                    {
-                        outputs[idProp] = idStr;
-                    }
-
+                    outputs[idProp] = idStr;
                 }
             }
         }
@@ -104,25 +112,26 @@ public partial class MusicBrainzPropertyMapper : IPropertyMapper
 
     private static IEnumerable<PropertyMapping> GetAvailableMappings()
     {
-        yield return new PropertyMapping(20,
-            [Ep.Artist.MusicBrainzId],
+        const int cost = 20;
+        
+        yield return new PropertyMapping(cost,
+            [MusicBrainzIdProperty.Artist],
             [
                 Ep.Artist.Name,
-                Ep.Artist.AlbumIds(Ep.Album.MusicBrainzReleaseId),
+                Ep.Artist.AlbumIds(MusicBrainzIdProperty.Release),
                 
-                ..PropsFromUrlRels.Keys,
+                ..ArtistPropsFromUrlRels.Keys,
+            ]);
+        
+        yield return new PropertyMapping(cost,
+            [MusicBrainzIdProperty.Release],
+            [
+                Ep.Album.Name,
+                Ep.Album.ImageUrl,
+                Ep.Album.ImageId(MusicBrainzIdProperty.CoverArt),
+                Ep.Album.TrackIds(MusicBrainzIdProperty.Recording),
+                
+                ..ReleasePropsFromUrlRels.Keys,
             ]);
     }
-    
-    [GeneratedRegex(@"^https?:\/\/(?:www\.)?allmusic\.com\/artist\/(?:[^\/]+)?(mn[0-9]{10})")]
-    private static partial Regex RxUrlArtistAllMusic();
-    
-    [GeneratedRegex(@"^https?:\/\/(?:www\.)?discogs\.com\/artist\/([1-9][0-9]*)")]
-    private static partial Regex RxUrlArtistDiscogs();
-    
-    [GeneratedRegex(@"^https?:\/\/(?:www\.)?last\.fm\/(?:[a-z]{2}\/)?music\/([^\/\?\#]+)$")]
-    private static partial Regex RxUrlLastFm();
-    
-    [GeneratedRegex(@"^https?:\/\/(?:www\.)?wikidata\.org\/(?:wiki|entity)\/(Q\d+)$")]
-    private static partial Regex RxUrlWikidata();
 }

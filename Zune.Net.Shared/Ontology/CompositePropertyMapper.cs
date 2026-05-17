@@ -21,14 +21,14 @@ public class CompositePropertyMapper(PropertyMapperRegistry mapperRegistry)
         return outputs[targetProperty];
     }
     
-    public async Task<TTarget> MapAsync<TSource, TTarget>(TypedEntityProperty<TSource> sourceProperty, TSource source,
-        TypedEntityProperty<TTarget> targetProperty)
+    public async Task<TTarget> MapAsync<TSource, TTarget>(ITypedEntityProperty<TSource> sourceProperty, TSource source,
+        ITypedEntityProperty<TTarget> targetProperty)
     {
         var outputs = await MapAsync(sourceProperty, source, [targetProperty]);
         return outputs.Get(targetProperty);
     }
 
-    public async Task<IPropertyBag> MapAsync<TSource>(TypedEntityProperty<TSource> sourceProperty,
+    public async Task<IPropertyBag> MapAsync<TSource>(ITypedEntityProperty<TSource> sourceProperty,
         TSource source, IReadOnlyPropertySet targetProperties)
     {
         return await MapAsync((IEntityProperty)sourceProperty, source, targetProperties);

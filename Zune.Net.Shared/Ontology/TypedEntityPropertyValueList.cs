@@ -7,7 +7,7 @@ namespace Zune.Net.Ontology;
 /// </summary>
 public class TypedEntityPropertyValueList<T> : List<T>
 {
-    public required TypedEntityProperty<T> Property { get; init; }
+    public required ITypedEntityProperty<T> Property { get; init; }
 
     public TypedEntityPropertyValueList()
     {
@@ -20,7 +20,7 @@ public class TypedEntityPropertyValueList<T> : List<T>
 
 public static class TypedEntityPropertyValueListExtensions
 {
-    public static TypedEntityPropertyValueList<T> ToPropertyValueList<T>(this IEnumerable<T> items, TypedEntityProperty<T> prop)
+    public static TypedEntityPropertyValueList<T> ToPropertyValueList<T>(this IEnumerable<T> items, ITypedEntityProperty<T> prop)
     {
         return new TypedEntityPropertyValueList<T>(items)
         {

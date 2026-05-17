@@ -15,14 +15,22 @@ public class PropertyMapperRegistry
     public static PropertyMapperRegistry CreateDefault()
     {
         return new PropertyMapperRegistry()
-            .RegisterMapper(new MusicBrainzPropertyMapper())
-            .RegisterMapper(new DiscogsPropertyMapper())
-            .RegisterMapper(new WikidataIdMapper());
+            .RegisterMappers([
+                new MusicBrainzPropertyMapper(),
+                new DiscogsPropertyMapper(),
+                new WikidataIdMapper(),
+            ]);
     }
 
     public PropertyMapperRegistry RegisterMapper(IPropertyMapper mapper)
     {
         _mappers.Add(mapper);
+        return this;
+    }
+
+    public PropertyMapperRegistry RegisterMappers(IEnumerable<IPropertyMapper> mappers)
+    {
+        _mappers.AddRange(mappers);
         return this;
     }
 
