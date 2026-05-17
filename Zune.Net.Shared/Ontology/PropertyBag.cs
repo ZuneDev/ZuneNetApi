@@ -85,7 +85,7 @@ public class PropertyBag(IDictionary<IEntityProperty, object> properties = null)
     public override int GetHashCode()
     {
         return _properties.Keys
-            .Select(prop => EqualityComparer<IEntityProperty>.Default.GetHashCode(prop))
+            .Select(prop => prop.GetHashCode())
             .Aggregate(0, (current, curHash) => unchecked(current + curHash * 37));
     }
 

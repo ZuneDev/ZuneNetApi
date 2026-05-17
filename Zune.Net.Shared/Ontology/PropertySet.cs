@@ -8,11 +8,8 @@ namespace Zune.Net.Ontology;
 [CollectionBuilder(typeof(IReadOnlyPropertySetBuilder), nameof(IReadOnlyPropertySetBuilder.Create))]
 public interface IReadOnlyPropertySet : IReadOnlySet<IEntityProperty>;
 
-[CollectionBuilder(typeof(IPropertySetBuilder), nameof(IPropertySetBuilder.Create))]
-public interface IPropertySet : IReadOnlyPropertySet, ISet<IEntityProperty>;
-
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
-public class PropertySet : HashSet<IEntityProperty>, IPropertySet
+public class PropertySet : HashSet<IEntityProperty>, IReadOnlyPropertySet
 {
     private string DebuggerDisplay => ToString();
     
@@ -27,7 +24,7 @@ public class PropertySet : HashSet<IEntityProperty>, IPropertySet
     public override int GetHashCode()
     {
         return this
-            .Select(prop => EqualityComparer<IEntityProperty>.Default.GetHashCode(prop))
+            .Select(prop => prop.GetHashCode())
             .Aggregate(0, (current, curHash) => unchecked(current + curHash * 37));
     }
     
@@ -39,7 +36,7 @@ public class PropertySet : HashSet<IEntityProperty>, IPropertySet
 
 public static class PropertySetExtensions
 {
-    public static IPropertySet ToPropertySet(this IEnumerable<IEntityProperty> props) => new PropertySet(props);
+    public static PropertySet ToPropertySet(this IEnumerable<IEntityProperty> props) => new(props);
     
-    public static IPropertySet IntoPropertySet(this IEntityProperty prop) => new PropertySet([prop]);
+    public static PropertySet IntoPropertySet(this IEntityProperty prop) => new([prop]);
 }
