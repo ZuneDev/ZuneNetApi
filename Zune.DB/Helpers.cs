@@ -8,6 +8,8 @@ namespace Zune.DB
     {
         public static Guid GenerateGuid(string content)
         {
+            // TODO: Switch to FNV-1a 128-bit
+            
             // Using MD5 here is fine, as these GUIDs aren't used for
             // anything meant to be secure. We could use SHA256, but
             // we'd have to crush it down to 16 bytes for the GUID

@@ -86,7 +86,7 @@ public class Tests
         stopwatch.Start();
 
         var idResults = await idMapper.GetArtistIdsByMbidAsync(mbid);
-        var dcid = Convert.ToInt32(idResults?.Discogs);
+        var dcid = idResults?.Discogs;
         
         var (dcArtist, _) = await Helpers.Discogs.GetDCArtistByMBID(mbid);
         var name = dcArtist.Value<string>("name");

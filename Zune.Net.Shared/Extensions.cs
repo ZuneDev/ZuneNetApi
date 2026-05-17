@@ -143,11 +143,12 @@ namespace Zune.Net
 
         public static (uint A, ushort B, ulong C) GetGuidParts(this Guid guid)
         {
-            byte[] bytes = guid.ToByteArray();
+            Span<byte> bytes = stackalloc byte[16];
+            guid.TryWriteBytes(bytes);
             return (
                 BitConverter.ToUInt32(bytes),
-                BitConverter.ToUInt16(bytes, sizeof(uint)),
-                BitConverter.ToUInt64(bytes, sizeof(uint) + sizeof(ushort))
+                BitConverter.ToUInt16(bytes[sizeof(uint)..]),
+                BitConverter.ToUInt64(bytes[(sizeof(uint) + sizeof(ushort))..])
             );
         }
 

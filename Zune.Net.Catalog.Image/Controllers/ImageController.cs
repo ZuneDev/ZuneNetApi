@@ -15,7 +15,7 @@ namespace Zune.Net.Catalog.Image.Controllers
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
     public class ImageController(ZuneNetContext database, BatchIdMapper batchIdMapper) : Controller
     {
-        private static readonly ConcurrentDictionary<int, JObject> DcArtistCache = new();
+        private static readonly ConcurrentDictionary<ulong, JObject> DcArtistCache = new();
         private static readonly int[] CaaSupportedSizes = [250, 500, 1200];
 
         [HttpGet, Route("image/{id:guid}")]
@@ -32,9 +32,10 @@ namespace Zune.Net.Catalog.Image.Controllers
             {
                 imageUrl = imageEntry.Url;
             }
-            else if (idC == 0)
+            // TODO: Phase this out
+            else if (idA is 0)
             {
-                var dcid = unchecked((int)idA);
+                var dcid = idC;
 
                 // Get or update cached artist
                 if (!DcArtistCache.TryGetValue(dcid, out var dcArtist))
