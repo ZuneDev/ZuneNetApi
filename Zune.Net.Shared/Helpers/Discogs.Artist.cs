@@ -9,13 +9,13 @@ using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Zune.Net.Identifiers;
+using Zune.Net.Ontology;
 
 namespace Zune.Net.Helpers
 {
     public partial class Discogs
     {
-        public static async Task<JObject> GetDCArtistByDCID(int dcid)
+        public static async Task<JObject> GetDCArtistByDCID(ulong dcid)
         {
             return await WithAuth(API_BASE.AppendPathSegments("artists", dcid)).GetJsonAsync<JObject>();
         }
@@ -48,24 +48,28 @@ namespace Zune.Net.Helpers
             return await WithAuth(discogs_link).GetJsonAsync<JObject>();
         }
 
-        public static Content DCProfileToBiographyContent(string dc_profile)
+        public static Content DCProfileToBiographyContent(string dcProfile)
         {
             // Convert relationships
-            Regex rx = new(@"\[([rmal])=?(\d+)\]", RegexOptions.IgnoreCase);
-            string htmlBio = rx.Replace(dc_profile, match =>
+            Regex rx = new(@"\[([rmal])=?(.+?)\]", RegexOptions.IgnoreCase);
+            var htmlBio = rx.Replace(dcProfile, match =>
             {
                 var entityType = match.Groups[1].Value[0];
-                int dcid = int.Parse(match.Groups[2].Value);
-                string htmlEquiv = match.Value;
+                var htmlEquiv = match.Value;
+
+                var anchorValue = match.Groups[2].Value;
+                if (!int.TryParse(anchorValue, out var dcid))
+                 return anchorValue;
+                
                 switch (entityType)
                 {
                     // Release
                     case 'r':
                         try
                         {
-                            var mbid_rel = MusicBrainz.GetReleaseMBIDByDCID(dcid);
-                            var mb_album = MusicBrainz.GetAlbumByMBID(mbid_rel);
-                            htmlEquiv = $"<link type=\"Album\" id=\"{mb_album.Id}\">{mb_album.Title}</link>";
+                            var mbidRel = MusicBrainz.GetReleaseMBIDByDCID(dcid);
+                            var mbAlbum = MusicBrainz.GetAlbumByMBID(mbidRel);
+                            htmlEquiv = $"<link type=\"Album\" id=\"{mbAlbum.Id}\">{mbAlbum.Title}</link>";
                         }
                         catch (HttpError) { }
                         break;
@@ -74,9 +78,9 @@ namespace Zune.Net.Helpers
                     case 'a':
                         try
                         {
-                            var mbid_artist = MusicBrainz.GetAristMBIDByDCID(dcid);
-                            var mb_artist = MusicBrainz.GetArtistByMBID(mbid_artist);
-                            htmlEquiv = $"<link type=\"Contributor\" id=\"{mb_artist.Id}\">{mb_artist.Title}</link>";
+                            var mbidArtist = MusicBrainz.GetAristMBIDByDCID(dcid);
+                            var mbArtist = MusicBrainz.GetArtistByMBID(mbidArtist);
+                            htmlEquiv = $"<link type=\"Contributor\" id=\"{mbArtist.Id}\">{mbArtist.Title}</link>";
                         }
                         catch (HttpError) { }
                         break;
@@ -85,9 +89,9 @@ namespace Zune.Net.Helpers
                     case 'l':
                         try
                         {
-                            var mbid_label = MusicBrainz.GetLabelMBIDByDCID(dcid);
+                            var mbidLabel = MusicBrainz.GetLabelMBIDByDCID(dcid);
                             // TODO: Label lookup
-                            htmlEquiv = $"<link type=\"Label\" id=\"{mbid_label}\">the label</link>";
+                            htmlEquiv = $"<link type=\"Label\" id=\"{mbidLabel}\">the label</link>";
                         }
                         catch (HttpError) { }
                         break;

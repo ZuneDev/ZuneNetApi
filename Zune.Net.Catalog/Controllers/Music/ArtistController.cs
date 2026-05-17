@@ -178,9 +178,8 @@ namespace Zune.Net.Catalog.Controllers.Music
         public async Task<ActionResult<Feed<Image>>> Images(Guid mbid)
         {
             (var dc_artist, var mb_artist) = await Discogs.GetDCArtistByMBID(mbid);
-            DateTime updated = DateTime.Now;
-            int dcid = dc_artist.Value<int>("id");
-            byte[] zero = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 };
+            var updated = DateTime.Now;
+            var dcid = dc_artist.Value<ulong>("id");
 
             Feed<Image> feed = new()
             {
@@ -195,8 +194,13 @@ namespace Zune.Net.Catalog.Controllers.Music
             {
                 feed.Entries = images.Select((j, idx) =>
                 {
+                    // TODO: Let's not use a special format just for Discogs images
                     // Encode DCID and image index in ID
-                    Guid imgId = new(dcid, (short)idx, 0, zero);
+                    Span<byte> bytes = stackalloc byte[16];
+                    BitConverter.TryWriteBytes(bytes, (uint)0);
+                    BitConverter.TryWriteBytes(bytes[sizeof(uint)..], (ushort)idx);
+                    BitConverter.TryWriteBytes(bytes[(sizeof(uint) + sizeof(ushort))..], dcid);
+                    var imgId = new Guid(bytes);
 
                     return new Image
                     {
