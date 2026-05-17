@@ -53,10 +53,12 @@ public class PropertyBag(IDictionary<IEntityProperty, object> properties = null)
     public bool TryGetValue(IEntityProperty key, [MaybeNullWhen(false)] out object value) =>
         _properties.TryGetValue(key, out value);
 
-    public object this[IEntityProperty key]
+    public object this[IEntityProperty prop]
     {
-        get => _properties[key];
-        set => _properties[key] = value;
+        get => _properties[prop];
+        set => _properties[prop] = prop is IParsableEntityProperty parsableProp && value is string valueStr
+            ? parsableProp.ParseObject(valueStr)
+            : value;
     }
 
     public ICollection<IEntityProperty> Keys => _properties.Keys;
@@ -129,7 +131,11 @@ public static class PropertyBagExtensions
             target.TryAdd(prop, value);
     }
     
-    public static T Get<T>(this IPropertyBag bag, TypedEntityProperty<T> prop) => (T)bag[prop];
+    public static T Get<T>(this IPropertyBag bag, ITypedEntityProperty<T> prop) => (T)bag[prop];
     
     public static IEnumerable<T> Get<T>(this IPropertyBag bag, TypedListEntityProperty<T> prop) => (IEnumerable<T>)bag[prop];
+    
+    public static void Set<T>(this IPropertyBag bag, ITypedEntityProperty<T> prop, T value) => bag[prop] = value;
+    
+    public static void Set<T>(this IPropertyBag bag, TypedListEntityProperty<T> prop, TypedEntityPropertyValueList<T> values) => bag[prop] = values;
 }

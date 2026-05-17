@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -29,9 +30,28 @@ public record EntityProperty(EntityType EntityType, EntityFact Fact) : IEntityPr
     public override string ToString() => $"{EntityType}.{Fact}";
 }
 
-public record TypedEntityProperty<T>(EntityType EntityType, EntityFact Fact)
-    : EntityProperty(EntityType, Fact)
+public interface IParsableEntityProperty : IEntityProperty
 {
+    object ParseObject(string value);
+}
+
+public interface ITypedEntityProperty<out T> : IParsableEntityProperty
+{
+    T Parse(string value);
+}
+
+public record TypedEntityProperty<T>(EntityType EntityType, EntityFact Fact)
+    : EntityProperty(EntityType, Fact), ITypedEntityProperty<T>
+{
+    public virtual T Parse(string value)
+    {
+        var converter = TypeDescriptor.GetConverter(typeof(T));
+        var result = converter.ConvertFromInvariantString(value);
+        return (T)result;
+    }
+    
+    public object ParseObject(string value) => Parse(value);
+
     public override int GetHashCode() => base.GetHashCode();
 
     protected override Type EqualityContract => base.EqualityContract;
@@ -39,7 +59,70 @@ public record TypedEntityProperty<T>(EntityType EntityType, EntityFact Fact)
     public override string ToString() => base.ToString();
 }
 
-public record TypedListEntityProperty<T>(EntityType EntityType, EntityFact Fact, TypedEntityProperty<T> ChildProperty)
+public interface ITypedEntityIdProperty<out TId, out TProviderEntities>
+    : ITypedEntityProperty<TId>
+    where TProviderEntities : Enum
+{
+    /// <summary>
+    /// The type of the entity this property applies to, specific to the provider of this identifier.
+    /// </summary>
+    TProviderEntities ProviderEntityType { get; }
+}
+
+public abstract class TypedEntityIdProperty<TId, TProviderEntities>
+    (TProviderEntities providerEntityType, EntityType entityType, EntityFact fact)
+    : ITypedEntityProperty<TId>
+    where TProviderEntities : Enum
+{
+    public TProviderEntities ProviderEntityType { get; } = providerEntityType;
+    public EntityType EntityType { get; } = entityType;
+    public EntityFact Fact { get; } = fact;
+    
+    public abstract TId Parse(string value);
+    public virtual object ParseObject(string value) => Parse(value);
+
+    public override bool Equals(object otherProp)
+    {
+        if (otherProp is null)
+            return false;
+        
+        if (ReferenceEquals(this, otherProp))
+            return true;
+        
+        if (otherProp is not TypedEntityIdProperty<TId, TProviderEntities> otherTypedIdProp)
+            return false;
+        
+        return ProviderEntityType.Equals(otherTypedIdProp.ProviderEntityType)
+            && EntityType == otherTypedIdProp.EntityType
+            && Fact == otherTypedIdProp.Fact;
+    }
+
+    public override int GetHashCode() => (ProviderEntityType, EntityType, Fact).GetHashCode();
+    
+    public override string ToString() => $"{typeof(TProviderEntities).Name}:{ProviderEntityType}.{Fact}";
+}
+
+/// <summary>
+/// Represents a property that is a reference to another entity using its identifier.
+/// </summary>
+/// <param name="EntityType">The type of the entity this property applies to.</param>
+/// <param name="Fact">The fact on the entity this property represents.</param>
+/// <param name="IdProperty">The property on the referenced entity that contains the identifier.</param>
+/// <typeparam name="TId">The type of the identifier for the referenced entity.</typeparam>
+/// <typeparam name="TProvider">An enum specifying who assigned this ID and what kind of provider entity it applies to.</typeparam>
+public record TypedEntityReferenceProperty<TId, TProvider>(EntityType EntityType, EntityFact Fact,
+    ITypedEntityIdProperty<TId, TProvider> IdProperty)
+    : EntityProperty(EntityType, Fact)
+    where TProvider : Enum
+{
+    public override int GetHashCode() => base.GetHashCode();
+
+    protected override Type EqualityContract => base.EqualityContract;
+    
+    public override string ToString() => $"{base.ToString()}<{IdProperty}>";
+}
+
+public record TypedListEntityProperty<T>(EntityType EntityType, EntityFact Fact, ITypedEntityProperty<T> ChildProperty)
     : EntityProperty(EntityType, Fact)
 {
     public override int GetHashCode() => base.GetHashCode();
@@ -53,54 +136,28 @@ public static class Ep
 {
     public static class Artist
     {
-        public static readonly TypedEntityProperty<string> Id = new(EntityType.Artist, EntityFact.ArtistId);
-        public static readonly TypedEntityProperty<string> AllMusicId = new(EntityType.Artist, EntityFact.AllMusicArtistId);
-        public static readonly TypedEntityProperty<int> DiscogsId = new(EntityType.Artist, EntityFact.DiscogsArtistId);
-        public static readonly TypedEntityProperty<int> DeezerId = new(EntityType.Artist, EntityFact.DeezerArtistId);
-        public static readonly TypedEntityProperty<string> LastFmId = new(EntityType.Artist, EntityFact.LastFmArtistId);
-        public static readonly TypedEntityProperty<Guid> MusicBrainzId = new(EntityType.Artist, EntityFact.MusicBrainzArtistId);
-        public static readonly TypedEntityProperty<string> SpotifyId = new(EntityType.Artist, EntityFact.SpotifyArtistId);
-        public static readonly TypedEntityProperty<int> TidalId = new(EntityType.Artist, EntityFact.TidalArtistId);
-        public static readonly TypedEntityProperty<string> WikidataPerformerId = new(EntityType.Artist, EntityFact.WikidataPerformerId);
-    
         public static readonly TypedEntityProperty<string> Name = new(EntityType.Artist, EntityFact.ArtistName);
-        public static TypedListEntityProperty<T> AlbumIds<T>(TypedEntityProperty<T> childProp) => new(EntityType.Album, EntityFact.ArtistAlbumIds, childProp);
-        public static TypedListEntityProperty<T> InfluenceIds<T>(TypedEntityProperty<T> childProp) => new(EntityType.Album, EntityFact.ArtistInfluenceIds, childProp);
-        public static TypedListEntityProperty<T> InfluencerIds<T>(TypedEntityProperty<T> childProp) => new(EntityType.Album, EntityFact.ArtistInfluencerIds, childProp);
-        public static TypedListEntityProperty<T> SimilarToIds<T>(TypedEntityProperty<T> childProp) => new(EntityType.Album, EntityFact.ArtistSimilarToIds, childProp);
+        public static TypedListEntityProperty<T> AlbumIds<T>(ITypedEntityProperty<T> childProp) => new(EntityType.Album, EntityFact.ArtistAlbumIds, childProp);
+        public static TypedListEntityProperty<T> InfluenceIds<T>(ITypedEntityProperty<T> childProp) => new(EntityType.Album, EntityFact.ArtistInfluenceIds, childProp);
+        public static TypedListEntityProperty<T> InfluencerIds<T>(ITypedEntityProperty<T> childProp) => new(EntityType.Album, EntityFact.ArtistInfluencerIds, childProp);
+        public static TypedListEntityProperty<T> SimilarToIds<T>(ITypedEntityProperty<T> childProp) => new(EntityType.Album, EntityFact.ArtistSimilarToIds, childProp);
         public static readonly TypedEntityProperty<string> Bio = new(EntityType.Artist, EntityFact.ArtistBio);
         public static readonly TypedListEntityProperty<string> ImageUrls = new(EntityType.Artist, EntityFact.ArtistImageUrls, Image.ImageUrl);
         public static readonly TypedListEntityProperty<string> PrimaryImageUrl = new(EntityType.Artist, EntityFact.ArtistPrimaryImageUrl, Image.ImageUrl);
-        
     }
 
     public static class Album
     {
-        public static readonly TypedEntityProperty<string> Id = new(EntityType.Album, EntityFact.AlbumId);
-        public static readonly TypedEntityProperty<string> AllMusicId = new(EntityType.Album, EntityFact.AllMusicAlbumId);
-        public static readonly TypedEntityProperty<int> AppleMusicId = new(EntityType.Album, EntityFact.AppleMusicAlbumId);
-        public static readonly TypedEntityProperty<int> DiscogsMasterId = new(EntityType.Album, EntityFact.DiscogsMasterId);
-        public static readonly TypedEntityProperty<int> DeezerId = new(EntityType.Album, EntityFact.DeezerAlbumId);
-        public static readonly TypedEntityProperty<string> LastFmId = new(EntityType.Album, EntityFact.LastFmAlbumId);
-        public static readonly TypedEntityProperty<Guid> MusicBrainzReleaseGroupId = new(EntityType.Album, EntityFact.MusicBrainzReleaseGroupId);
-        public static readonly TypedEntityProperty<Guid> MusicBrainzReleaseId = new(EntityType.Album, EntityFact.MusicBrainzReleaseId);
-        public static readonly TypedEntityProperty<string> SpotifyId = new(EntityType.Album, EntityFact.SpotifyAlbumId);
-        public static readonly TypedEntityProperty<int> TidalId = new(EntityType.Album, EntityFact.TidalAlbumId);
-    
         public static readonly TypedEntityProperty<string> Name = new(EntityType.Album, EntityFact.AlbumName);
-        public static TypedListEntityProperty<T> TrackIds<T>(TypedEntityProperty<T> childProp) => new(EntityType.Album, EntityFact.AlbumTrackIds, childProp);
-        public static TypedListEntityProperty<T> SimilarToIds<T>(TypedEntityProperty<T> childProp) => new(EntityType.Album, EntityFact.AlbumSimilarToIds, childProp);
+        public static TypedListEntityProperty<T> TrackIds<T>(ITypedEntityProperty<T> childProp) => new(EntityType.Album, EntityFact.AlbumTrackIds, childProp);
+        public static TypedListEntityProperty<T> SimilarToIds<T>(ITypedEntityProperty<T> childProp) => new(EntityType.Album, EntityFact.AlbumSimilarToIds, childProp);
         public static readonly TypedEntityProperty<string> ArtistId = new(EntityType.Album, EntityFact.AlbumArtistId);
-        public static readonly TypedEntityProperty<string> ImageId = new(EntityType.Album, EntityFact.AlbumImageId);
+        public static TypedEntityProperty<T> ImageId<T>(ITypedEntityProperty<T> imageProp) => new(EntityType.Album, EntityFact.AlbumImageId);
         public static readonly TypedEntityProperty<string> ImageUrl = new(EntityType.Album, EntityFact.AlbumImageUrl);
     }
 
     public static class Image
     {
-        public static readonly TypedEntityProperty<string> Id = new(EntityType.Image, EntityFact.ImageId);
-        public static readonly TypedEntityProperty<Guid> CoverArtArchiveId = new(EntityType.Image, EntityFact.CoverArtArchiveId);
-        public static readonly TypedEntityProperty<Guid> ZuneId = new(EntityType.Image, EntityFact.ZuneImageId);
-    
         public static readonly TypedEntityProperty<string> ImageUrl = new(EntityType.Image, EntityFact.ImageUrl);
         public static readonly TypedEntityProperty<System.IO.Stream> ImageStream = new(EntityType.Image, EntityFact.ImageStream);
     }
@@ -119,6 +176,8 @@ public enum EntityType
 
 public enum EntityFact
 {
+    Unknown,
+    
     /* Artists */
     AllMusicArtistId,
     BandcampArtistId,
@@ -166,6 +225,13 @@ public enum EntityFact
     AlbumArtist,
     AlbumImageId,
     AlbumImageUrl,
+    
+    /* Tracks */
+    TrackId,
+    TrackName,
+    TrackNumber,
+    TrackDuration,
+    TrackDiscNumber,
     
     /* Images */
     BandcampImageId,

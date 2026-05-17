@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Zune.Net.Helpers;
+using Zune.Net.Ontology.Identifiers;
 
 namespace Zune.Net.Ontology.Mappers;
 
@@ -16,22 +17,21 @@ public class DiscogsPropertyMapper : IPropertyMapper
         
         try
         {
-            var inputProperty = inputs.Keys.Single(p =>
-                p.Fact is EntityFact.DiscogsArtistId or EntityFact.DiscogsMasterId);
-            
-            var dcid = Convert.ToInt32(inputs[inputProperty]);
+            var inputProperty = inputs.Keys.OfType<DiscogsIdProperty>().Single();
+            var dcid = inputs.Get(inputProperty);
             
             if (inputProperty.EntityType is EntityType.Artist)
             {
                 var dcArtist = await Discogs.GetDCArtistByDCID(dcid);
                 
                 var name = dcArtist.Value<string>("name");
-                outputs[Ep.Artist.Name] = name;
+                outputs.Set(Ep.Artist.Name, name);
 
                 if (desiredOutputs.Contains(Ep.Artist.Bio))
                 {
-                    var bio = Discogs.DCProfileToBiographyContent(dcArtist.Value<string>("profile")).Value;
-                    outputs[Ep.Artist.Bio] = bio;
+                    var profile = dcArtist.Value<string>("profile");
+                    var bio = Discogs.DCProfileToBiographyContent(profile).Value;
+                    outputs.Set(Ep.Artist.Bio, bio);
                 }
             }
         }
@@ -45,7 +45,7 @@ public class DiscogsPropertyMapper : IPropertyMapper
     private static IEnumerable<PropertyMapping> GetAvailableMappings()
     {
         yield return new PropertyMapping(10,
-            [Ep.Artist.DiscogsId],
+            [DiscogsIdProperty.Artist],
             [
                 Ep.Artist.Name,
                 Ep.Artist.Bio,

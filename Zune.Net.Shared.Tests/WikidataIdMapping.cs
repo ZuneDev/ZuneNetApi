@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Zune.Net.Ontology;
+using Zune.Net.Ontology.Identifiers;
 using Zune.Net.Ontology.Mappers;
 
 namespace Zune.Net.Shared.Tests;
@@ -21,8 +22,8 @@ public class Tests
     {
         var mbid = new Guid("534ee493-bfac-4575-a44a-0ae41e2c3fe4");
         var dcid = await _mapper.MapAsync(
-            Ep.Artist.MusicBrainzId, mbid,
-            Ep.Artist.DiscogsId);
+            MusicBrainzIdProperty.Artist, mbid,
+            DiscogsIdProperty.Artist);
 
         Assert.That(dcid, Is.EqualTo(61800));
     }
@@ -32,7 +33,7 @@ public class Tests
     {
         var mbid = new Guid("534ee493-bfac-4575-a44a-0ae41e2c3fe4");
         var name = await _mapper.MapAsync(
-            Ep.Artist.MusicBrainzId, mbid,
+            MusicBrainzIdProperty.Artist, mbid,
             Ep.Artist.Name);
 
         Assert.That(name, Is.EqualTo("Rush"));
@@ -47,7 +48,7 @@ public class Tests
         stopwatch.Start();
 
         var result = await _mapper.MapAsync(
-            Ep.Artist.MusicBrainzId, mbid,
+            MusicBrainzIdProperty.Artist, mbid,
             [Ep.Artist.Name, Ep.Artist.Bio]);
 
         stopwatch.Stop();
@@ -109,17 +110,17 @@ public class Tests
     }
 
     [Test]
-    public async Task MapArtistMbidToDcidUsingWikidata()
+    public async Task GetArtistDcidFromMbidUsingWikidata()
     {
         var wikidataIdMapper = new WikidataIdMapper();
         
         var mbid = new Guid("534ee493-bfac-4575-a44a-0ae41e2c3fe4");
-        var targetProperty = Ep.Artist.DiscogsId;
+        var targetProperty = DiscogsIdProperty.Artist;
         
         var output = await wikidataIdMapper.ExecuteAsync(
             new PropertyBag
             {
-                [Ep.Artist.MusicBrainzId] = mbid,
+                [MusicBrainzIdProperty.Artist] = mbid,
             },
             [targetProperty]);
 
