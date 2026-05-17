@@ -177,14 +177,17 @@ public class WikidataIdMapper : IPropertyMapper
 
         HashSet<PropertyMapping> mappings = new(EntityToWikidataPropMap.Count * 10);
         
-        foreach (var (inputEntityProp, wkProp) in EntityToWikidataPropMap)
+        foreach (var (inputEntityProp, _) in EntityToWikidataPropMap)
         {
-            IPropertySet inputs = [inputEntityProp];
+            IReadOnlyPropertySet inputs = [inputEntityProp];
                 
             var outputs = EntityToWikidataPropMap.Keys
                 .Where(p => p.EntityType == inputEntityProp.EntityType)
-                .Where(p => p != inputEntityProp)
+                .Where(p => !p.Equals(inputEntityProp))
                 .ToPropertySet();
+
+            if (outputs.Count is 0)
+                continue;
                 
             mappings.Add(new PropertyMapping(cost, inputs, outputs));
         }
