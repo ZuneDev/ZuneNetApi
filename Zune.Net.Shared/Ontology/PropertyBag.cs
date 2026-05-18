@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Zune.Net.Ontology.BaseProperties;
 
 namespace Zune.Net.Ontology;
 
@@ -133,9 +134,9 @@ public static class PropertyBagExtensions
     
     public static T Get<T>(this IPropertyBag bag, ITypedEntityProperty<T> prop) => (T)bag[prop];
     
-    public static IEnumerable<T> Get<T>(this IPropertyBag bag, TypedListEntityProperty<T> prop) => (IEnumerable<T>)bag[prop];
+    public static IEnumerable<T> Get<T>(this IPropertyBag bag, TypedEntityListProperty<T> prop) => (IEnumerable<T>)bag[prop];
     
     public static void Set<T>(this IPropertyBag bag, ITypedEntityProperty<T> prop, T value) => bag[prop] = value;
     
-    public static void Set<T>(this IPropertyBag bag, TypedListEntityProperty<T> prop, TypedEntityPropertyValueList<T> values) => bag[prop] = values;
+    public static void Set<T>(this IPropertyBag bag, TypedEntityListProperty<T> prop, TypedEntityPropertyValueList<T> values) => bag[prop] = values;
 }

@@ -1,16 +1,18 @@
+using Zune.Net.Ontology.BaseProperties;
+
 namespace Zune.Net.Ontology.Identifiers;
 
 public class AppleMusicIdProperty(AppleMusicEntityType providerEntityType, EntityType entityType, EntityFact fact)
     : TypedEntityIdProperty<ulong, AppleMusicEntityType>(providerEntityType, entityType, fact)
 {
     public static AppleMusicIdProperty Album => new(AppleMusicEntityType.Album,
-        EntityType.Album, EntityFact.AlbumId);
+        EntityType.Album, EntityFact.Album);
     
     public static AppleMusicIdProperty Artist => new(AppleMusicEntityType.Artist,
-        EntityType.Artist, EntityFact.ArtistId);
+        EntityType.Artist, EntityFact.Artist);
     
     public static AppleMusicIdProperty Track => new(AppleMusicEntityType.Track,
-        EntityType.Track, EntityFact.TrackId);
+        EntityType.Track, EntityFact.Track);
 
     public override ulong Parse(string value) => ulong.Parse(value);
 }

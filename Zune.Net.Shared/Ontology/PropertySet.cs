@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Zune.Net.Ontology.BaseProperties;
 
 namespace Zune.Net.Ontology;
 

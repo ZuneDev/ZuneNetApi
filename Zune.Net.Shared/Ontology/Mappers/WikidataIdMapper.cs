@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using VDS.RDF;
 using VDS.RDF.Query;
+using Zune.Net.Ontology.BaseProperties;
 using Zune.Net.Ontology.Identifiers;
 
 namespace Zune.Net.Ontology.Mappers;

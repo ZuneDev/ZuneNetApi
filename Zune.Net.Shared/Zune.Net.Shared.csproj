@@ -24,6 +24,12 @@
         <PackageReference Include="PodcastAPI" Version="1.1.6" />
         <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
         <!--<PackageReference Include="Inflatable.Lastfm" Version="1.2.0" />-->
+        
+        <ProjectReference Include="..\Zune.Net.Roslyn\Zune.Net.Roslyn.csproj"
+                          PrivateAssets="all"
+                          ReferenceOutputAssembly="false"
+                          OutputItemType="Analyzer"
+                          SetTargetFramework="TargetFramework=netstandard2.0" />
     </ItemGroup>
 
     <ItemGroup>

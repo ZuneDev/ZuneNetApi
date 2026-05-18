@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using OwlCore.Extensions;
-
+using Zune.Net.Ontology.BaseProperties;
 using Hyperpath = System.Collections.Immutable.ImmutableList<Zune.Net.Ontology.PropertyMapperHyperedge>;
 using RankedHyperpath = System.Linq.IOrderedEnumerable<System.Collections.Immutable.ImmutableList<Zune.Net.Ontology.PropertyMapperHyperedge>>;
 

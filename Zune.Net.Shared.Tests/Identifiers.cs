@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Zune.Net.Ontology;
+using Zune.Net.Ontology.BaseProperties;
 using Zune.Net.Ontology.Identifiers;
 
 namespace Zune.Net.Shared.Tests;
@@ -20,7 +21,6 @@ public class Identifiers
             
             Assert.That<IEntityProperty>(MusicBrainzIdProperty.ReleaseGroup, Is.Not.EqualTo(DiscogsIdProperty.Artist));
             Assert.That<IEntityProperty>(DiscogsIdProperty.Track, Is.Not.EqualTo(MusicBrainzIdProperty.Artist));
-            Assert.That<IEntityProperty>(MusicBrainzIdProperty.CoverArt, Is.Not.EqualTo(DiscogsIdProperty.Release));
             Assert.That<IEntityProperty>(DiscogsIdProperty.Master, Is.Not.EqualTo(TidalIdProperty.Track));
             Assert.That<IEntityProperty>(SpotifyIdProperty.Track, Is.Not.EqualTo(AllMusicIdProperty.Album));
         });

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Zune.Net.Ontology.BaseProperties;
 
 namespace Zune.Net.Ontology;
 
