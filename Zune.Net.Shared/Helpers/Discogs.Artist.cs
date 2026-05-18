@@ -28,16 +28,6 @@ namespace Zune.Net.Helpers
             return (await GetDCArtistByMBArtist(mbArtist), mbArtist);
         }
 
-        public static async Task<JObject> GetDCArtistByMBID(Guid mbid, BatchIdMapper mapper)
-        {
-            var artistIds = await mapper.GetArtistIdsByMbidAsync(mbid);
-            var dcid = artistIds?.Discogs;
-            if (dcid is null)
-                return null;
-
-            return await GetDCArtistByDCID(dcid.Value);
-        }
-
         public static async Task<JObject> GetDCArtistByMBArtist(IArtist mb_artist)
         {
             var discogs_rel = mb_artist.Relationships.FirstOrDefault(rel => rel.Type == "discogs");

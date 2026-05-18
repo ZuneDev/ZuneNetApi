@@ -49,8 +49,8 @@ public class DiscogsPropertyMapper : IPropertyMapper
             [
                 Ep.Artist.Name,
                 Ep.Artist.Bio,
-                Ep.Artist.ImageUrls,
-                Ep.Artist.PrimaryImageUrl,
+                // TODO: Ep.Artist.Image,
+                Ep.Artist.PrimaryImageInstances,
             ]);
     }
 }

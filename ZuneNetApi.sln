@@ -50,6 +50,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{FEF0C02A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zune.Net.Shared.Tests", "Zune.Net.Shared.Tests\Zune.Net.Shared.Tests.csproj", "{3B6A26F5-4A1D-47DE-A6BB-8C486DD79FA9}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Meta", "Meta", "{1E6B1D55-17EC-4152-B573-CB33C48CBEC1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zune.Net.Roslyn", "Zune.Net.Roslyn\Zune.Net.Roslyn.csproj", "{DAE1E342-5039-4BB4-B823-5B25C7C09506}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -132,6 +136,10 @@ Global
 		{3B6A26F5-4A1D-47DE-A6BB-8C486DD79FA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3B6A26F5-4A1D-47DE-A6BB-8C486DD79FA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3B6A26F5-4A1D-47DE-A6BB-8C486DD79FA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAE1E342-5039-4BB4-B823-5B25C7C09506}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAE1E342-5039-4BB4-B823-5B25C7C09506}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAE1E342-5039-4BB4-B823-5B25C7C09506}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAE1E342-5039-4BB4-B823-5B25C7C09506}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -146,6 +154,7 @@ Global
 		{CCC46068-7D2D-4FAE-BD30-BC8B2CE15888} = {17BB2AA9-D664-4055-9139-6828A1C23634}
 		{1BD6D313-83B0-4A74-9ABB-0D8ACDF3245F} = {17BB2AA9-D664-4055-9139-6828A1C23634}
 		{3B6A26F5-4A1D-47DE-A6BB-8C486DD79FA9} = {FEF0C02A-04A8-4DBC-9F07-BB05C34716A8}
+		{DAE1E342-5039-4BB4-B823-5B25C7C09506} = {1E6B1D55-17EC-4152-B573-CB33C48CBEC1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5B0D462F-33A1-4F5C-9959-52FC4FB337A6}
