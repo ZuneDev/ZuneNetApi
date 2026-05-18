@@ -11,9 +11,6 @@ public record EntityProperty(EntityType EntityType, EntityFact Fact) : IEntityPr
     public override string ToString() => $"{EntityType}.{Fact}";
 }
 
-public interface IParsableEntityProperty : IEntityProperty
-{
-    object ParseObject(string value);
-}
-
 public interface ITypedEntityProperty<out T> : IEntityProperty;
+
+public record TypedEntityProperty<T>(EntityType EntityType, EntityFact Fact) : ITypedEntityProperty<T>;

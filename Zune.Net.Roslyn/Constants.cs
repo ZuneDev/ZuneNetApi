@@ -17,4 +17,7 @@ public static class Constants
     
     public const string EntityReferenceListPropertyAttribute = "EntityReferenceListPropertyAttribute";
     public const string EntityReferenceListPropertyAttributeFqn = $"{ZuneNetOntologyCore}.{EntityReferenceListPropertyAttribute}";
+    
+    public const string EntityIdPropertyAttribute = "EntityIdPropertyAttribute";
+    public const string EntityIdPropertyAttributeFqn = $"{ZuneNetOntologyCore}.{EntityIdPropertyAttribute}";
 }
