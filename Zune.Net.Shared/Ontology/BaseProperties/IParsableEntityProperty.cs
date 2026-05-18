@@ -3,6 +3,11 @@ using System.ComponentModel;
 
 namespace Zune.Net.Ontology.BaseProperties;
 
+public interface IParsableEntityProperty : IEntityProperty
+{
+    object ParseObject(string value);
+}
+
 public interface IParsableTypedEntityProperty<out T> : ITypedEntityProperty<T>, IParsableEntityProperty
 {
     T Parse(string value);

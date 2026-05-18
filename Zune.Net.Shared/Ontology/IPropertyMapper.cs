@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Threading.Tasks;
 using Zune.Net.Ontology.BaseProperties;
 using Zune.Net.Ontology.Core;
@@ -22,44 +23,61 @@ public record PropertyMapping(int Cost, IReadOnlyPropertySet Inputs, IReadOnlyPr
 
 public static partial class Ep
 {
-    public static class Artist
+    [EntityReferenceProperty(EntityFact.PrimaryImage)]
+    [EntityReferenceListProperty(EntityFact.Album)]
+    [EntityReferenceListProperty(EntityFact.Image)]
+    [EntityReferenceListProperty(EntityFact.Influenced)]
+    [EntityReferenceListProperty(EntityFact.InfluencedBy)]
+    [EntityReferenceListProperty(EntityFact.SimilarTo)]
+    public static partial class Artist
     {
         public static readonly EntityStringProperty Name = new(EntityType.Artist, EntityFact.Name);
+        public static readonly EntityStringProperty Bio = new(EntityType.Artist, EntityFact.Bio);
         
-        public static TypedEntityReferenceProperty<TId, TProvider> ImageId<TId, TProvider>(ITypedEntityIdProperty<TId, TProvider> imageProp)
-            where TProvider : Enum
-            => new(EntityType.Album, EntityFact.PrimaryImage, imageProp);
-        
-        public static TypedEntityListProperty<T> AlbumIds<T>(ITypedEntityProperty<T> childProp) => new(EntityType.Artist, EntityFact.Album, childProp);
-        
-        public static TypedEntityListProperty<T> InfluenceIds<T>(ITypedEntityProperty<T> childProp) => new(EntityType.Artist, EntityFact.InfluencedBy, childProp);
-        
-        public static TypedEntityListProperty<T> InfluencerIds<T>(ITypedEntityProperty<T> childProp) => new(EntityType.Artist, EntityFact.Influenced, childProp);
-        
-        public static TypedEntityListProperty<T> SimilarToIds<T>(ITypedEntityProperty<T> childProp) => new(EntityType.Artist, EntityFact.SimilarTo, childProp);
-        
-        public static readonly ParsableTypedEntityProperty<string> Bio = new(EntityType.Artist, EntityFact.Bio);
-        
-        public static readonly TypedEntityListProperty<string> PrimaryImageInstances = new(EntityType.Artist, EntityFact.PrimaryImage, ImageInstance.Url);
+        public static readonly TypedEntityListProperty<string> PrimaryImageInstances =
+            new(EntityType.Artist, EntityFact.PrimaryImage, ImageInstance.Url);
     }
 
     [EntityReferenceProperty(EntityFact.Artist)]
     [EntityReferenceProperty(EntityFact.PrimaryImage)]
-    [EntityReferenceListProperty(EntityFact.Track)]
     [EntityReferenceListProperty(EntityFact.SimilarTo)]
+    [EntityReferenceListProperty(EntityFact.Track)]
+    [EntityReferenceListProperty(EntityFact.Genre)]
     public static partial class Album
     {
         public static readonly EntityStringProperty Name = new(EntityType.Album, EntityFact.Name);
-        
-        public static TypedEntityListProperty<T> TrackIds<T>(ITypedEntityProperty<T> childProp) => new(EntityType.Album, EntityFact.Track, childProp);
-        public static EntityListProperty TrackIds(IEntityProperty childProp) => new(EntityType.Album, EntityFact.Track, childProp);
-        
-        public static TypedEntityListProperty<T> SimilarToIds<T>(ITypedEntityProperty<T> childProp) => new(EntityType.Album, EntityFact.SimilarTo, childProp);
+        public static readonly ParsableTypedEntityProperty<TimeSpan> Duration = new(EntityType.Album, EntityFact.Duration);
+        public static readonly ParsableTypedEntityProperty<int> TrackCount = new(EntityType.Album, EntityFact.Size1D);
+    }
+    
+    [EntityReferenceProperty(EntityFact.Artist)]
+    [EntityReferenceProperty(EntityFact.Album)]
+    [EntityReferenceListProperty(EntityFact.Genre)]
+    [EntityReferenceListProperty(EntityFact.SimilarTo)]
+    public static partial class Track
+    {
+        public static readonly EntityStringProperty Name = new(EntityType.Track, EntityFact.Name);
+        public static readonly ParsableTypedEntityProperty<TimeSpan> Duration = new(EntityType.Track, EntityFact.Duration);
+        public static readonly ParsableTypedEntityProperty<int> Number = new(EntityType.Track, EntityFact.Number);
+        public static readonly ParsableTypedEntityProperty<int> DiscNumber = new(EntityType.Track, EntityFact.DiscNumber);
+    }
+
+    [EntityReferenceListProperty(EntityFact.ImageInstance)]
+    public static partial class Image
+    {
     }
 
     public static class ImageInstance
     {
-        public static readonly EntityStringProperty Url = new(EntityType.Image, EntityFact.Url);
+        public static readonly EntityStringProperty Url = new(EntityType.ImageInstance, EntityFact.Url);
+        public static readonly TypedEntityProperty<Size> Size = new(EntityType.ImageInstance, EntityFact.Size2D);
+    }
+    
+    [EntityReferenceListProperty(EntityFact.Album)]
+    [EntityReferenceListProperty(EntityFact.Track)]
+    public static partial class Genre
+    {
+        public static readonly EntityStringProperty Name = new(EntityType.Track, EntityFact.Name);
     }
 }
 
@@ -85,6 +103,7 @@ public enum EntityFact
     Artist,
     Album,
     Track,
+    Genre,
     Influenced,
     InfluencedBy,
     SimilarTo,
@@ -92,8 +111,9 @@ public enum EntityFact
     PrimaryImage,
     ImageInstance,
     Url,
-    Size2D,
     Duration,
     Number,
-    DiscNumber
+    DiscNumber,
+    Size1D,
+    Size2D,
 }
