@@ -2,17 +2,12 @@ using Zune.Net.Ontology.BaseProperties;
 
 namespace Zune.Net.Ontology.Identifiers;
 
-public class SpotifyIdProperty(SpotifyEntityType providerEntityType, EntityType entityType, EntityFact fact)
-    : TypedEntityIdProperty<string, SpotifyEntityType>(providerEntityType, entityType, fact)
+public class SpotifyIdProperty(SpotifyEntityType providerEntityType, EntityType entityType)
+    : TypedEntityIdProperty<string, SpotifyEntityType>(providerEntityType, entityType)
 {
-    public static SpotifyIdProperty Artist => new(SpotifyEntityType.Artist,
-        EntityType.Artist, EntityFact.Artist);
-    
-    public static SpotifyIdProperty Album => new(SpotifyEntityType.Album,
-        EntityType.Album, EntityFact.Album);
-    
-    public static SpotifyIdProperty Track => new(SpotifyEntityType.Track,
-        EntityType.Track, EntityFact.Track);
+    public static SpotifyIdProperty Artist => new(SpotifyEntityType.Artist, EntityType.Artist);
+    public static SpotifyIdProperty Album => new(SpotifyEntityType.Album, EntityType.Album);
+    public static SpotifyIdProperty Track => new(SpotifyEntityType.Track, EntityType.Track);
 
     public override string Parse(string value) => value;
 }
