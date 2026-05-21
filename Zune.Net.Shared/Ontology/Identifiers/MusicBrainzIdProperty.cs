@@ -3,20 +3,14 @@ using Zune.Net.Ontology.BaseProperties;
 
 namespace Zune.Net.Ontology.Identifiers;
 
-public class MusicBrainzIdProperty(MusicBrainzEntityType providerEntityType, EntityType entityType, EntityFact fact)
-    : TypedEntityIdProperty<Guid, MusicBrainzEntityType>(providerEntityType, entityType, fact)
+public class MusicBrainzIdProperty(MusicBrainzEntityType providerEntityType, EntityType entityType)
+    : TypedEntityIdProperty<Guid, MusicBrainzEntityType>(providerEntityType, entityType)
 {
-    public static MusicBrainzIdProperty Artist => new(MusicBrainzEntityType.Artist,
-        EntityType.Artist, EntityFact.Artist);
+    public static MusicBrainzIdProperty Artist => new(MusicBrainzEntityType.Artist, EntityType.Artist);
     
-    public static MusicBrainzIdProperty Release => new(MusicBrainzEntityType.Release,
-        EntityType.Album, EntityFact.Album);
-    
-    public static MusicBrainzIdProperty ReleaseGroup => new(MusicBrainzEntityType.ReleaseGroup,
-        EntityType.Unknown, EntityFact.Unknown);
-    
-    public static MusicBrainzIdProperty Recording => new(MusicBrainzEntityType.Recording,
-        EntityType.Track, EntityFact.Track);
+    public static MusicBrainzIdProperty Release => new(MusicBrainzEntityType.Release, EntityType.Album);
+    public static MusicBrainzIdProperty ReleaseGroup => new(MusicBrainzEntityType.ReleaseGroup, EntityType.Unknown);
+    public static MusicBrainzIdProperty Recording => new(MusicBrainzEntityType.Recording, EntityType.Track);
 
     public static TypedEntityListProperty<Guid> ArtistReleases => Ep.Artist.AlbumIds(Release);
 

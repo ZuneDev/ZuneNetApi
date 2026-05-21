@@ -22,14 +22,14 @@ public interface ITypedEntityIdProperty<out TIdValue, out TProviderEntities>
 }
 
 public abstract class TypedEntityIdProperty<TIdValue, TProviderEntities>
-    (TProviderEntities providerEntityType, EntityType entityType, EntityFact fact)
+    (TProviderEntities providerEntityType, EntityType entityType)
     : ITypedEntityIdProperty<TIdValue, TProviderEntities>
     where TProviderEntities : Enum
 {
     public TProviderEntities ProviderEntityType { get; } = providerEntityType;
     public EntityType EntityType { get; } = entityType;
-    public EntityFact Fact { get; } = fact;
-    
+    public EntityFact Fact => EntityFact.Id;
+
     public abstract TIdValue Parse(string value);
     public virtual object ParseObject(string value) => Parse(value);
 

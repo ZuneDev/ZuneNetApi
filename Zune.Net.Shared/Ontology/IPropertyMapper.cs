@@ -33,9 +33,6 @@ public static partial class Ep
     {
         public static readonly EntityStringProperty Name = new(EntityType.Artist, EntityFact.Name);
         public static readonly EntityStringProperty Bio = new(EntityType.Artist, EntityFact.Bio);
-        
-        public static readonly TypedEntityListProperty<string> PrimaryImageInstances =
-            new(EntityType.Artist, EntityFact.PrimaryImage, ImageInstance.Url);
     }
 
     [EntityReferenceProperty(EntityFact.Artist)]
