@@ -22,6 +22,8 @@ namespace Zune.Net.Catalog.Image
         {
             services.AddControllersWithViews(o => o.UseZestFormatters());
             
+            services.AddSingleton<IdMapper>();
+            
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll", Extensions.PermissiveCorsPolicy);
