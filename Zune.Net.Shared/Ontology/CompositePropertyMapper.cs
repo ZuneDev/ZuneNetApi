@@ -33,16 +33,25 @@ public class CompositePropertyMapper(PropertyMapperRegistry mapperRegistry)
     {
         return await MapAsync((IEntityProperty)sourceProperty, source, targetProperties);
     }
-    
+
     public async Task<IPropertyBag> MapAsync(IEntityProperty sourceProperty,
         object source, IReadOnlyPropertySet targetProperties)
     {
-        DebugInfo = new();
-        
         PropertyBag variables = new()
         {
             [sourceProperty] = source
         };
+        
+        await MapAsync(variables, targetProperties);
+        
+        return variables;
+    }
+    
+    public async Task MapAsync(PropertyBag variables, IReadOnlyPropertySet targetProperties)
+    {
+        DebugInfo = new();
+
+        var sourceProperties = variables.AsReadOnlyPropertySet();
 
         var rankedPaths = GetOrComputeMap(
             variables.AsReadOnlyPropertySet(),
@@ -55,7 +64,7 @@ public class CompositePropertyMapper(PropertyMapperRegistry mapperRegistry)
             var remainingOutputs = targetProperties
                 .Union(path.SelectMany(n => n.Edge.Inputs))
                 .ToHashSet();
-            remainingOutputs.Remove(sourceProperty);
+            remainingOutputs.ExceptWith(sourceProperties);
 
             // Evaluated mappings, skipping ones we've already done (doesn't matter if it succeeded)
             foreach (var hyperedge in path.Where(hyperedge => !usedHyperedges.Contains(hyperedge)))
@@ -99,10 +108,8 @@ public class CompositePropertyMapper(PropertyMapperRegistry mapperRegistry)
             
             // Check if we're done
             if (variables.TryGetForSet(targetProperties, out _))
-                return variables;
+                return;
         }
-        
-        return variables;
     }
     
     public RankedHyperpath GetOrComputeMap(

@@ -29,6 +29,9 @@ namespace Zune.Net.Roslyn.Generators
                     {
                         public EntityFact Fact => fact;
                     }
+                    
+                    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false), Embedded]
+                    internal sealed class {{Constants.EntityIdPropertyAttribute}} : Attribute;
                     """, Encoding.UTF8));
             });
         }

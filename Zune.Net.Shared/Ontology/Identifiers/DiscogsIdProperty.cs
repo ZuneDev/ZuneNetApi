@@ -14,6 +14,15 @@ public class DiscogsIdProperty(DiscogsEntityType providerEntityType, EntityType 
     public override ulong Parse(string value) => ulong.Parse(value);
 }
 
+public class DiscogsImageIdProperty(DiscogsEntityType providerEntityType, EntityType entityType)
+    : TypedEntityIdProperty<Uri, DiscogsEntityType>(providerEntityType, entityType)
+{
+    public static DiscogsImageIdProperty Image => new(DiscogsEntityType.Image, EntityType.Image);
+    public static DiscogsImageIdProperty Release => new(DiscogsEntityType.Release, EntityType.Album);
+
+    public override Uri Parse(string value) => new(value);
+}
+
 public enum DiscogsEntityType
 {
     Artist,
@@ -24,4 +33,6 @@ public enum DiscogsEntityType
     Composition,
     Style,
     Genre,
+    Image,
+    ImageInstance
 }

@@ -8,7 +8,23 @@ public interface IEntityReferenceProperty : IEntityProperty
 }
 
 public record EntityReferenceProperty(EntityType EntityType, EntityFact Fact, IEntityIdProperty IdProperty)
-    : IEntityReferenceProperty;
+    : IEntityReferenceProperty
+{
+    public virtual bool Equals(EntityReferenceProperty other)
+    {
+        if (other is null)
+            return false;
+        
+        if (EntityType != other.EntityType
+            || Fact != other.Fact)
+            return false;
+        
+        if (IdProperty is null || other.IdProperty is null)
+            return true;
+
+        return IdProperty.Equals(other.IdProperty);
+    }
+}
 
 /// <summary>
 /// Represents a property that is a reference to another entity using its identifier.

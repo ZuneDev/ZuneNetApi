@@ -148,7 +148,7 @@ namespace Zune.Net.Catalog.Controllers.Music
             [FromQuery] bool resize = false, [FromQuery(Name = "width")] int? requestedWidth = null,
             [FromQuery] string contentType = MediaTypeNames.Image.Jpeg)
         {
-            var dcArtist = await Discogs.GetDCArtistByMBID(mbid, batchIdMapper);
+            var (dcArtist, _) = await Discogs.GetDCArtistByMBID(mbid);
             var imgUrl = dcArtist["images"]?
                 .FirstOrDefault(i => i.Value<string>("type") == "primary")?
                 .Value<string>("uri");

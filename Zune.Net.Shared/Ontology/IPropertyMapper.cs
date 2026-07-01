@@ -23,6 +23,7 @@ public record PropertyMapping(int Cost, IReadOnlyPropertySet Inputs, IReadOnlyPr
 
 public static partial class Ep
 {
+    [EntityIdProperty]
     [EntityReferenceProperty(EntityFact.PrimaryImage)]
     [EntityReferenceListProperty(EntityFact.Album)]
     [EntityReferenceListProperty(EntityFact.Image)]
@@ -35,6 +36,7 @@ public static partial class Ep
         public static readonly EntityStringProperty Bio = new(EntityType.Artist, EntityFact.Bio);
     }
 
+    [EntityIdProperty]
     [EntityReferenceProperty(EntityFact.Artist)]
     [EntityReferenceProperty(EntityFact.PrimaryImage)]
     [EntityReferenceListProperty(EntityFact.SimilarTo)]
@@ -47,6 +49,7 @@ public static partial class Ep
         public static readonly ParsableTypedEntityProperty<int> TrackCount = new(EntityType.Album, EntityFact.Size1D);
     }
     
+    [EntityIdProperty]
     [EntityReferenceProperty(EntityFact.Artist)]
     [EntityReferenceProperty(EntityFact.Album)]
     [EntityReferenceListProperty(EntityFact.Genre)]
@@ -59,17 +62,20 @@ public static partial class Ep
         public static readonly ParsableTypedEntityProperty<int> DiscNumber = new(EntityType.Track, EntityFact.DiscNumber);
     }
 
+    [EntityIdProperty]
     [EntityReferenceListProperty(EntityFact.ImageInstance)]
     public static partial class Image
     {
     }
 
-    public static class ImageInstance
+    [EntityIdProperty]
+    public static partial class ImageInstance
     {
         public static readonly EntityStringProperty Url = new(EntityType.ImageInstance, EntityFact.Url);
         public static readonly TypedEntityProperty<Size> Size = new(EntityType.ImageInstance, EntityFact.Size2D);
     }
     
+    [EntityIdProperty]
     [EntityReferenceListProperty(EntityFact.Album)]
     [EntityReferenceListProperty(EntityFact.Track)]
     public static partial class Genre

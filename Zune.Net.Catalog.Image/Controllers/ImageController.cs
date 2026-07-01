@@ -8,12 +8,14 @@ using System.Threading.Tasks;
 using Zune.DB;
 using Zune.Net.Helpers;
 using Zune.Net.Ontology;
+using Zune.Net.Ontology.BaseProperties;
+using Zune.Net.Ontology.Identifiers;
 
 namespace Zune.Net.Catalog.Image.Controllers
 {
     [Route("/")]
     [Produces(Atom.Constants.ATOM_MIMETYPE)]
-    public class ImageController(ZuneNetContext database, BatchIdMapper batchIdMapper) : Controller
+    public class ImageController(ZuneNetContext database, CompositePropertyMapper propertyMapper) : Controller
     {
         private static readonly ConcurrentDictionary<ulong, JObject> DcArtistCache = new();
         private static readonly int[] CaaSupportedSizes = [250, 500, 1200];
@@ -61,8 +63,8 @@ namespace Zune.Net.Catalog.Image.Controllers
 			return await this.GetAndResizeImageAsync(imageUrl, resize, requestedWidth, contentType);
         }
 
-        [HttpGet, Route("music/artist/{id}/{type}")]
-        public async Task<IActionResult> ArtistImage(string id, string type,
+        [HttpGet, Route("music/artist/{mbid:guid}/{type}")]
+        public async Task<IActionResult> ArtistImage(Guid mbid, string type,
             [FromQuery] bool resize = false, [FromQuery(Name = "width")] int? requestedWidth = null,
             [FromQuery] string contentType = MediaTypeNames.Image.Jpeg)
         {
@@ -70,7 +72,10 @@ namespace Zune.Net.Catalog.Image.Controllers
 
             if (type == "primaryImage")
             {
-                var mbid = Guid.Parse(id);
+                await propertyMapper.MapAsync()
+                
+                var result = await propertyMapper.MapAsync(MusicBrainzIdProperty.Artist, mbid,
+                    Ep.Artist.PrimaryImageId(Ep.Image.Id));
                 var dcArtist = await Discogs.GetDCArtistByMBID(mbid, batchIdMapper);
 
                 imageUrl = dcArtist.Value<JArray>("images")?
@@ -78,7 +83,7 @@ namespace Zune.Net.Catalog.Image.Controllers
                     .Value<string>("uri");
             }
 
-            return await this.GetAndResizeImageAsync(imageUrl, true, requestedWidth, contentType);
+            return await this.GetAndResizeImageAsync(imageUrl, resize, requestedWidth, contentType);
         }
     }
 }
