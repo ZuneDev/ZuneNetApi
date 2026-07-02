@@ -227,7 +227,7 @@ namespace Zune.Net.Catalog.Controllers.Music
         public async Task<ActionResult<Feed<Artist>>> SimilarArtists(Guid mbid)
         {
             var relatedArtists = await LastFM.GetSimilarArtist(mbid);
-            var feed = LastFM.CreateFeed<Artist>($"/artist/{mbid}/similarArtists", "Similar");
+            var feed = LastFM.CreateFeed<Artist>(Request.Path.Value, "Similar");
             IdMapper mapped = new IdMapper();
             List<Guid> mbidList = [];
 
