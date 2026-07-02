@@ -8,8 +8,11 @@ namespace Zune.Xml.Catalog
     [XmlRoot("entry")]
     public class Artist : Entry
     {
-        [XmlElement("sortTitle")]
+        [XmlElement("sortTitle")] //Derived from Zune 4.8 UIX runtime code injection
         public string SortTitle { get; set; }
+
+        [XmlElement("sortName")] //Derived from Metadata Export Guide example xml, confirmed working with zhd
+        public string SortName { get; set; }
 
         [XmlElement("imageId")]
         public Guid ImageId { get; set; }
