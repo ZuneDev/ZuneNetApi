@@ -30,7 +30,7 @@ namespace Zune.Net.Helpers
         public static async Task<JObject> GetDCArtistByMBID(Guid mbid, IdMapper mapper)
         {
             var artistIds = await mapper.GetArtistIdsByMbidAsync(mbid);
-            if (int.TryParse(artistIds?.Discogs, out var dcid))
+            if (!int.TryParse(artistIds?.Discogs, out var dcid))
                 return null;
 
             return await GetDCArtistByDCID(dcid);
